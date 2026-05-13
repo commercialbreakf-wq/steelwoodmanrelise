@@ -108,7 +108,7 @@ body{background-color:#151311;color:#e7e2dd;-webkit-font-smoothing:antialiased}
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] text-on-surface-variant uppercase tracking-widest block">Контактный телефон</label>
-                            <input type="tel" name="phone" id="editPhone" oninput="maskPhoneGlobal(this)" class="w-full bg-surface-container-low border border-white/10 text-on-surface p-4 rounded-xl focus:border-primary focus:ring-0 outline-none transition-all" placeholder="+7-(000)-000-00-00">
+                            <input type="text" name="phone" id="editPhone" class="w-full bg-surface-container-low border-outline-variant/20 focus:border-primary text-on-surface font-body-md py-3 px-4 outline-none transition-all" placeholder="+7 (___) ___-__-__">
                         </div>
                         <div class="space-y-2 md:col-span-2">
                             <label class="text-[10px] text-on-surface-variant uppercase tracking-widest block">Название компании</label>
@@ -116,11 +116,11 @@ body{background-color:#151311;color:#e7e2dd;-webkit-font-smoothing:antialiased}
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] text-on-surface-variant uppercase tracking-widest block">ИНН</label>
-                            <input type="text" name="inn" id="editInn" maxlength="12" oninput="limitDigitsGlobal(this, 12)" class="w-full bg-surface-container-low border border-white/10 text-on-surface p-4 rounded-xl focus:border-primary focus:ring-0 outline-none transition-all" placeholder="10 или 12 цифр">
+                            <input type="text" name="inn" id="editInn" class="w-full bg-surface-container-low border-outline-variant/20 focus:border-primary text-on-surface font-body-md py-3 px-4 outline-none transition-all" placeholder="10 или 12 цифр">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] text-on-surface-variant uppercase tracking-widest block">КПП</label>
-                            <input type="text" name="kpp" id="editKpp" maxlength="9" oninput="limitDigitsGlobal(this, 9)" class="w-full bg-surface-container-low border border-white/10 text-on-surface p-4 rounded-xl focus:border-primary focus:ring-0 outline-none transition-all" placeholder="9 цифр">
+                            <input type="text" name="kpp" id="editKpp" class="w-full bg-surface-container-low border-outline-variant/20 focus:border-primary text-on-surface font-body-md py-3 px-4 outline-none transition-all" placeholder="9 цифр">
                         </div>
                         <div class="space-y-2 md:col-span-2">
                             <label class="text-[10px] text-on-surface-variant uppercase tracking-widest block">Юридический адрес</label>
@@ -209,23 +209,6 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
     
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
-    
-    // VALIDATION
-    const error = window.validateProfileDataGlobal(data);
-    if (error) {
-        // Shake the button and show error
-        btn.classList.add('bg-red-600');
-        btn.classList.replace('bg-primary', 'bg-red-600');
-        const originalBtnHTML = btn.innerHTML;
-        btn.innerHTML = `<span class="material-symbols-outlined text-sm">error</span> ${error.toUpperCase()}`;
-        
-        setTimeout(() => {
-            btn.classList.replace('bg-red-600', 'bg-primary');
-            btn.innerHTML = originalBtnHTML;
-            btn.disabled = false;
-        }, 3000);
-        return;
-    }
     
     try {
         const res = await fetch('/api/auth/profile', {

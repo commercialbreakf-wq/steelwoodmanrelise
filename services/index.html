@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="ru">
+<html class="dark snap-y snap-proximity scroll-smooth" lang="ru">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>Услуги резки | ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -68,7 +68,7 @@
 <main>
 <!-- Hero Section -->
 <!-- Hero Section -->
-<section id="hero" class="relative min-h-screen flex flex-col border-b border-white/5 bg-background pt-20">
+<section id="hero" class="relative min-h-[100dvh] flex flex-col border-b border-white/5 bg-background overflow-hidden pt-20 snap-start">
     <div class="absolute inset-0 z-0">
         <img alt="Cutting Technology" class="w-full h-full object-cover opacity-40 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKIhnDDjkKxjPSasFIRDus6vXEm0K2BrM59t36NPK2Xa4KGmCLrOu-Y1WgGm-V9W79o3JtMwXcc8e0t1gSqUvlucr2gv1j3JNhHyQj450j2R2G9cuuf8MKBGNfnG--NM_SHj5BUdC9x6yH5hxwNhSyvrDYNZuSeGmEMLrAdypXcYPCNcoNilF4rhJHl1kRC7So9nVRFC_MOBfUKdzmYdUpXSeujkJk76_iHOOS98AygV5OqJZguk6KgJp-yD1BYCMceI3p4wXfTes"/>
         <div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
@@ -85,13 +85,13 @@
             </div>
         </div>
     </div>
-    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 transition-opacity z-20">
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="document.getElementById('precision-stats').scrollIntoView({ behavior: 'smooth' })">
         <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
     </div>
 </section>
 
 <!-- Precision Stats Bento Grid -->
-<section id="precision-stats" class="min-h-screen flex flex-col justify-center py-12 md:py-24 px-margin-edge-mobile md:px-margin-edge bg-surface-container-lowest border-b border-white/5 scroll-mt-0">
+<section id="precision-stats" class="h-screen flex flex-col justify-center py-12 md:py-24 px-margin-edge-mobile md:px-margin-edge bg-surface-container-lowest border-b border-white/5 scroll-mt-0">
     <div class="max-w-[1440px] mx-auto w-full">
         <div class="mb-8 md:mb-16 max-w-2xl">
             <h2 class="font-display-xl text-3xl md:text-5xl uppercase mb-4 md:mb-6">Порог Допуска</h2>
@@ -117,7 +117,7 @@
     </div>
 </section>
 <!-- Technology Detail Sections -->
-<section id="laser-variants" class="md:min-h-screen flex flex-col justify-center py-24 px-margin-edge-mobile md:px-margin-edge metal-grid-bg scroll-mt-20">
+<section id="laser-variants" class="min-h-[100dvh] flex flex-col justify-center py-24 px-margin-edge-mobile md:px-margin-edge metal-grid-bg scroll-mt-20 overflow-hidden">
     <div class="max-w-[1440px] mx-auto w-full">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-gutter">
             <!-- Laser Cutting -->
@@ -145,7 +145,7 @@
     </div>
 </section>
 <!-- Technical Specification Table -->
-<section id="tech-matrix" class="md:min-h-screen flex flex-col justify-center py-24 px-margin-edge-mobile md:px-margin-edge bg-surface scroll-mt-20">
+<section id="tech-matrix" class="min-h-[100dvh] flex flex-col justify-center py-24 px-margin-edge-mobile md:px-margin-edge bg-surface scroll-mt-20 overflow-hidden">
 <div class="max-w-[1440px] mx-auto">
 <div class="mb-12 border-l-4 border-primary pl-8">
 <h2 class="font-display-xl text-3xl md:text-5xl uppercase mb-2">Техническая Матрица</h2>
@@ -236,7 +236,7 @@
 </div>
 </section>
 <!-- CTA + Footer Merged Section -->
-<section id="cta-footer-merged" class="md:min-h-screen flex flex-col border-t border-white/5 bg-background">
+<section id="cta-footer-merged" class="flex flex-col border-t border-white/5 bg-background overflow-hidden">
     <div class="relative flex-grow flex flex-col justify-center items-center px-margin-edge-mobile md:px-margin-edge py-12">
         <div class="absolute inset-0 z-0">
             <img alt="Industrial Detail" class="w-full h-full object-cover opacity-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdHaZEniaftwN6xbLuLGaQk4pLOcfckmgXV0dSSc7325ukmnxx1ow5c4u4ZjkitpRQwDEUVmzgWFUieE_HpwgjvgzUtJF3trNdrMXTC433OWXgMaA0zV5JE-c9CgSk4a_tmZFO48gTIIVnBDdDKVaNEPgLFZxBtXY_I-UsS-yUj8b3vEKvLKF0S30fY2YzPoqLK19Gj88Nd3p_HVUUfwea15Gn-fAl2rfCJwiPsbJzFN6JrbAqKkU-5cKNDeP6ViyvswCkaClABLs"/>

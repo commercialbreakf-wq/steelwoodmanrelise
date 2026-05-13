@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="dark" lang="ru">
 <head>
 <meta charset="utf-8"/>
@@ -58,7 +58,7 @@ tailwind.config = {
 <!-- Breadcrumbs & Search -->
 <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-12 gap-6">
 <nav id="breadcrumbs" class="flex items-center gap-2 font-label-caps text-[11px] md:text-[12px] text-on-surface-variant overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
-<a class="hover:text-primary transition-colors no-underline" href="/">ГЛАВНАЯ</a>
+<a class="hover:text-primary transition-colors no-underline" href="/hi_tech_style/code.html">ГЛАВНАЯ</a>
 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
 <span class="cursor-pointer hover:text-primary transition-colors" onclick="resetFilters()">КАТАЛОГ</span>
 </nav>
@@ -216,7 +216,7 @@ async function fetchProducts() {
 function updateBreadcrumbs() {
     const nav = document.getElementById('breadcrumbs');
     let html = `
-        <a class="hover:text-primary transition-colors no-underline" href="/">ГЛАВНАЯ</a>
+        <a class="hover:text-primary transition-colors no-underline" href="/hi_tech_style/code.html">ГЛАВНАЯ</a>
         <span class="material-symbols-outlined text-[14px]">chevron_right</span>
         <span class="cursor-pointer hover:text-primary transition-colors" onclick="resetFilters()">КАТАЛОГ</span>
     `;
@@ -365,7 +365,7 @@ function toggleSection(section) {
 function applyFilters() {
     currentPage = 1;
     fetchProducts();
-    window.scrollToTopGlobal();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function setFilterSize(value, catName) {
@@ -505,7 +505,7 @@ function renderPagination(nav) {
 
 function changePage(p) {
     currentPage = p;
-    window.scrollToTopGlobal();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     fetchProducts();
 }
 
@@ -606,11 +606,10 @@ function addToCart(id) {
 }
 
 function toggleAuthModal() {
-    window.location.href = '/';
+    window.location.href = '/cart/';
 }
 
 updateCartBadge();
 </script>
 </body>
 </html>
-

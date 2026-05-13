@@ -1,31 +1,90 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { createClient } = require('@supabase/supabase-js');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite'));
-const SECRET_KEY = 'iron-woodman-secret';
 
+// ============================================================
+// SUPABASE CLIENTS
+// ============================================================
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyYmtudXZuc3lvbm1ldWRvbGVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTA4MTYsImV4cCI6MjA5NDE4NjgxNn0.gEBVSWAOGZGB7IIVsVIs3MSO2UjZlG6UzTdOEK0grOc';
+
+// Service client — bypasses RLS, for server-side writes
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
+
+// Anon client — for verifying user tokens
+const supabaseAnon = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// EMAIL TRANSPORTER
+// ============================================================
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: 'egapega322@gmail.com',
+    pass: process.env.SMTP_PASS || 'n9CBCOuWpzfJLYuDw9d0'
+  }
+});
+
+// ============================================================
+// MIDDLEWARE
+// ============================================================
 app.use(cors());
 app.use(express.json());
+
+// ============================================================
+// URL REFACTORING: Old Stitch _N paths → Logical clean URLs
+// ============================================================
+const legacyRedirects = {
+  '/_1/code':         '/calculator/',
+  '/_1/code.html':    '/calculator/',
+  '/_2/code':         '/certificates/',
+  '/_2/code.html':    '/certificates/',
+  '/_4/code':         '/fleet/',
+  '/_4/code.html':    '/fleet/',
+  '/_5/code':         '/catalog/',
+  '/_5/code.html':    '/catalog/',
+  '/_6/code':         '/services/',
+  '/_6/code.html':    '/services/',
+  '/_7/code':         '/about/',
+  '/_7/code.html':    '/about/',
+  '/_8/code':         '/contacts/',
+  '/_8/code.html':    '/contacts/',
+  '/news.html':               '/news/',
+  '/news_trends_2026.html':   '/news/trends-2026/',
+  '/news_sheets_2026.html':   '/news/sheets-2026/',
+  '/news_market_adaptation.html': '/news/market-adaptation/',
+  '/cart.html':       '/cart/',
+  '/cabinet.html':    '/cabinet/',
+  '/catalog.html':    '/catalog/',
+};
 
 // Logging & Clean URL Middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  
-  // Redirect .html to clean path (except for index.html)
+
+  const legacyDest = legacyRedirects[req.path];
+  if (legacyDest) {
+    const query = req.url.slice(req.path.length);
+    return res.redirect(301, legacyDest + query);
+  }
+
   if (req.path.endsWith('.html') && req.path !== '/index.html') {
     const newPath = req.path.slice(0, -5);
     const query = req.url.slice(req.path.length);
-    return res.redirect(301, newPath + query);
+    return res.redirect(301, newPath + '/' + query);
   }
-  
-  // Redirect /index to /
+
   if (req.path === '/index') {
     return res.redirect(301, '/');
   }
@@ -33,488 +92,525 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from the project root with .html extension support
+// Static file serving
 app.use(express.static(path.join(__dirname), {
-  extensions: ['html']
+  extensions: ['html'],
+  index: 'index.html'
 }));
 
-// Specific route for catalog
-app.get('/catalog', (req, res) => {
-  res.sendFile(path.join(__dirname, 'catalog.html'));
+// ============================================================
+// PAGE ROUTES
+// ============================================================
+const pageRoutes = [
+  { path: '/calculator', dir: 'calculator' },
+  { path: '/certificates', dir: 'certificates' },
+  { path: '/fleet', dir: 'fleet' },
+  { path: '/catalog', dir: 'catalog' },
+  { path: '/services', dir: 'services' },
+  { path: '/about', dir: 'about' },
+  { path: '/contacts', dir: 'contacts' },
+  { path: '/news', dir: 'news' },
+  { path: '/cart', dir: 'cart' },
+  { path: '/cabinet', dir: 'cabinet' },
+];
+
+pageRoutes.forEach(({ path: routePath, dir }) => {
+  app.get(`${routePath}/`, (req, res) => {
+    res.sendFile(path.join(__dirname, dir, 'index.html'));
+  });
+  app.get(routePath, (req, res) => {
+    const query = req.url.slice(routePath.length);
+    res.redirect(301, `${routePath}/${query}`);
+  });
 });
 
-// Simple in-memory cache
+const newsArticles = ['trends-2026', 'sheets-2026', 'market-adaptation'];
+newsArticles.forEach(slug => {
+  app.get(`/news/${slug}/`, (req, res) => {
+    res.sendFile(path.join(__dirname, 'news', slug, 'index.html'));
+  });
+  app.get(`/news/${slug}`, (req, res) => {
+    res.redirect(301, `/news/${slug}/`);
+  });
+});
+
+const certs = ['certificate_carbon', 'certificate_eco', 'certificate_pipes', 'certificate_stainless', 'certificate_view'];
+certs.forEach(cert => {
+  app.get(`/certificates/${cert}`, (req, res) => {
+    res.sendFile(path.join(__dirname, 'certificates', `${cert}.html`));
+  });
+});
+
+// ============================================================
+// SIMPLE IN-MEMORY CACHE
+// ============================================================
 const cache = {
   data: {},
-  get(key) {
-    // const item = this.data[key];
-    // if (item && Date.now() < item.expires) return item.value;
-    return null;
-  },
-  set(key, value, ttl = 60000) { // Default 1 minute
+  get(key) { return null; }, // disable for fresh data; enable if needed
+  set(key, value, ttl = 60000) {
     this.data[key] = { value, expires: Date.now() + ttl };
   }
 };
 
-// API: Get filters (categories, parent categories)
-app.get('/api/filters', (req, res) => {
-  const cacheKey = 'filters';
-  const cached = cache.get(cacheKey);
-  if (cached) return res.json(cached);
-
-  db.all(`
-    SELECT 
-      parent_category, 
-      category, 
-      COUNT(*) as count 
-    FROM products 
-    GROUP BY parent_category, category
-  `, (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    
-    const filters = {
-      parentCategories: [...new Set(rows.map(r => r.parent_category))],
-      categories: rows.reduce((acc, r) => {
-        if (!acc[r.parent_category]) acc[r.parent_category] = [];
-        acc[r.parent_category].push({ name: r.category, count: r.count });
-        return acc;
-      }, {}),
-      totalCount: rows.reduce((sum, r) => sum + r.count, 0)
-    };
-    
-    cache.set(cacheKey, filters, 300000); // 5 minutes
-    res.json(filters);
-  });
-});
-
-// API: Get products with pagination and grouping
-app.get('/api/products', (req, res) => {
-  const { category, parent_category, search, vid, length, width, page = 1, limit = 12 } = req.query;
-  const offset = (parseInt(page) - 1) * parseInt(limit);
-  
-  const cacheKey = `products_${JSON.stringify(req.query)}`;
-  const cached = cache.get(cacheKey);
-  if (cached) return res.json(cached);
-
-  let whereClauses = [];
-  let params = [];
-
-  if (category) {
-    const cats = category.split(',');
-    whereClauses.push(`category IN (${cats.map(() => '?').join(',')})`);
-    params.push(...cats);
-  }
-  if (parent_category) {
-    const parents = parent_category.split(',');
-    whereClauses.push(`parent_category IN (${parents.map(() => '?').join(',')})`);
-    params.push(...parents);
-  }
-  if (search) {
-    const words = search.trim().split(/\s+/);
-    words.forEach(word => {
-      const low = word.toLowerCase();
-      const cap = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      const up = word.toUpperCase();
-      
-      whereClauses.push('(name LIKE ? OR name LIKE ? OR name LIKE ? OR category LIKE ? OR parent_category LIKE ?)');
-      params.push(`%${low}%`, `%${cap}%`, `%${up}%`, `%${low}%`, `%${low}%`);
-    });
-  }
-  if (vid) {
-    const vids = vid.split(',');
-    whereClauses.push(`vid IN (${vids.map(() => '?').join(',')})`);
-    params.push(...vids);
-  }
-  if (length) {
-    const lengths = length.split(',');
-    whereClauses.push(`length IN (${lengths.map(() => '?').join(',')})`);
-    params.push(...lengths);
-  }
-  if (width) {
-    const widths = width.split(',');
-    whereClauses.push(`width IN (${widths.map(() => '?').join(',')})`);
-    params.push(...widths);
-  }
-
-  const whereSql = whereClauses.length > 0 ? 'WHERE ' + whereClauses.join(' AND ') : '';
-
-  // Get total count for pagination
-  const countQuery = `SELECT COUNT(*) as total FROM products ${whereSql}`;
-  
-  db.get(countQuery, params, (err, countRow) => {
-    if (err) return res.status(500).json({ error: err.message });
-    const total = countRow.total;
-
-    // Get paginated products
-    const query = `
-      SELECT *
-      FROM products 
-      ${whereSql} 
-      ORDER BY category, name 
-      LIMIT ? OFFSET ?
-    `;
-    
-    db.all(query, [...params, parseInt(limit), offset], (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      
-      const result = {
-        products: rows.map(row => ({
-          ...row,
-          parentCategory: row.parent_category,
-          priceTon: row.price_ton ? row.price_ton.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
-          priceTonNum: row.price_ton,
-          priceUnit: row.price_unit ? row.price_unit.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
-          unitLabel: row.unit_label,
-          perTon: row.weight,
-          desc: row.description,
-          img: row.image,
-          specs: (() => {
-            try {
-              return row.specs ? JSON.parse(row.specs) : [];
-            } catch (e) {
-              console.error(`Error parsing specs for product ${row.id}:`, e.message);
-              return [];
-            }
-          })(),
-          badge: 'В НАЛИЧИИ',
-          variantCount: 1
-        })),
-        pagination: {
-          total,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          pages: Math.ceil(total / parseInt(limit))
-        }
-      };
-
-      cache.set(cacheKey, result, 30000); // 30 seconds
-      res.json(result);
-    });
-  });
-});
-
-// API: Get specific filters for a category (vid, length, width)
-app.get('/api/category-filters', (req, res) => {
-  const { category } = req.query;
-  if (!category) return res.status(400).json({ error: 'Category required' });
-
-  const cacheKey = `cat_filters_${category}`;
-  const cached = cache.get(cacheKey);
-  if (cached) return res.json(cached);
-
-  db.all(`
-    SELECT 
-      DISTINCT vid, length, width, type 
-    FROM products 
-    WHERE category LIKE ?
-  `, [`${category}%`], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    
-    const filters = {
-      vids: [...new Set(rows.map(r => r.vid))].filter(Boolean).sort(),
-      lengths: [...new Set(rows.map(r => r.length))].filter(l => l && l !== 'Немерная').sort(),
-      widths: [...new Set(rows.map(r => r.width))].filter(w => w && w !== 'Стандарт').sort(),
-      types: [...new Set(rows.map(r => r.type))].filter(Boolean).sort()
-    };
-    
-    cache.set(cacheKey, filters, 300000); // 5 minutes
-    res.json(filters);
-  });
-});
-
-// API: Get single product
-app.get('/api/products/:id', (req, res) => {
-  db.get('SELECT * FROM products WHERE id = ?', [req.params.id], (err, row) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!row) return res.status(404).json({ error: 'Product not found' });
-    res.json({
-      ...row,
-      specs: (() => {
-        try {
-          return row.specs ? JSON.parse(row.specs) : [];
-        } catch (e) {
-          console.error(`Error parsing specs for product ${row.id}:`, e.message);
-          return [];
-        }
-      })()
-    });
-  });
-});
-
-// API: Login (simple)
-app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!user) return res.status(401).json({ error: 'User not found' });
-    
-    // In a real app, use bcrypt.compare
-    if (password !== user.password && password !== '123456') { 
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '24h' });
-    res.json({ 
-      user: { 
-        id: user.id, 
-        email: user.email, 
-        name: user.name, 
-        phone: user.phone, 
-        company_name: user.company_name,
-        inn: user.inn,
-        kpp: user.kpp,
-        legal_address: user.legal_address,
-        actual_address: user.actual_address,
-        position: user.position,
-        role: user.role 
-      }, 
-      token 
-    });
-  });
-});
-
-// API: Register
-app.post('/api/auth/register', (req, res) => {
-  const { email, password, name } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-  
-  db.run('INSERT INTO users (email, password, name) VALUES (?, ?, ?)', [email, password, name], function(err) {
-    if (err) {
-      if (err.message.includes('UNIQUE')) return res.status(400).json({ error: 'Email already exists' });
-      return res.status(500).json({ error: err.message });
-    }
-    const token = jwt.sign({ id: this.lastID, email }, SECRET_KEY);
-    res.json({ 
-      user: { id: this.lastID, email, name, phone: null, role: 'user' }, 
-      token 
-    });
-  });
-});
-
-const nodemailer = require('nodemailer');
-
-// Email configuration (Mock for now, but configured for SMTP)
-const transporter = nodemailer.createTransport({
-  host: 'smtp.mail.ru', // Adjust as needed
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'info@steelwoodman.ru', // User's email
-    pass: 'your-app-password' // Should be an environment variable
-  }
-});
-
-// Middleware to verify JWT
-const authenticateToken = (req, res, next) => {
+// ============================================================
+// AUTH MIDDLEWARE — verify Supabase JWT
+// ============================================================
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) return next(); // Guest
 
-  jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Invalid token' });
-    req.user = user;
-    next();
-  });
+  if (!token) {
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const { data: { user }, error } = await supabaseAnon.auth.getUser(token);
+    if (error || !user) {
+      req.user = null;
+      return next();
+    }
+    req.user = user; // { id (auth UUID), email, ... }
+    req.token = token;
+  } catch (e) {
+    req.user = null;
+  }
+  next();
 };
 
-// ... existing routes ...
+// ============================================================
+// API: CATALOG — Get filters
+// ============================================================
+app.get('/api/filters', async (req, res) => {
+  const { data, error } = await supabaseAdmin
+    .from('products')
+    .select('parent_category, category')
+    .order('parent_category');
 
-// API: Get Current User (Full Profile)
-app.get('/api/auth/me', authenticateToken, (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
-  
-  db.get('SELECT id, email, name, phone, company_name, inn, kpp, legal_address, actual_address, position, role FROM users WHERE id = ?', [req.user.id], (err, user) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json(user);
+  if (error) return res.status(500).json({ error: error.message });
+
+  const grouped = {};
+  const parentCategories = [];
+
+  data.forEach(row => {
+    if (!grouped[row.parent_category]) {
+      grouped[row.parent_category] = [];
+      parentCategories.push(row.parent_category);
+    }
+    const exists = grouped[row.parent_category].find(c => c.name === row.category);
+    if (!exists) {
+      grouped[row.parent_category].push({ name: row.category, count: 1 });
+    } else {
+      exists.count++;
+    }
+  });
+
+  res.json({
+    parentCategories: [...new Set(parentCategories)],
+    categories: grouped,
+    totalCount: data.length
   });
 });
 
-// API: Update Profile
-app.put('/api/auth/profile', authenticateToken, (req, res) => {
+// ============================================================
+// API: CATALOG — Get products with pagination
+// ============================================================
+app.get('/api/products', async (req, res) => {
+  const { category, parent_category, search, vid, length, width, page = 1, limit = 12 } = req.query;
+  const from = (parseInt(page) - 1) * parseInt(limit);
+  const to = from + parseInt(limit) - 1;
+
+  let query = supabaseAdmin.from('products').select('*', { count: 'exact' });
+
+  if (parent_category) {
+    const parents = parent_category.split(',');
+    query = query.in('parent_category', parents);
+  }
+  if (category) {
+    const cats = category.split(',');
+    query = query.in('category', cats);
+  }
+  if (search) {
+    query = query.ilike('name', `%${search}%`);
+  }
+  if (vid) {
+    query = query.in('vid', vid.split(','));
+  }
+  if (length) {
+    query = query.in('length', length.split(','));
+  }
+  if (width) {
+    query = query.in('width', width.split(','));
+  }
+
+  query = query.order('category').order('name').range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) return res.status(500).json({ error: error.message });
+
+  const products = (data || []).map(row => ({
+    ...row,
+    parentCategory: row.parent_category,
+    priceTon: row.price_ton ? Number(row.price_ton).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
+    priceTonNum: row.price_ton ? Number(row.price_ton) : null,
+    priceUnit: row.price_unit ? Number(row.price_unit).toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
+    unitLabel: row.unit_label,
+    perTon: row.weight,
+    desc: row.description,
+    img: row.image,
+    specs: (() => {
+      try { return row.specs ? (typeof row.specs === 'string' ? JSON.parse(row.specs) : row.specs) : []; }
+      catch (e) { return []; }
+    })(),
+    badge: 'В НАЛИЧИИ',
+    variantCount: 1
+  }));
+
+  res.json({
+    products,
+    pagination: {
+      total: count || 0,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      pages: Math.ceil((count || 0) / parseInt(limit))
+    }
+  });
+});
+
+// ============================================================
+// API: CATALOG — Category-specific filters (vid, length, width)
+// ============================================================
+app.get('/api/category-filters', async (req, res) => {
+  const { category } = req.query;
+  if (!category) return res.status(400).json({ error: 'Категория не указана' });
+
+  const { data, error } = await supabaseAdmin
+    .from('products')
+    .select('vid, length, width, type')
+    .ilike('category', `${category}%`);
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const filters = {
+    vids: [...new Set(data.map(r => r.vid))].filter(Boolean).sort(),
+    lengths: [...new Set(data.map(r => r.length))].filter(l => l && l !== 'Немерная').sort(),
+    widths: [...new Set(data.map(r => r.width))].filter(w => w && w !== 'Стандарт').sort(),
+    types: [...new Set(data.map(r => r.type))].filter(Boolean).sort()
+  };
+
+  res.json(filters);
+});
+
+// ============================================================
+// API: CATALOG — Single product
+// ============================================================
+app.get('/api/products/:id', async (req, res) => {
+  const { data, error } = await supabaseAdmin
+    .from('products')
+    .select('*')
+    .eq('id', req.params.id)
+    .single();
+
+  if (error) return res.status(404).json({ error: 'Товар не найден' });
+
+  res.json({
+    ...data,
+    specs: (() => {
+      try { return data.specs ? (typeof data.specs === 'string' ? JSON.parse(data.specs) : data.specs) : []; }
+      catch (e) { return []; }
+    })()
+  });
+});
+
+// ============================================================
+// API: AUTH — Register (via Supabase Auth)
+// ============================================================
+app.post('/api/auth/register', async (req, res) => {
+  const { email, password, name } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'Email и пароль обязательны' });
+
+  const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    user_metadata: { name: name || email.split('@')[0] },
+    email_confirm: true  // auto-confirm for B2B use
+  });
+
+  if (error) {
+    if (error.message.includes('already')) return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
+    return res.status(500).json({ error: error.message });
+  }
+
+  // Sign in immediately to get a token
+  const { data: session, error: signInErr } = await supabaseAnon.auth.signInWithPassword({ email, password });
+  if (signInErr) return res.status(500).json({ error: signInErr.message });
+
+  const profile = await supabaseAdmin.from('users').select('*').eq('auth_id', data.user.id).single();
+
+  res.json({
+    user: {
+      id: profile.data?.id,
+      email,
+      name: profile.data?.name || name,
+      role: 'user'
+    },
+    token: session.session.access_token,
+    refresh_token: session.session.refresh_token
+  });
+});
+
+// ============================================================
+// API: AUTH — Login (via Supabase Auth)
+// ============================================================
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  const { data, error } = await supabaseAnon.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    return res.status(401).json({ error: 'Неверный логин или пароль' });
+  }
+
+  // Fetch profile from public.users
+  const { data: profile } = await supabaseAdmin
+    .from('users')
+    .select('*')
+    .eq('auth_id', data.user.id)
+    .single();
+
+  res.json({
+    user: {
+      id: profile?.id,
+      email: data.user.email,
+      name: profile?.name || data.user.user_metadata?.name,
+      phone: profile?.phone,
+      company_name: profile?.company_name,
+      inn: profile?.inn,
+      kpp: profile?.kpp,
+      legal_address: profile?.legal_address,
+      actual_address: profile?.actual_address,
+      position: profile?.position,
+      role: profile?.role || 'user'
+    },
+    token: data.session.access_token,
+    refresh_token: data.session.refresh_token
+  });
+});
+
+// ============================================================
+// API: AUTH — Get current user profile
+// ============================================================
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
   if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
-  
+
+  const { data: profile, error } = await supabaseAdmin
+    .from('users')
+    .select('*')
+    .eq('auth_id', req.user.id)
+    .single();
+
+  if (error || !profile) return res.status(404).json({ error: 'Профиль не найден' });
+
+  res.json({
+    id: profile.id,
+    email: req.user.email,
+    name: profile.name,
+    phone: profile.phone,
+    company_name: profile.company_name,
+    inn: profile.inn,
+    kpp: profile.kpp,
+    legal_address: profile.legal_address,
+    actual_address: profile.actual_address,
+    position: profile.position,
+    role: profile.role
+  });
+});
+
+// ============================================================
+// API: AUTH — Update profile
+// ============================================================
+app.put('/api/auth/profile', authenticateToken, async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
+
   const { name, phone, company_name, inn, kpp, legal_address, actual_address, position } = req.body;
-  
-  const query = `
-    UPDATE users SET 
-      name = ?, 
-      phone = ?, 
-      company_name = ?, 
-      inn = ?, 
-      kpp = ?, 
-      legal_address = ?, 
-      actual_address = ?, 
-      position = ?
-    WHERE id = ?
-  `;
-  
-  db.run(query, [name, phone, company_name, inn, kpp, legal_address, actual_address, position, req.user.id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Profile updated successfully' });
-  });
+
+  const { error } = await supabaseAdmin
+    .from('users')
+    .update({ name, phone, company_name, inn, kpp, legal_address, actual_address, position })
+    .eq('auth_id', req.user.id);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: 'Profile updated successfully' });
 });
 
-// API: Get User Orders
-app.get('/api/orders/my', authenticateToken, (req, res) => {
+// ============================================================
+// API: ORDERS — Get user orders
+// ============================================================
+app.get('/api/orders/my', authenticateToken, async (req, res) => {
   if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
 
-  // Simplified query for better compatibility
-  db.all(`SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC`, [req.user.id], (err, orders) => {
-    if (err) return res.status(500).json({ error: err.message });
-    
-    if (orders.length === 0) return res.json([]);
+  // First get the public.users.id for this auth user
+  const { data: profile } = await supabaseAdmin
+    .from('users')
+    .select('id')
+    .eq('auth_id', req.user.id)
+    .single();
 
-    // Fetch items for each order
-    const orderIds = orders.map(o => o.id);
-    db.all(`
-      SELECT oi.*, p.name as fallback_name 
-      FROM order_items oi 
-      LEFT JOIN products p ON oi.product_id = p.id 
-      WHERE oi.order_id IN (${orderIds.join(',')})
-    `, (err, items) => {
-      if (err) return res.status(500).json({ error: err.message });
+  if (!profile) return res.json([]);
 
-      const result = orders.map(order => ({
-        ...order,
-        items: items.filter(item => item.order_id === order.id).map(item => ({
-          ...item,
-          name: item.product_name || item.fallback_name || item.product_id
-        }))
-      }));
-      res.json(result);
-    });
-  });
+  const { data: orders, error } = await supabaseAdmin
+    .from('orders')
+    .select('*, order_items(*)')
+    .eq('user_id', profile.id)
+    .order('created_at', { ascending: false });
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const result = (orders || []).map(order => ({
+    ...order,
+    items: (order.order_items || []).map(item => ({
+      ...item,
+      name: item.product_name || item.product_id
+    }))
+  }));
+
+  res.json(result);
 });
 
-// API: Create Order
+// ============================================================
+// API: ORDERS — Create order
+// ============================================================
 app.post('/api/orders', authenticateToken, async (req, res) => {
   const { name, phone, email, inn, items, total } = req.body;
-  const userId = req.user ? req.user.id : null;
 
-  console.log('--- New Order Request ---');
-  console.log('User ID:', userId);
-  console.log('Customer:', name, phone);
-  console.log('Total:', total);
+  // Find user_id if authenticated
+  let userId = null;
+  if (req.user) {
+    const { data: profile } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('auth_id', req.user.id)
+      .single();
+    userId = profile?.id || null;
+  }
 
-  db.run(`INSERT INTO orders (user_id, total, customer_name, customer_phone, customer_email, customer_inn) 
-          VALUES (?, ?, ?, ?, ?, ?)`, 
-  [userId, total, name, phone, email, inn], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    const orderId = this.lastID;
+  // Create order
+  const { data: order, error: orderErr } = await supabaseAdmin
+    .from('orders')
+    .insert({
+      user_id: userId,
+      total,
+      customer_name: name,
+      customer_phone: phone,
+      customer_email: email,
+      customer_inn: inn,
+      status: 'pending'
+    })
+    .select()
+    .single();
 
-    // Update user profile if authenticated
-    if (userId) {
-      db.run('UPDATE users SET name = ?, phone = ? WHERE id = ?', [name, phone, userId]);
-    }
-    
-    const stmt = db.prepare('INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES (?, ?, ?, ?, ?)');
-    items.forEach(item => {
-      stmt.run(orderId, item.id, item.name, item.quantity, item.price);
-    });
-    stmt.finalize();
+  if (orderErr) return res.status(500).json({ error: orderErr.message });
 
-    // Prepare email content
-    const itemsHtml = items.map(item => `<li>${item.name || item.id} x ${item.quantity} - ${item.price} ₽</li>`).join('');
-    const mailOptions = {
-      from: 'info@steelwoodman.ru',
-      to: 'info@steelwoodman.ru',
-      subject: `Новый заказ #${orderId} - ${name}`,
-      html: `
-        <h2>Новый заказ на сайте</h2>
-        <p><strong>Заказ #:</strong> ${orderId}</p>
-        <p><strong>Клиент:</strong> ${name}</p>
-        <p><strong>Телефон:</strong> ${phone}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>ИНН:</strong> ${inn || 'не указан'}</p>
-        <h3>Товары:</h3>
-        <ul>${itemsHtml}</ul>
-        <p><strong>Итого:</strong> ${total} ₽</p>
-      `
-    };
+  // Insert order items
+  const orderItems = (items || []).map(item => ({
+    order_id: order.id,
+    product_id: String(item.id),
+    product_name: item.name,
+    quantity: item.quantity,
+    price: item.price
+  }));
 
-    // Send email (handling error silently for now if transporter is not fully configured)
-    transporter.sendMail(mailOptions).catch(e => console.error('Email error:', e.message));
-    
-    res.json({ id: orderId, message: 'Order created successfully' });
-  });
+  if (orderItems.length > 0) {
+    const { error: itemsErr } = await supabaseAdmin.from('order_items').insert(orderItems);
+    if (itemsErr) console.error('Order items insert error:', itemsErr.message);
+  }
+
+  // Update user profile if authenticated
+  if (userId) {
+    await supabaseAdmin.from('users').update({ name, phone }).eq('id', userId);
+  }
+
+  // Send email notification
+  const itemsHtml = (items || []).map(item =>
+    `<li>${item.name || item.id} x ${item.quantity} — ${item.price} ₽</li>`
+  ).join('');
+
+  transporter.sendMail({
+    from: 'egapega322@gmail.com',
+    to: process.env.ADMIN_EMAILS || 'egapega322@gmail.com',
+    subject: `Новый заказ #${order.id} — ${name}`,
+    html: `<h2>Новый заказ на сайте</h2>
+      <p><strong>Заказ #:</strong> ${order.id}</p>
+      <p><strong>Клиент:</strong> ${name}</p>
+      <p><strong>Телефон:</strong> ${phone}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>ИНН:</strong> ${inn || 'не указан'}</p>
+      <h3>Товары:</h3><ul>${itemsHtml}</ul>
+      <p><strong>Итого:</strong> ${total} ₽</p>`
+  }).catch(e => console.error('Order email error:', e.message));
+
+  res.json({ id: order.id, message: 'Order created successfully' });
 });
 
-// Initialize tables
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS leads (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    phone TEXT,
-    email TEXT,
-    message TEXT,
-    type TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
-  db.run(`CREATE TABLE IF NOT EXISTS subscribers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE,
-    status TEXT DEFAULT 'active',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
-});
-
-// API: Create Lead/Request
-app.post('/api/leads', (req, res) => {
+// ============================================================
+// API: LEADS — Create lead/request
+// ============================================================
+app.post('/api/leads', async (req, res) => {
   const { name, phone, email, message, type = 'contact' } = req.body;
 
-  db.run(`INSERT INTO leads (name, phone, email, message, type) VALUES (?, ?, ?, ?, ?)`,
-  [name, phone, email, message, type], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    const leadId = this.lastID;
+  const { data: lead, error } = await supabaseAdmin
+    .from('leads')
+    .insert({ name, phone, email, message, type })
+    .select()
+    .single();
 
-    const mailOptions = {
-      from: 'info@steelwoodman.ru',
-      to: 'info@steelwoodman.ru',
-      subject: `Заявка №${leadId} ${phone}`,
-      text: `Новая заявка на сайте\n\nНомер: ${leadId}\nИмя: ${name}\nТелефон: ${phone}\nEmail: ${email}\nТип: ${type}\nСообщение: ${message}`,
-      html: `
-        <h2>Новая заявка на сайте</h2>
-        <p><strong>Заявка №:</strong> ${leadId}</p>
-        <p><strong>Имя:</strong> ${name}</p>
-        <p><strong>Телефон:</strong> ${phone}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Тип:</strong> ${type}</p>
-        <p><strong>Сообщение:</strong><br/>${message}</p>
-      `
-    };
+  if (error) return res.status(500).json({ error: error.message });
 
-    transporter.sendMail(mailOptions).catch(e => console.error('Lead email error:', e.message));
-    
-    // Additional mailing list logic for subscriptions
-    if (type === 'subscription' && email && email !== 'Не указано') {
-      db.run(`INSERT OR IGNORE INTO subscribers (email) VALUES (?)`, [email], (subErr) => {
-        if (subErr) console.error('Subscription DB error:', subErr.message);
-      });
-    }
+  // Send email notification
+  transporter.sendMail({
+    from: 'egapega322@gmail.com',
+    to: process.env.ADMIN_EMAILS || 'egapega322@gmail.com',
+    subject: `Заявка №${lead.id} ${phone}`,
+    html: `<h2>Новая заявка на сайте</h2>
+      <p><strong>Заявка №:</strong> ${lead.id}</p>
+      <p><strong>Имя:</strong> ${name}</p>
+      <p><strong>Телефон:</strong> ${phone}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Тип:</strong> ${type}</p>
+      <p><strong>Сообщение:</strong><br/>${message}</p>`
+  }).catch(e => console.error('Lead email error:', e.message));
 
-    res.json({ id: leadId, message: 'Application submitted successfully' });
-  });
+  // Handle subscription
+  if (type === 'subscription' && email && email !== 'Не указано') {
+    await supabaseAdmin.from('subscribers').upsert({ email, status: 'active' }, { onConflict: 'email' });
+  }
+
+  res.json({ id: lead.id, message: 'Application submitted successfully' });
 });
 
-// Route for specific pages if needed
+// ============================================================
+// HOME ROUTE
+// ============================================================
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// ============================================================
+// 404
+// ============================================================
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
 
+// ============================================================
+// START
+// ============================================================
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
+    console.log(`Supabase URL: ${SUPABASE_URL}`);
     console.log(`API available at http://localhost:${port}/api/products`);
   });
 }
 
 module.exports = app;
-
-
-

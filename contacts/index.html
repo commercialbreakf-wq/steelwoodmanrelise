@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html class="dark snap-y snap-proximity scroll-smooth" lang="ru"><head>
+<html class="dark snap-y snap-mandatory scroll-smooth" lang="ru"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Контакты | ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
@@ -135,7 +135,7 @@
 <!-- Shared Header -->
 <main class="min-h-screen">
 <!-- Hero Section -->
-<section id="hero" class="relative min-h-screen flex flex-col border-b machined-border bg-background snap-start">
+<section id="hero" class="relative h-screen flex flex-col border-b machined-border bg-background overflow-hidden snap-start">
     <div class="absolute inset-0 z-0">
         <img alt="Industrial Facility" class="w-full h-full object-cover grayscale opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbXTvW2oixr9-eQg-7brjPngDVA3y1BGv3ouFmRST6Y4VG3kWJTSvgrtlgCoh082z45DY3-EBK-ckPzbST4935hFkm4KIQ4nNtm5qzxW-0MSjjBgW7TwGuZbQSipnTHnwylNB_kYdeSJD8jbkGEkHwzF7m3DpdX38WgzGB-HupfOeh1DnKspoWtGtzBlteabeiDGWztwSMhixbqhiypwtY3mS0RqI8D7qHo21SXfJ0vpsKVgdACKWse72GJF47aQSdBg1WqAj2koY"/>
         <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
@@ -152,11 +152,12 @@
     </div>
 
     <!-- Scroll Arrow -->
-    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 z-20">
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer z-20" onclick="document.getElementById('contact-details').scrollIntoView({ behavior: 'smooth' })">
         <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
     </div>
 </section>
-<section id="contact-details" class="max-w-[1440px] mx-auto px-margin py-stack-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<div class="snap-start">
+<section id="contact-details" class="max-w-[1440px] mx-auto px-margin py-stack-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter scroll-mt-20">
 <!-- Contact Info Column -->
 <div class="lg:col-span-4 flex flex-col gap-gutter">
 <div class="bg-surface-container-low machined-border p-stack-lg flex-1">
@@ -277,4 +278,5 @@
 </main>
 
 <footer id="globalFooter"></footer>
+</div>
 </body></html>

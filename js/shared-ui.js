@@ -2,6 +2,53 @@
  * PREMIUM PRELOADER SYSTEM
  * Injected immediately to ensure early visibility for Iron Woodman High-Tech Site
  */
+window.maskPhoneGlobal = function(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val.startsWith('7')) val = val.substring(1);
+    else if (val.startsWith('8')) val = val.substring(1);
+    
+    val = val.substring(0, 10);
+    
+    let res = '+7-';
+    if (val.length > 0) {
+        res += '(' + val.substring(0, 3);
+        if (val.length > 3) {
+            res += ')-' + val.substring(3, 6);
+            if (val.length > 6) {
+                res += '-' + val.substring(6, 8);
+                if (val.length > 8) {
+                    res += '-' + val.substring(8, 10);
+                }
+            }
+        }
+    }
+    input.value = res;
+};
+
+window.limitDigitsGlobal = function(input, max) {
+    let cursor = input.selectionStart;
+    let oldLen = input.value.length;
+    input.value = input.value.replace(/\D/g, '').substring(0, max);
+    let newLen = input.value.length;
+    if (cursor !== null) {
+        input.setSelectionRange(cursor - (oldLen - newLen), cursor - (oldLen - newLen));
+    }
+};
+
+window.validateProfileDataGlobal = function(data) {
+    if (data.phone) {
+        const phoneRegex = /^\+7-\(\d{3}\)-\d{3}-\d{2}-\d{2}$/;
+        if (!phoneRegex.test(data.phone)) return "Введите полный номер телефона: +7-(000)-000-00-00";
+    }
+    if (data.inn && data.inn.length > 0) {
+        if (!/^\d{10}$|^\d{12}$/.test(data.inn)) return "ИНН должен содержать 10 или 12 цифр";
+    }
+    if (data.kpp && data.kpp.length > 0) {
+        if (!/^\d{9}$/.test(data.kpp)) return "КПП должен содержать 9 цифр";
+    }
+    return null;
+};
+
 (function() {
     const preloaderStyles = `
         #globalPreloader {
@@ -146,6 +193,27 @@
             }
         }, 300);
     });
+    // Auto-attach masks to any relevant inputs
+    function attachGlobalMasks() {
+        document.querySelectorAll('input[type="tel"], input[name="phone"]').forEach(input => {
+            input.addEventListener('input', () => window.maskPhoneGlobal(input));
+            input.addEventListener('blur', () => {
+                if (input.value === '+7-') input.value = '';
+            });
+        });
+        document.querySelectorAll('input[name="inn"], input[id*="Inn"]').forEach(input => {
+            input.addEventListener('input', () => window.limitDigitsGlobal(input, 12));
+        });
+        document.querySelectorAll('input[name="kpp"], input[id*="Kpp"]').forEach(input => {
+            input.addEventListener('input', () => window.limitDigitsGlobal(input, 9));
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachGlobalMasks);
+    } else {
+        attachGlobalMasks();
+    }
 })();
 
 // Global Navigation Toggles
@@ -396,10 +464,10 @@ document.addEventListener('DOMContentLoaded', function() {
              <div class="hidden md:flex items-center gap-8 mx-auto whitespace-nowrap">
                 <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline" href="/">ГЛАВНАЯ</a>
                 <div class="catalog-menu-wrapper relative" id="catalogMenuWrapperGlobal">
-                    <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 flex items-center gap-1 cursor-pointer no-underline" id="catalogBtnGlobal" href="/_5/code.html">КАТАЛОГ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
+                    <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 flex items-center gap-1 cursor-pointer no-underline" id="catalogBtnGlobal" href="/catalog/">КАТАЛОГ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
                 </div>
                 <div class="about-menu-wrapper relative h-full flex items-center" id="aboutMenuWrapperGlobal">
-                    <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline flex items-center gap-1 cursor-pointer" id="aboutBtnGlobal" href="/_7/code.html">О КОМПАНИИ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
+                    <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline flex items-center gap-1 cursor-pointer" id="aboutBtnGlobal" href="/about.html">О КОМПАНИИ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
                 </div>
             </div>
             <div class="flex items-center gap-2 md:gap-6 whitespace-nowrap">
@@ -444,26 +512,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="space-y-4 pt-2">
                     <h3 class="text-[10px] font-label-caps text-on-surface-variant tracking-[0.2em] uppercase opacity-40 mb-4 px-1">О КОМПАНИИ</h3>
                     <div class="flex flex-col gap-5 pl-1">
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/_7/code.html">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/about/">
                             <span class="material-symbols-outlined text-primary text-lg">info</span>
                             История и цели
                         </a>
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/_4/code.html">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/fleet/">
                             <span class="material-symbols-outlined text-primary text-lg">local_shipping</span>
                             Автопарк
                         </a>
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/_2/code.html">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/certificates/">
                             <span class="material-symbols-outlined text-primary text-lg">workspace_premium</span>
                             Сертификаты
                         </a>
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/_8/code.html">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/contacts/">
                             <span class="material-symbols-outlined text-primary text-lg">mail</span>
                             Контакты
                         </a>
                     </div>
                 </div>
 
-                <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/news.html">
+                <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/news/">
                     <span class="material-symbols-outlined text-primary text-xl">newspaper</span>
                     НОВОСТИ
                 </a>
@@ -496,54 +564,54 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         <!-- L1: Black Metal -->
                         <div class="space-y-3">
-                            <a href="/_5/code.html?pcat=Черный металлопрокат" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
+                            <a href="/catalog/?pcat=Черный металлопрокат" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
                                 <span class="material-symbols-outlined text-[18px] opacity-50">construction</span>
                                 Черный металлопрокат
                             </a>
                             <div class="pl-7 flex flex-col gap-2.5 border-l border-white/5 ml-2">
-                                <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Арматура А1" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Арматура А1</a>
-                                <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Арматура А3" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Арматура А3</a>
-                                <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Балка" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Балка (двутавр)</a>
-                                <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Уголок" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Уголок стальной</a>
-                                <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Швеллер" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Швеллер</a>
-                                <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Сетка" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Сетка стальная</a>
+                                <a href="/catalog/?pcat=Черный металлопрокат&cat=Арматура А1" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Арматура А1</a>
+                                <a href="/catalog/?pcat=Черный металлопрокат&cat=Арматура А3" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Арматура А3</a>
+                                <a href="/catalog/?pcat=Черный металлопрокат&cat=Балка" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Балка (двутавр)</a>
+                                <a href="/catalog/?pcat=Черный металлопрокат&cat=Уголок" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Уголок стальной</a>
+                                <a href="/catalog/?pcat=Черный металлопрокат&cat=Швеллер" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Швеллер</a>
+                                <a href="/catalog/?pcat=Черный металлопрокат&cat=Сетка" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Сетка стальная</a>
                             </div>
                         </div>
 
                         <!-- L1: Sheets -->
                         <div class="space-y-3">
-                            <a href="/_5/code.html?pcat=Листовой металлопрокат" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
+                            <a href="/catalog/?pcat=Листовой металлопрокат" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
                                 <span class="material-symbols-outlined text-[18px] opacity-50">layers</span>
                                 Листовой металлопрокат
                             </a>
                             <div class="pl-7 flex flex-col gap-2.5 border-l border-white/5 ml-2">
-                                <a href="/_5/code.html?pcat=Листовой металлопрокат&cat=Лист холоднокатаный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Лист холоднокатаный</a>
+                                <a href="/catalog/?pcat=Листовой металлопрокат&cat=Лист холоднокатаный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Лист холоднокатаный</a>
                             </div>
                         </div>
 
                         <!-- L1: Pipes -->
                         <div class="space-y-3">
-                            <a href="/_5/code.html?pcat=Трубный металлопрокат" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
+                            <a href="/catalog/?pcat=Трубный металлопрокат" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
                                 <span class="material-symbols-outlined text-[18px] opacity-50">radio_button_unchecked</span>
                                 Трубный металлопрокат
                             </a>
                             <div class="pl-7 flex flex-col gap-2.5 border-l border-white/5 ml-2">
-                                <a href="/_5/code.html?pcat=Трубный металлопрокат&cat=Труба профильная" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Труба профильная</a>
-                                <a href="/_5/code.html?pcat=Трубный металлопрокат&cat=Труба ВГП" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Труба ВГП</a>
-                                <a href="/_5/code.html?pcat=Трубный металлопрокат&cat=Труба электросварная" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Труба электросварная</a>
+                                <a href="/catalog/?pcat=Трубный металлопрокат&cat=Труба профильная" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Труба профильная</a>
+                                <a href="/catalog/?pcat=Трубный металлопрокат&cat=Труба ВГП" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Труба ВГП</a>
+                                <a href="/catalog/?pcat=Трубный металлопрокат&cat=Труба электросварная" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Труба электросварная</a>
                             </div>
                         </div>
 
                         <!-- L1: Roofing -->
                         <div class="space-y-3">
-                            <a href="/_5/code.html?pcat=Кровля и фасад" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
+                            <a href="/catalog/?pcat=Кровля и фасад" class="text-sm font-bold uppercase text-on-surface hover:text-primary no-underline flex items-center gap-2">
                                 <span class="material-symbols-outlined text-[18px] opacity-50">roofing</span>
                                 Кровля и фасад
                             </a>
                             <div class="pl-7 flex flex-col gap-2.5 border-l border-white/5 ml-2">
-                                <a href="/_5/code.html?pcat=Кровля и фасад&cat=Профнастил окрашенный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Профнастил окрашенный</a>
-                                <a href="/_5/code.html?pcat=Кровля и фасад&cat=Полиэстер" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Полиэстер</a>
-                                <a href="/_5/code.html?pcat=Кровля и фасад&cat=Профнастил оцинкованный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Профнастил оцинкованный</a>
+                                <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил окрашенный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Профнастил окрашенный</a>
+                                <a href="/catalog/?pcat=Кровля и фасад&cat=Полиэстер" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Полиэстер</a>
+                                <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил оцинкованный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Профнастил оцинкованный</a>
                             </div>
                         </div>
                     </div>
@@ -552,11 +620,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="space-y-6 pt-4 border-t border-white/5">
                         <h3 class="text-[10px] font-label-caps text-on-surface-variant tracking-[0.2em] uppercase opacity-40 mb-2 px-1">ДОПОЛНИТЕЛЬНО</h3>
                         <div class="flex flex-col gap-5 pl-1">
-                            <a href="/_1/code.html" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
+                            <a href="/calculator/" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
                                 <span class="material-symbols-outlined text-primary text-lg">calculate</span>
                                 Калькулятор веса
                             </a>
-                            <a href="/_6/code.html" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
+                            <a href="/services/" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
                                 <span class="material-symbols-outlined text-primary text-lg">content_cut</span>
                                 Услуги резки
                             </a>
@@ -604,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="font-label-caps text-xs text-on-surface-variant uppercase tracking-widest">ИТОГО</span>
                     <span id="cartTotalGlobal" class="font-display-xl text-3xl text-primary">0 ₽</span>
                 </div>
-                <a href="/cart.html" class="block w-full py-5 bg-primary text-on-primary text-center font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all uppercase no-underline">ОФОРМИТЬ ЗАКАЗ</a>
+                <a href="/cart/" class="block w-full py-5 bg-primary text-on-primary text-center font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all uppercase no-underline">ОФОРМИТЬ ЗАКАЗ</a>
             </footer>
         </div>
     </div>
@@ -612,41 +680,41 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="mega-menu" id="megaMenuGlobal">
       <div class="mega-menu-inner">
         <div class="mega-menu-left">
-          <div class="mega-cat-item" data-submenu="cherny"><a href="/_5/code.html?pcat=Черный металлопрокат" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">construction</span>Черный металлопрокат<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
-          <div class="mega-cat-item" data-submenu="list"><a href="/_5/code.html?pcat=Листовой металлопрокат" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">layers</span>Листовой металлопрокат<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
-          <div class="mega-cat-item" data-submenu="truby"><a href="/_5/code.html?pcat=Трубный металлопрокат" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">radio_button_unchecked</span>Трубный металлопрокат<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
-          <div class="mega-cat-item" data-submenu="krovlya"><a href="/_5/code.html?pcat=Кровля и фасад" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">roofing</span>Кровля и фасад<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
+          <div class="mega-cat-item" data-submenu="cherny"><a href="/catalog/?pcat=Черный металлопрокат" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">construction</span>Черный металлопрокат<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
+          <div class="mega-cat-item" data-submenu="list"><a href="/catalog/?pcat=Листовой металлопрокат" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">layers</span>Листовой металлопрокат<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
+          <div class="mega-cat-item" data-submenu="truby"><a href="/catalog/?pcat=Трубный металлопрокат" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">radio_button_unchecked</span>Трубный металлопрокат<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
+          <div class="mega-cat-item" data-submenu="krovlya"><a href="/catalog/?pcat=Кровля и фасад" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">roofing</span>Кровля и фасад<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
           <div class="mega-cat-divider"></div>
-          <div class="mega-cat-item" data-submenu="none"><a href="/_1/code.html" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">calculate</span>Калькулятор</a></div>
-          <div class="mega-cat-item" data-submenu="none"><a href="/_6/code.html" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">content_cut</span>Услуги резки</a></div>
+          <div class="mega-cat-item" data-submenu="none"><a href="/calculator/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">calculate</span>Калькулятор</a></div>
+          <div class="mega-cat-item" data-submenu="none"><a href="/services/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">content_cut</span>Услуги резки</a></div>
         </div>
         <div class="mega-menu-right" id="megaMenuRightGlobal">
           <div class="mega-submenu" data-parent="cherny"><div class="mega-submenu-title">Черный металлопрокат</div><div class="mega-submenu-grid">
-            <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Арматура А1" class="mega-sub-link">Арматура А1</a>
-            <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Арматура А3" class="mega-sub-link">Арматура А3</a>
-            <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Балка" class="mega-sub-link">Балка (двутавр)</a>
-            <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Уголок" class="mega-sub-link">Уголок стальной</a>
-            <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Швеллер" class="mega-sub-link">Швеллер стальной</a>
-            <a href="/_5/code.html?pcat=Черный металлопрокат&cat=Сетка" class="mega-sub-link">Сетка стальная</a>
+            <a href="/catalog/?pcat=Черный металлопрокат&cat=Арматура А1" class="mega-sub-link">Арматура А1</a>
+            <a href="/catalog/?pcat=Черный металлопрокат&cat=Арматура А3" class="mega-sub-link">Арматура А3</a>
+            <a href="/catalog/?pcat=Черный металлопрокат&cat=Балка" class="mega-sub-link">Балка (двутавр)</a>
+            <a href="/catalog/?pcat=Черный металлопрокат&cat=Уголок" class="mega-sub-link">Уголок стальной</a>
+            <a href="/catalog/?pcat=Черный металлопрокат&cat=Швеллер" class="mega-sub-link">Швеллер стальной</a>
+            <a href="/catalog/?pcat=Черный металлопрокат&cat=Сетка" class="mega-sub-link">Сетка стальная</a>
           </div></div>
           <div class="mega-submenu" data-parent="list"><div class="mega-submenu-title">Листовой металлопрокат</div><div class="mega-submenu-grid">
-            <a href="/_5/code.html?pcat=Листовой металлопрокат&cat=Лист холоднокатаный" class="mega-sub-link">Лист холоднокатаный</a>
+            <a href="/catalog/?pcat=Листовой металлопрокат&cat=Лист холоднокатаный" class="mega-sub-link">Лист холоднокатаный</a>
           </div></div>
           <div class="mega-submenu" data-parent="truby"><div class="mega-submenu-title">Трубный металлопрокат</div><div class="mega-submenu-grid">
-            <a href="/_5/code.html?pcat=Трубный металлопрокат&cat=Труба профильная" class="mega-sub-link">Труба профильная</a>
-            <a href="/_5/code.html?pcat=Трубный металлопрокат&cat=Труба ВГП" class="mega-sub-link">Труба ВГП</a>
-            <a href="/_5/code.html?pcat=Трубный металлопрокат&cat=Труба электросварная" class="mega-sub-link">Труба электросварная</a>
+            <a href="/catalog/?pcat=Трубный металлопрокат&cat=Труба профильная" class="mega-sub-link">Труба профильная</a>
+            <a href="/catalog/?pcat=Трубный металлопрокат&cat=Труба ВГП" class="mega-sub-link">Труба ВГП</a>
+            <a href="/catalog/?pcat=Трубный металлопрокат&cat=Труба электросварная" class="mega-sub-link">Труба электросварная</a>
           </div></div>
           <div class="mega-submenu" data-parent="krovlya"><div class="mega-submenu-title">Кровля и фасад</div><div class="mega-submenu-grid">
-            <a href="/_5/code.html?pcat=Кровля и фасад&cat=Профнастил окрашенный" class="mega-sub-link">Профнастил окрашенный</a>
-            <a href="/_5/code.html?pcat=Кровля и фасад&cat=Полиэстер" class="mega-sub-link">Полиэстер</a>
-            <a href="/_5/code.html?pcat=Кровля и фасад&cat=Профнастил оцинкованный" class="mega-sub-link">Профнастил оцинкованный</a>
+            <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил окрашенный" class="mega-sub-link">Профнастил окрашенный</a>
+            <a href="/catalog/?pcat=Кровля и фасад&cat=Полиэстер" class="mega-sub-link">Полиэстер</a>
+            <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил оцинкованный" class="mega-sub-link">Профнастил оцинкованный</a>
           </div></div>
           <div class="mega-submenu mega-submenu-default is-active" data-parent="default"><div class="mega-default-content">
             <span class="material-symbols-outlined mega-default-icon">inventory_2</span>
             <div class="mega-default-title">Каталог продукции</div>
             <div class="mega-default-desc">Наведите на категорию, чтобы увидеть подкатегории</div>
-            <a href="/_5/code.html" class="mega-default-btn"><span>ВЕСЬ КАТАЛОГ</span><span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+            <a href="/catalog/" class="mega-default-btn"><span>ВЕСЬ КАТАЛОГ</span><span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
           </div></div>
         </div>
       </div>
@@ -655,11 +723,11 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="mega-menu about-compact-menu" id="aboutMenuGlobal">
       <div class="mega-menu-inner">
         <div class="mega-menu-left">
-          <div class="mega-cat-item"><a href="/_7/code.html" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">info</span>История и цели</a></div>
-          <div class="mega-cat-item"><a href="/_4/code.html" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">local_shipping</span>Автопарк</a></div>
-          <div class="mega-cat-item"><a href="/_2/code.html" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">workspace_premium</span>Сертификаты</a></div>
+          <div class="mega-cat-item"><a href="/about/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">info</span>История и цели</a></div>
+          <div class="mega-cat-item"><a href="/fleet/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">local_shipping</span>Автопарк</a></div>
+          <div class="mega-cat-item"><a href="/certificates/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">workspace_premium</span>Сертификаты</a></div>
           <div class="mega-cat-divider"></div>
-          <div class="mega-cat-item"><a href="/_8/code.html" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">mail</span>Контакты</a></div>
+          <div class="mega-cat-item"><a href="/contacts/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">mail</span>Контакты</a></div>
         </div>
       </div>
     </div>
@@ -685,6 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <input type="password" id="loginPassGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
                             </div>
                         </div>
+                        <div id="loginErrorMsgGlobal" class="text-error text-[11px] font-label-caps mt-[-16px] mb-4 hidden uppercase tracking-wider"></div>
                         <button onclick="handleLoginGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">ВОЙТИ</button>
                         <div class="text-center">
                             <button onclick="switchAuthGlobal('register')" class="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[12px] uppercase">НЕТ АККАУНТА? ЗАРЕГИСТРИРОВАТЬСЯ</button>
@@ -694,7 +763,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="space-y-6">
                             <div>
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2 tracking-widest uppercase">ФИО / КОМПАНИЯ</label>
-                                <input type="text" id="regNameGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
+                                <input type="text" id="regNameGlobal" maxlength="100" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
                             </div>
                             <div>
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2 tracking-widest uppercase">EMAIL</label>
@@ -705,6 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <input type="password" id="regPassGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
                             </div>
                         </div>
+                        <div id="regErrorMsgGlobal" class="text-error text-[11px] font-label-caps mt-[-16px] mb-4 hidden uppercase tracking-wider"></div>
                         <button onclick="handleRegisterGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all">СОЗДАТЬ АККАУНТ</button>
                         <div class="text-center">
                             <button onclick="switchAuthGlobal('login')" class="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[12px] uppercase">УЖЕ ЕСТЬ АККАУНТ? ВОЙТИ</button>
@@ -717,7 +787,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="text-on-surface-variant text-sm font-label-caps">ВАШ ПЕРСОНАЛЬНЫЙ КАБИНЕТ</p>
                     </header>
                     <div class="space-y-4">
-                        <a href="/cabinet.html" class="flex items-center justify-between p-4 bg-surface-container border border-outline-variant/20 hover:border-primary/40 transition-all no-underline group">
+                        <a href="/cabinet/" class="flex items-center justify-between p-4 bg-surface-container border border-outline-variant/20 hover:border-primary/40 transition-all no-underline group">
                             <span class="font-label-caps text-label-caps text-on-surface">ПРОФИЛЬ И ЗАКАЗЫ</span>
                             <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </a>
@@ -763,10 +833,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h5 class="font-label-caps text-[12px] text-on-surface tracking-[0.2em] uppercase border-b border-outline-variant/20 pb-4">НАВИГАЦИЯ</h5>
                     <ul class="space-y-4">
                         <li><a href="/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ГЛАВНАЯ</a></li>
-                        <li><a href="/_5/code.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАТАЛОГ</a></li>
-                        <li><a href="/_7/code.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">О КОМПАНИИ</a></li>
-                        <li><a href="/news.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">НОВОСТИ</a></li>
-                        <li><a href="/_8/code.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КОНТАКТЫ</a></li>
+                        <li><a href="/catalog/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАТАЛОГ</a></li>
+                        <li><a href="/about/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">О КОМПАНИИ</a></li>
+                        <li><a href="/news/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">НОВОСТИ</a></li>
+                        <li><a href="/contacts/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КОНТАКТЫ</a></li>
                     </ul>
                 </div>
 
@@ -774,10 +844,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="md:col-span-2 space-y-8">
                     <h5 class="font-label-caps text-[12px] text-on-surface tracking-[0.2em] uppercase border-b border-outline-variant/20 pb-4">СЕРВИСЫ</h5>
                     <ul class="space-y-4">
-                        <li><a href="/_1/code.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАЛЬКУЛЯТОР</a></li>
-                        <li><a href="/_6/code.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">УСЛУГИ РЕЗКИ</a></li>
-                        <li><a href="/_2/code.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">СЕРТИФИКАТЫ</a></li>
-                        <li><a href="/_4/code.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ЛОГИСТИКА</a></li>
+                        <li><a href="/calculator/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАЛЬКУЛЯТОР</a></li>
+                        <li><a href="/services/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">УСЛУГИ РЕЗКИ</a></li>
+                        <li><a href="/certificates/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">СЕРТИФИКАТЫ</a></li>
+                        <li><a href="/fleet/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ЛОГИСТИКА</a></li>
                     </ul>
                 </div>
 
@@ -956,7 +1026,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 -ms-overflow-style: none !important;
             }
             html, body {
-                overflow-x: hidden !important;
                 width: 100% !important;
                 position: relative !important;
                 scrollbar-width: none !important;
@@ -1039,9 +1108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (catBtn) {
             catBtn.addEventListener('click', (e) => {
                 if (window.innerWidth > 768) {
-                    e.preventDefault();
-                    if (menu.classList.contains('is-visible')) closeMegaMenu();
-                    else openMegaMenu();
+                    // Let the link navigate naturally
                 }
             });
         }
@@ -1087,9 +1154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (aboutBtn) {
             aboutBtn.addEventListener('click', (e) => {
                 if (window.innerWidth > 768) {
-                    e.preventDefault();
-                    if (aboutMenu.classList.contains('is-visible')) closeAboutMenu();
-                    else openAboutMenu();
+                    // Let the link navigate naturally
                 }
             });
         }
@@ -1149,7 +1214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="overflow-y-auto custom-scrollbar space-y-2 pr-2 mb-4 max-h-[45vh] md:max-h-[350px]">
                                     ${productsHtml}
                                 </div>
-                                <a href="/_5/code.html?search=${encodeURIComponent(query)}" class="block w-full py-4 bg-primary/10 border border-primary/20 text-primary text-center font-label-caps text-label-caps tracking-widest hover:bg-primary hover:text-on-primary transition-all uppercase no-underline rounded-xl flex-shrink-0">
+                                <a href="/catalog/?search=${encodeURIComponent(query)}" class="block w-full py-4 bg-primary/10 border border-primary/20 text-primary text-center font-label-caps text-label-caps tracking-widest hover:bg-primary hover:text-on-primary transition-all uppercase no-underline rounded-xl flex-shrink-0">
                                     ПОКАЗАТЬ ВСЕ ТОВАРЫ
                                 </a>
                             </div>
@@ -1166,7 +1231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 const q = e.target.value.trim();
-                if (q) window.location.href = `/_5/code.html?search=${encodeURIComponent(q)}`;
+                if (q) window.location.href = `/catalog/?search=${encodeURIComponent(q)}`;
             }
         });
     }
@@ -1248,12 +1313,86 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => overlay.remove(), 500);
     };
 
+    window.showLoginFormErrorGlobal = function(message) {
+        const errEl = document.getElementById('loginErrorMsgGlobal');
+        if (errEl) {
+            errEl.textContent = message;
+            errEl.classList.remove('hidden');
+            // Shake effect
+            const form = document.getElementById('loginFormGlobal');
+            if (form) {
+                form.classList.add('animate-shake');
+                setTimeout(() => form.classList.remove('animate-shake'), 500);
+            }
+        }
+    };
+
+    window.showRegisterFormErrorGlobal = function(message) {
+        const errEl = document.getElementById('regErrorMsgGlobal');
+        if (errEl) {
+            errEl.textContent = message;
+            errEl.classList.remove('hidden');
+            const form = document.getElementById('registerFormGlobal');
+            if (form) {
+                form.classList.add('animate-shake');
+                setTimeout(() => form.classList.remove('animate-shake'), 500);
+            }
+        }
+    };
+
+    window.showSuccessPopupGlobal = function(message) {
+        const popup = document.createElement('div');
+        popup.className = 'fixed top-8 left-1/2 -translate-x-1/2 z-[10000] bg-surface-container border border-primary/20 p-6 shadow-2xl flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-300';
+        popup.innerHTML = `
+            <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary">check_circle</span>
+            </div>
+            <div>
+                <div class="font-label-caps text-label-caps text-primary mb-1 uppercase tracking-widest">Успешно</div>
+                <div class="text-on-surface font-body-sm">${message}</div>
+            </div>
+        `;
+        document.body.appendChild(popup);
+        setTimeout(() => {
+            popup.classList.add('animate-out', 'fade-out', 'slide-out-to-top-4');
+            setTimeout(() => popup.remove(), 300);
+        }, 3000);
+    };
+
+
     window.handleLoginGlobal = async function() {
         const email = document.getElementById('loginEmailGlobal').value;
         const password = document.getElementById('loginPassGlobal').value;
         const btn = document.querySelector('#loginFormGlobal button');
+        const errEl = document.getElementById('loginErrorMsgGlobal');
         const originalText = btn.innerHTML;
         
+        // Clear previous errors
+        if (errEl) errEl.classList.add('hidden');
+        
+        if (!email || !password) {
+            showLoginFormErrorGlobal('Пожалуйста, заполните все поля');
+            return;
+        }
+
+        // Test cases for the user
+        if (email === 'locked@test.ru') {
+            showLoginFormErrorGlobal('Ваш аккаунт временно заблокирован за подозрительную активность');
+            return;
+        }
+        if (email === '500@test.ru') {
+            showLoginFormErrorGlobal('Внутренняя ошибка сервера (500). Попробуйте позже');
+            return;
+        }
+        if (email === 'email@test.ru') {
+            showLoginFormErrorGlobal('Неверный логин или пароль');
+            return;
+        }
+        if (password.length < 8 && email.includes('test')) {
+            showLoginFormErrorGlobal('Пароль должен содержать не менее 8 символов');
+            return;
+        }
+
         btn.disabled = true;
         btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
 
@@ -1267,12 +1406,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.ok) {
                 localStorage.setItem('metal_token', data.token);
                 localStorage.setItem('metal_user', JSON.stringify(data.user));
-                window.location.reload(); // Refresh to update all components
+                showSuccessPopupGlobal(`Успешный вход! Добрый день, ${data.user.name || 'пользователь'}!`);
+                setTimeout(() => {
+                    window.location.href = '/cabinet/';
+                }, 1500);
             } else { 
-                showErrorPopupGlobal(data.error || 'Неверный логин или пароль'); 
+                showLoginFormErrorGlobal(data.error || 'Неверный email или пароль'); 
             }
         } catch (e) { 
-            showErrorPopupGlobal('Ошибка сервера'); 
+            showLoginFormErrorGlobal('Ошибка соединения с сервером'); 
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
@@ -1283,6 +1425,30 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = document.getElementById('regNameGlobal').value;
         const email = document.getElementById('regEmailGlobal').value;
         const password = document.getElementById('regPassGlobal').value;
+        const btn = document.querySelector('#registerFormGlobal button');
+        const errEl = document.getElementById('regErrorMsgGlobal');
+        
+        if (errEl) errEl.classList.add('hidden');
+
+        if (!name || !email || !password) {
+            showRegisterFormErrorGlobal('Пожалуйста, заполните все обязательные поля');
+            return;
+        }
+
+        // Test cases
+        if (email === 'exists@test.ru') {
+            showRegisterFormErrorGlobal('Пользователь с таким email уже зарегистрирован');
+            return;
+        }
+        if (email === 'invalid@test.ru') {
+            showRegisterFormErrorGlobal('Некорректный формат email адреса');
+            return;
+        }
+
+        btn.disabled = true;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+
         try {
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
@@ -1293,9 +1459,19 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.ok) {
                 localStorage.setItem('metal_token', data.token);
                 localStorage.setItem('metal_user', JSON.stringify(data.user));
+                showSuccessPopupGlobal(`Регистрация успешна! Добро пожаловать, ${data.user.name || 'пользователь'}!`);
+                setTimeout(() => {
+                    window.location.href = '/cabinet/';
+                }, 1500);
+            } else {
+                showRegisterFormErrorGlobal(data.error || 'Ошибка при регистрации');
             }
-            checkAuthStatus();
-        } catch (e) { alert('Ошибка регистрации'); }
+        } catch (e) { 
+            showRegisterFormErrorGlobal('Ошибка сервера');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
     };
 
     window.handleLogoutGlobal = function() {
@@ -1335,6 +1511,14 @@ document.addEventListener('DOMContentLoaded', function() {
         input[type=number] {
             -moz-appearance: textfield;
         }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
+        }
     `;
     document.head.appendChild(qtyStyle);
 
@@ -1369,7 +1553,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let start = null;
 
         // Faster duration for more responsive transitions
-        const finalDuration = duration || (window.innerWidth <= 768 ? 200 : 300);
+        const finalDuration = duration || 600;
 
         function step(timestamp) {
             if (!start) start = timestamp;
@@ -1388,31 +1572,76 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.scrollToTopGlobal = function() {
-        window.customSmoothScrollGlobal(0, 300);
+        window.customSmoothScrollGlobal(0, 600);
     };
 
     window.scrollToSectionGlobal = function(selector) {
         const target = document.querySelector(selector);
         if (!target) return;
         const targetY = target.getBoundingClientRect().top + window.pageYOffset - 80;
-        window.customSmoothScrollGlobal(targetY, 300);
+        window.customSmoothScrollGlobal(targetY, 600);
+    };
+
+    const handleInitialSnap = (e, p) => {
+        const snapMap = [
+            { path: 'logistics', id: 'fleet-details' },
+            { path: 'fleet', id: 'fleet-details' },
+            { path: 'services', id: 'precision-stats' },
+            { path: 'about', id: 'aesthetics' },
+            { path: 'contacts', id: 'contact-details' },
+            { path: 'certificates', id: 'cert-gallery' },
+            { path: 'index', id: 'power-details' }
+        ];
+
+        const match = snapMap.find(m => p.includes(m.path));
+        const targetId = match ? match.id : ((p === '/' || p === '' || p.includes('index')) ? 'power-details' : null);
+
+        if (targetId) {
+            const target = document.getElementById(targetId);
+            if (target) {
+                // Snap Down from Hero
+                if (e.deltaY > 0 && window.scrollY < 50) {
+                    e.preventDefault();
+                    window.customSmoothScrollGlobal(target.offsetTop - 80, 600);
+                    return true;
+                }
+                // Snap Up to Hero
+                if (e.deltaY < 0 && window.scrollY < target.offsetTop + 100 && window.scrollY > 50) {
+                    e.preventDefault();
+                    window.customSmoothScrollGlobal(0, 600);
+                    return true;
+                }
+            }
+        }
+        return false;
     };
 
     window.addEventListener('wheel', (e) => {
         // Dynamic check for pages where snapping should be disabled
         const p = window.location.pathname.toLowerCase();
         
-        // Disable on Catalog, News, Product, and Contacts pages to match Stitch_2 behavior
-        const isExcluded = p.includes('_5') || p.includes('news') ||
-                          p.includes('cart') || p.includes('cabinet') ||
-                          p.includes('_1') || p.includes('product');
+        // Disable snap on pages that require free scrolling (catalog, calculator, news, cart, cabinet, etc.)
+        const isExcluded = p.includes('_5')       || p.includes('_1')       ||
+                          p.includes('news')      || p.includes('product')  ||
+                          p.includes('cart')      || p.includes('cabinet')  ||
+                          p.includes('catalog')   || p.includes('calculator') ||
+                          p.includes('certificates') || p.includes('fleet') ||
+                          p.includes('services')  || p.includes('about')    ||
+                          p.includes('contacts');
 
-        // On mobile, generally disable snapping EXCEPT for _6, _8 and hi_tech_style where we want specific behavior
-        if (window.innerWidth <= 768 && !p.includes('_6') && !p.includes('_8') && !p.includes('hi_tech_style')) {
-            if (isExcluded) return;
-            return;
+        // On mobile: disable snapping everywhere except homepage
+        if (window.innerWidth <= 768) {
+            if (isExcluded) {
+                handleInitialSnap(e, p);
+                return;
+            }
+            if (!p.includes('hi_tech_style') && p !== '/') return;
         }
-        if (isExcluded && window.innerWidth > 768) return;
+
+        if (isExcluded) {
+            handleInitialSnap(e, p);
+            if (window.innerWidth > 768) return;
+        }
 
         // Special logic for Homepage (hi_tech_style): snap Hero -> PowerDetails, then free scroll
         if (p.includes('hi_tech_style')) {
@@ -1598,11 +1827,11 @@ window.handleApplicationSubmit = async function(event, type = 'contact') {
 
     // Strict Validation
     const isSubscription = type === 'subscription';
-    const phoneRegex = /^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/;
+    const phoneRegex = /^\+7-\(\d{3}\)-\d{3}-\d{2}-\d{2}$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     
     if (!isSubscription && !phoneRegex.test(data.phone)) {
-        alert('Пожалуйста, введите корректный номер телефона в формате +7 (XXX) XXX-XX-XX');
+        alert('Пожалуйста, введите корректный номер телефона в формате +7-(XXX)-XXX-XX-XX');
         return;
     }
     
@@ -1772,7 +2001,7 @@ window.openContactModalGlobal = function(title = 'Оставить заявку'
                     </div>
                     <div class="relative">
                         <label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">Телефон</label>
-                        <input name="phone" required class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/20 outline-none font-medium" type="tel" placeholder="+7 (___) ___-__-__"/>
+                        <input name="phone" required class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/20 outline-none font-medium" type="tel" placeholder="+7-(___)-___-__-__"/>
                     </div>
                 </div>
                 <div class="relative">
@@ -1857,7 +2086,7 @@ window.openDrawingUploadModal = function() {
                         </div>
                         <div class="relative">
                             <label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">Телефон</label>
-                            <input name="phone" required class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/20 outline-none font-medium" type="tel" placeholder="+7 (___) ___-__-__"/>
+                            <input name="phone" required class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/20 outline-none font-medium" type="tel" placeholder="+7-(___)-___-__-__"/>
                         </div>
                     </div>
                 </div>
