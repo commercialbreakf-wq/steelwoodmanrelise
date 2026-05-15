@@ -233,17 +233,14 @@ app.post('/api/subscribers', async (req, res) => {
 });
 
 
-// Serve static files (Correct for Vercel)
-app.use(express.static(path.join(process.cwd(), '.'), { extensions: ['html'] }));
 
-// Fallback to index.html for SPA feel or 404
-app.use((req, res) => {
-  if (req.path.startsWith('/api')) return res.status(404).json({ error: 'API route not found' });
-  res.sendFile(path.join(process.cwd(), 'index.html'));
-});
+// NOTE: Static files are served by Vercel CDN in production.
+// express.static is only needed for local development via server.js.
+// Do NOT add express.static or HTML fallbacks here.
 
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => console.log(`Server on ${port}`));
 }
 
 module.exports = app;
+
