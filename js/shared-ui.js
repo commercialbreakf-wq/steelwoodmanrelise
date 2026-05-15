@@ -1545,6 +1545,38 @@ document.addEventListener('DOMContentLoaded', function() {
     let isScrollingGlobal = false;
     let lastScrollTimeGlobal = 0;
 
+    // Inject Global Fix for Horizontal Scroll — applied immediately
+    const globalStyle = document.createElement('style');
+    globalStyle.id = 'global-noscroll-x';
+    globalStyle.textContent = `
+        html {
+            overflow-x: hidden !important;
+            max-width: 100vw;
+        }
+        body {
+            overflow-x: hidden !important;
+            max-width: 100vw;
+            width: 100%;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            min-width: 0;
+        }
+        /* Prevent any child from breaking layout */
+        img, video, iframe, svg {
+            max-width: 100%;
+        }
+    `;
+    // Inject as early as possible
+    if (document.head) {
+        document.head.insertBefore(globalStyle, document.head.firstChild);
+    } else {
+        document.addEventListener('DOMContentLoaded', () => document.head.insertBefore(globalStyle, document.head.firstChild));
+    }
+
     window.customSmoothScrollGlobal = function(targetY, duration) {
         if (isScrollingGlobal) return;
         isScrollingGlobal = true;
@@ -1552,20 +1584,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const diff = targetY - startY;
         let start = null;
 
-        // Faster duration for more responsive transitions
-        const finalDuration = duration || 600;
+        // Optimized duration for a more premium, responsive feel
+        const finalDuration = duration || 500;
 
         function step(timestamp) {
             if (!start) start = timestamp;
             const time = timestamp - start;
             const percent = Math.min(time / finalDuration, 1);
-            // Cubic ease-out
-            const ease = 1 - Math.pow(1 - percent, 3);
+            
+            // Quartic ease-out for a more "sophisticated" and snappy start with smooth finish
+            const ease = 1 - Math.pow(1 - percent, 4);
+            
             window.scrollTo(0, startY + diff * ease);
+            
             if (time < finalDuration) {
                 window.requestAnimationFrame(step);
             } else {
-                setTimeout(() => { isScrollingGlobal = false; }, 50);
+                // Short timeout to prevent scroll bounce but maintain responsiveness
+                setTimeout(() => { isScrollingGlobal = false; }, 30);
             }
         }
         window.requestAnimationFrame(step);
@@ -1583,109 +1619,68 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const handleInitialSnap = (e, p) => {
+        // Map page paths (works with /about/, /about/index.html, about.html, etc.)
         const snapMap = [
             { path: 'logistics', id: 'fleet-details' },
-            { path: 'fleet', id: 'fleet-details' },
-            { path: 'services', id: 'precision-stats' },
-            { path: 'about', id: 'aesthetics' },
-            { path: 'contacts', id: 'contact-details' },
+            { path: 'fleet',     id: 'fleet-details' },
+            { path: 'services',  id: 'precision-stats' },
+            { path: 'about',     id: 'aesthetics' },
+            { path: 'contacts',  id: 'contact-details' },
             { path: 'certificates', id: 'cert-gallery' },
-            { path: 'index', id: 'power-details' }
         ];
 
+        // Determine target section ID
         const match = snapMap.find(m => p.includes(m.path));
-        const targetId = match ? match.id : ((p === '/' || p === '' || p.includes('index')) ? 'power-details' : null);
+        // Fallback to homepage target for '/', '/index.html', or hi_tech_style
+        const isHome = p === '/' || p === '' || p.endsWith('/index.html') || p.includes('hi_tech_style');
+        const targetId = match ? match.id : (isHome ? 'power-details' : null);
 
-        if (targetId) {
-            const target = document.getElementById(targetId);
-            if (target) {
-                // Snap Down from Hero
-                if (e.deltaY > 0 && window.scrollY < 50) {
-                    e.preventDefault();
-                    window.customSmoothScrollGlobal(target.offsetTop - 80, 600);
-                    return true;
-                }
-                // Snap Up to Hero
-                if (e.deltaY < 0 && window.scrollY < target.offsetTop + 100 && window.scrollY > 50) {
-                    e.preventDefault();
-                    window.customSmoothScrollGlobal(0, 600);
-                    return true;
-                }
-            }
+        if (!targetId) return false;
+
+        const target = document.getElementById(targetId);
+        if (!target) return false;
+
+        // Hero zone: user hasn't scrolled past the hero yet
+        const heroZone = Math.max(target.offsetTop * 0.3, 200);
+
+        // Snap Down: scrolling down while still in hero zone
+        if (e.deltaY > 0 && window.scrollY < heroZone) {
+            e.preventDefault();
+            window.customSmoothScrollGlobal(target.offsetTop - 80, 500);
+            return true;
         }
+        // Snap Up: scrolling up while just past the hero
+        if (e.deltaY < 0 && window.scrollY > 20 && window.scrollY < target.offsetTop + 150) {
+            e.preventDefault();
+            window.customSmoothScrollGlobal(0, 500);
+            return true;
+        }
+
         return false;
     };
 
     window.addEventListener('wheel', (e) => {
-        // Dynamic check for pages where snapping should be disabled
         const p = window.location.pathname.toLowerCase();
         
-        // Disable snap on pages that require free scrolling (catalog, calculator, news, cart, cabinet, etc.)
-        const isExcluded = p.includes('_5')       || p.includes('_1')       ||
-                          p.includes('news')      || p.includes('product')  ||
+        // 1. ALWAYS try the "Hero -> First Section" snap first.
+        // handleInitialSnap itself checks if we are in the right scroll zone.
+        if (handleInitialSnap(e, p)) return;
+
+        // Disable snap only on complex interactive pages
+        const isExcluded = p.includes('news')      || p.includes('product')  ||
                           p.includes('cart')      || p.includes('cabinet')  ||
                           p.includes('catalog')   || p.includes('calculator') ||
-                          p.includes('certificates') || p.includes('fleet') ||
-                          p.includes('services')  || p.includes('about')    ||
-                          p.includes('contacts');
+                          p.includes('_5')        || p.includes('_1');
 
-        // On mobile: disable snapping everywhere except homepage
+        // On mobile: strictly limit snapping to maintain UX, unless it's the main landing
         if (window.innerWidth <= 768) {
-            if (isExcluded) {
-                handleInitialSnap(e, p);
-                return;
-            }
-            if (!p.includes('hi_tech_style') && p !== '/') return;
+            if (isExcluded) return;
+            // Only allow snapping on homepage and main landing variants on mobile
+            if (p !== '/' && !p.includes('index') && !p.includes('hi_tech_style')) return;
         }
 
-        if (isExcluded) {
-            handleInitialSnap(e, p);
-            if (window.innerWidth > 768) return;
-        }
-
-        // Special logic for Homepage (hi_tech_style): snap Hero -> PowerDetails, then free scroll
-        if (p.includes('hi_tech_style')) {
-            const powerDetails = document.getElementById('power-details');
-            if (powerDetails && window.innerWidth <= 768) {
-                if ((e.deltaY > 0 && window.scrollY > 50) || 
-                    (e.deltaY < 0 && window.scrollY > powerDetails.offsetTop + 50)) {
-                    return;
-                }
-            }
-        }
-
-        // Special logic for Contacts page (_8), Fleet (_4), Certificates (_2), and History (_7): normal scroll after first content section
-        if (p.includes('_8') || p.includes('_4') || p.includes('_2') || p.includes('_7')) {
-            const detailsId = p.includes('_8') ? 'contact-details' : 
-                            (p.includes('_4') ? 'fleet-details' : 
-                            (p.includes('_2') ? 'cert-gallery' : 'aesthetics'));
-            const details = document.getElementById(detailsId);
-            if (details) {
-                if ((e.deltaY > 0 && window.scrollY > 50) || 
-                    (e.deltaY < 0 && window.scrollY > details.offsetTop + 50)) {
-                    return;
-                }
-            }
-        }
-
-
-
-        // Special logic for Cutting page (_6):
-        if (p.includes('_6')) {
-            const stats = document.getElementById('precision-stats');
-            if (stats) {
-                // On Mobile: snap only between Hero and Stats
-                if (window.innerWidth <= 768) {
-                    if ((e.deltaY > 0 && window.scrollY > 50) || 
-                        (e.deltaY < 0 && window.scrollY > stats.offsetTop + 50)) {
-                        return;
-                    }
-                }
-                // On PC: allow global snap engine to handle all sections (don't return)
-            }
-        }
-
-
+        // If explicitly excluded from full snapping (like Catalog), we stop here
+        if (isExcluded) return; 
 
         // Disable snapping if search, cart or auth drawers are open
         if (document.getElementById('globalSearchOverlay')?.classList.contains('active-search') || 
@@ -1695,38 +1690,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const now = Date.now();
-        if (isScrollingGlobal || now - lastScrollTimeGlobal < 100) {
+        if (isScrollingGlobal || now - lastScrollTimeGlobal < 50) {
             if (Math.abs(e.deltaY) > 2) e.preventDefault();
             return;
         }
 
-        // Free scroll up from footer to forms section
-        if (e.deltaY < 0) {
-            const forms = document.getElementById('forms-section');
-            if (forms && window.scrollY > forms.offsetTop - 50) {
-                return;
-            }
-        }
+        // Unified Snapping Logic (Same as Homepage)
         if (Math.abs(e.deltaY) > 5) {
             e.preventDefault();
             lastScrollTimeGlobal = now;
             
+            // Collect all potential snap targets
             const snapTargets = Array.from(document.querySelectorAll('section, footer'))
                 .filter(s => s.offsetHeight > 150); 
 
             let target = null;
+            const threshold = 100;
+
             if (e.deltaY > 0) {
-                // Scroll Down: Find first section whose top is below the header
-                target = snapTargets.find(s => s.getBoundingClientRect().top > 85);
+                // Scroll Down: Find first section whose top is below viewport top
+                target = snapTargets.find(s => s.getBoundingClientRect().top > threshold);
             } else {
-                // Scroll Up: Find last section whose top is above the header
+                // Scroll Up: Find last section whose top is above viewport top
                 const reversed = [...snapTargets].reverse();
-                target = reversed.find(s => s.getBoundingClientRect().top < -85);
+                target = reversed.find(s => s.getBoundingClientRect().top < -threshold);
+                
+                // If we're scrolling up from the first section, go to Hero (top)
+                if (!target && window.scrollY > 0) {
+                    window.customSmoothScrollGlobal(0, 500);
+                    return;
+                }
             }
             
             if (target) {
                 const targetY = target.getBoundingClientRect().top + window.pageYOffset - 80;
-                window.customSmoothScrollGlobal(targetY, 600);
+                window.customSmoothScrollGlobal(targetY, 500);
             }
         }
     }, { passive: false });
