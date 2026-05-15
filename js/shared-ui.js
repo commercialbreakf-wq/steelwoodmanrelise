@@ -2207,3 +2207,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     observer.observe(document.body, { childList: true, subtree: true });
 });
+
+// ============================================================
+// VERCEL WEB ANALYTICS
+// Initialize Vercel Web Analytics for page view tracking
+// ============================================================
+(function() {
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    
+    // Dynamically load the Vercel Analytics script
+    var script = document.createElement('script');
+    script.defer = true;
+    script.src = '/_vercel/insights/script.js';
+    document.head.appendChild(script);
+})();
