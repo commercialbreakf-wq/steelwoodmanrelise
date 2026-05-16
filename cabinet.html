@@ -150,9 +150,12 @@ body{background-color:#151311;color:#e7e2dd;-webkit-font-smoothing:antialiased}
 
     <div id="cabinetError" class="hidden text-center py-32 space-y-6">
         <span class="material-symbols-outlined text-error text-6xl">error</span>
-        <h2 class="text-2xl font-bold uppercase">ДОСТУП ОГРАНИЧЕН</h2>
-        <p class="text-on-surface-variant max-w-md mx-auto">Для просмотра этой страницы необходимо войти в свой аккаунт.</p>
-        <button onclick="toggleAuthModalGlobal()" class="px-12 py-4 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest">ВОЙТИ</button>
+        <h2 class="text-2xl font-bold uppercase" id="errorTitle">ДОСТУП ОГРАНИЧЕН</h2>
+        <p class="text-on-surface-variant max-w-md mx-auto" id="errorMsg">Для просмотра этой страницы необходимо войти в свой аккаунт.</p>
+        <div class="flex flex-col items-center gap-4">
+            <button onclick="toggleAuthModalGlobal()" class="px-12 py-4 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:brightness-110 transition-all uppercase">ВОЙТИ В АККАУНТ</button>
+            <a href="/" class="text-on-surface-variant text-xs uppercase tracking-widest hover:text-primary transition-colors">Вернуться на главную</a>
+        </div>
     </div>
 </main>
 
@@ -179,7 +182,7 @@ async function loadCabinet() {
             
             // Fill form
             document.getElementById('editName').value = user.name || '';
-            document.getElementById('editPhone').value = user.phone || '';
+            document.getElementById('editPhone').value = window.formatPhoneGlobal(user.phone || '');
             document.getElementById('editCompany').value = user.company_name || '';
             document.getElementById('editInn').value = user.inn || '';
             document.getElementById('editKpp').value = user.kpp || '';
@@ -190,11 +193,18 @@ async function loadCabinet() {
 
             loadOrders();
         } else {
-            throw new Error('Unauthorized');
+            const errData = await res.json().catch(() => ({}));
+            console.error('Cabinet: Auth failed', errData);
+            document.getElementById('errorTitle').textContent = 'СЕССИЯ ПРЕРВАНА';
+            document.getElementById('errorMsg').textContent = errData.error || 'Сессия истекла или недействительна. Пожалуйста, войдите снова.';
+            throw new Error(errData.error || 'Unauthorized');
         }
     } catch (e) {
         document.getElementById('cabinetLoading').classList.add('hidden');
         document.getElementById('cabinetError').classList.remove('hidden');
+        if (e.message.includes('базе данных')) {
+            document.getElementById('errorTitle').textContent = 'ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН';
+        }
     }
 }
 

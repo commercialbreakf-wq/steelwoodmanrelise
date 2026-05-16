@@ -6,23 +6,35 @@ window.maskPhoneGlobal = function(input) {
     let val = input.value.replace(/\D/g, '');
     if (val.startsWith('7')) val = val.substring(1);
     else if (val.startsWith('8')) val = val.substring(1);
-    
     val = val.substring(0, 10);
     
-    let res = '+7-';
+    let res = '+7';
     if (val.length > 0) {
-        res += '(' + val.substring(0, 3);
-        if (val.length > 3) {
-            res += ')-' + val.substring(3, 6);
-            if (val.length > 6) {
-                res += '-' + val.substring(6, 8);
-                if (val.length > 8) {
-                    res += '-' + val.substring(8, 10);
-                }
-            }
-        }
+        res += '-(' + val.substring(0, 3);
+        if (val.length >= 3) res += ')';
+        if (val.length > 3) res += '-' + val.substring(3, 6);
+        if (val.length > 6) res += '-' + val.substring(6, 8);
+        if (val.length > 8) res += '-' + val.substring(8, 10);
     }
     input.value = res;
+};
+
+window.formatPhoneGlobal = function(value) {
+    if (!value) return '';
+    let val = value.replace(/\D/g, '');
+    if (val.startsWith('7')) val = val.substring(1);
+    else if (val.startsWith('8')) val = val.substring(1);
+    val = val.substring(0, 10);
+    
+    let res = '+7';
+    if (val.length > 0) {
+        res += '-(' + val.substring(0, 3);
+        if (val.length >= 3) res += ')';
+        if (val.length > 3) res += '-' + val.substring(3, 6);
+        if (val.length > 6) res += '-' + val.substring(6, 8);
+        if (val.length > 8) res += '-' + val.substring(8, 10);
+    }
+    return res;
 };
 
 window.limitDigitsGlobal = function(input, max) {
@@ -37,14 +49,17 @@ window.limitDigitsGlobal = function(input, max) {
 
 window.validateProfileDataGlobal = function(data) {
     if (data.phone) {
-        const phoneRegex = /^\+7-\(\d{3}\)-\d{3}-\d{2}-\d{2}$/;
-        if (!phoneRegex.test(data.phone)) return "Введите полный номер телефона: +7-(000)-000-00-00";
+        const digits = data.phone.replace(/\D/g, '');
+        // We expect 11 digits (7 + 10 digits)
+        if (digits.length !== 11) return "Введите полный номер телефона (11 цифр)";
     }
     if (data.inn && data.inn.length > 0) {
-        if (!/^\d{10}$|^\d{12}$/.test(data.inn)) return "ИНН должен содержать 10 или 12 цифр";
+        const digits = data.inn.replace(/\D/g, '');
+        if (digits.length !== 10 && digits.length !== 12) return "ИНН должен содержать 10 или 12 цифр";
     }
     if (data.kpp && data.kpp.length > 0) {
-        if (!/^\d{9}$/.test(data.kpp)) return "КПП должен содержать 9 цифр";
+        const digits = data.kpp.replace(/\D/g, '');
+        if (digits.length !== 9) return "КПП должен содержать 9 цифр";
     }
     return null;
 };
@@ -464,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
              <div class="hidden md:flex items-center gap-8 mx-auto whitespace-nowrap">
                 <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline" href="/">ГЛАВНАЯ</a>
                 <div class="catalog-menu-wrapper relative" id="catalogMenuWrapperGlobal">
-                    <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 flex items-center gap-1 cursor-pointer no-underline" id="catalogBtnGlobal" href="/catalog/">КАТАЛОГ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
+                    <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 flex items-center gap-1 cursor-pointer no-underline" id="catalogBtnGlobal" href="/catalog">КАТАЛОГ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
                 </div>
                 <div class="about-menu-wrapper relative h-full flex items-center" id="aboutMenuWrapperGlobal">
                     <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline flex items-center gap-1 cursor-pointer" id="aboutBtnGlobal" href="/about.html">О КОМПАНИИ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
@@ -512,26 +527,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="space-y-4 pt-2">
                     <h3 class="text-[10px] font-label-caps text-on-surface-variant tracking-[0.2em] uppercase opacity-40 mb-4 px-1">О КОМПАНИИ</h3>
                     <div class="flex flex-col gap-5 pl-1">
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/about/">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/about">
                             <span class="material-symbols-outlined text-primary text-lg">info</span>
                             История и цели
                         </a>
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/fleet/">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/logistics">
                             <span class="material-symbols-outlined text-primary text-lg">local_shipping</span>
                             Автопарк
                         </a>
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/certificates/">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/certificates">
                             <span class="material-symbols-outlined text-primary text-lg">workspace_premium</span>
                             Сертификаты
                         </a>
-                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/contacts/">
+                        <a class="text-md font-display-xl uppercase hover:text-primary transition-all no-underline text-on-surface flex items-center gap-3" href="/contacts">
                             <span class="material-symbols-outlined text-primary text-lg">mail</span>
                             Контакты
                         </a>
                     </div>
                 </div>
 
-                <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/news/">
+                <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/news">
                     <span class="material-symbols-outlined text-primary text-xl">newspaper</span>
                     НОВОСТИ
                 </a>
@@ -620,11 +635,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="space-y-6 pt-4 border-t border-white/5">
                         <h3 class="text-[10px] font-label-caps text-on-surface-variant tracking-[0.2em] uppercase opacity-40 mb-2 px-1">ДОПОЛНИТЕЛЬНО</h3>
                         <div class="flex flex-col gap-5 pl-1">
-                            <a href="/calculator/" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
+                            <a href="/calculator" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
                                 <span class="material-symbols-outlined text-primary text-lg">calculate</span>
                                 Калькулятор веса
                             </a>
-                            <a href="/services/" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
+                            <a href="/services" class="text-md font-display-xl uppercase hover:text-primary no-underline text-on-surface flex items-center gap-3">
                                 <span class="material-symbols-outlined text-primary text-lg">content_cut</span>
                                 Услуги резки
                             </a>
@@ -685,8 +700,8 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="mega-cat-item" data-submenu="truby"><a href="/catalog/?pcat=Трубный металлопрокат" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">radio_button_unchecked</span>Трубный металлопрокат<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
           <div class="mega-cat-item" data-submenu="krovlya"><a href="/catalog/?pcat=Кровля и фасад" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">roofing</span>Кровля и фасад<span class="material-symbols-outlined mega-arrow">chevron_right</span></a></div>
           <div class="mega-cat-divider"></div>
-          <div class="mega-cat-item" data-submenu="none"><a href="/calculator/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">calculate</span>Калькулятор</a></div>
-          <div class="mega-cat-item" data-submenu="none"><a href="/services/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">content_cut</span>Услуги резки</a></div>
+          <div class="mega-cat-item" data-submenu="none"><a href="/calculator" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">calculate</span>Калькулятор</a></div>
+          <div class="mega-cat-item" data-submenu="none"><a href="/services" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">content_cut</span>Услуги резки</a></div>
         </div>
         <div class="mega-menu-right" id="megaMenuRightGlobal">
           <div class="mega-submenu" data-parent="cherny"><div class="mega-submenu-title">Черный металлопрокат</div><div class="mega-submenu-grid">
@@ -714,7 +729,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="material-symbols-outlined mega-default-icon">inventory_2</span>
             <div class="mega-default-title">Каталог продукции</div>
             <div class="mega-default-desc">Наведите на категорию, чтобы увидеть подкатегории</div>
-            <a href="/catalog/" class="mega-default-btn"><span>ВЕСЬ КАТАЛОГ</span><span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+            <a href="/catalog" class="mega-default-btn"><span>ВЕСЬ КАТАЛОГ</span><span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
           </div></div>
         </div>
       </div>
@@ -723,11 +738,11 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="mega-menu about-compact-menu" id="aboutMenuGlobal">
       <div class="mega-menu-inner">
         <div class="mega-menu-left">
-          <div class="mega-cat-item"><a href="/about/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">info</span>История и цели</a></div>
-          <div class="mega-cat-item"><a href="/fleet/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">local_shipping</span>Автопарк</a></div>
-          <div class="mega-cat-item"><a href="/certificates/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">workspace_premium</span>Сертификаты</a></div>
+          <div class="mega-cat-item"><a href="/about" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">info</span>История и цели</a></div>
+          <div class="mega-cat-item"><a href="/logistics" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">local_shipping</span>Автопарк</a></div>
+          <div class="mega-cat-item"><a href="/certificates" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">workspace_premium</span>Сертификаты</a></div>
           <div class="mega-cat-divider"></div>
-          <div class="mega-cat-item"><a href="/contacts/" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">mail</span>Контакты</a></div>
+          <div class="mega-cat-item"><a href="/contacts" class="mega-cat-link"><span class="material-symbols-outlined mega-cat-icon">mail</span>Контакты</a></div>
         </div>
       </div>
     </div>
@@ -796,7 +811,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
             <footer class="pt-8 border-t border-outline-variant/10 mt-auto">
-                <p class="text-[10px] text-on-surface-variant opacity-50 uppercase tracking-widest leading-relaxed">INDUSTRIAL PRECISION CLOUD SERVICE v1.0</p>
+                <p class="text-[10px] text-on-surface-variant opacity-50 uppercase tracking-widest leading-relaxed">ЖЕЛЕЗНЫЙ ДРОВОСЕК CLOUD SERVICE v2.0</p>
             </footer>
         </div>
     </div>
@@ -833,10 +848,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h5 class="font-label-caps text-[12px] text-on-surface tracking-[0.2em] uppercase border-b border-outline-variant/20 pb-4">НАВИГАЦИЯ</h5>
                     <ul class="space-y-4">
                         <li><a href="/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ГЛАВНАЯ</a></li>
-                        <li><a href="/catalog/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАТАЛОГ</a></li>
-                        <li><a href="/about/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">О КОМПАНИИ</a></li>
-                        <li><a href="/news/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">НОВОСТИ</a></li>
-                        <li><a href="/contacts/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КОНТАКТЫ</a></li>
+                        <li><a href="/catalog" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАТАЛОГ</a></li>
+                        <li><a href="/about" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">О КОМПАНИИ</a></li>
+                        <li><a href="/news" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">НОВОСТИ</a></li>
+                        <li><a href="/contacts" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КОНТАКТЫ</a></li>
                     </ul>
                 </div>
 
@@ -844,10 +859,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="md:col-span-2 space-y-8">
                     <h5 class="font-label-caps text-[12px] text-on-surface tracking-[0.2em] uppercase border-b border-outline-variant/20 pb-4">СЕРВИСЫ</h5>
                     <ul class="space-y-4">
-                        <li><a href="/calculator/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАЛЬКУЛЯТОР</a></li>
-                        <li><a href="/services/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">УСЛУГИ РЕЗКИ</a></li>
-                        <li><a href="/certificates/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">СЕРТИФИКАТЫ</a></li>
-                        <li><a href="/fleet/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ЛОГИСТИКА</a></li>
+                        <li><a href="/calculator" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАЛЬКУЛЯТОР</a></li>
+                        <li><a href="/services" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">УСЛУГИ РЕЗКИ</a></li>
+                        <li><a href="/certificates" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">СЕРТИФИКАТЫ</a></li>
+                        <li><a href="/logistics" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ЛОГИСТИКА</a></li>
                     </ul>
                 </div>
 
@@ -873,7 +888,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <!-- Bottom Copyright -->
             <div class="pt-10 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-6">
-                <p class="font-label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] uppercase">© 2024 ЖЕЛЕЗНЫЙ ДРОВОСЕК. INDUSTRIAL PRECISION.</p>
+                <p class="font-label-caps text-[10px] text-on-surface-variant/50 tracking-[0.3em] uppercase">© 2024 ЖЕЛЕЗНЫЙ ДРОВОСЕК.</p>
                 <div class="flex gap-8">
                     <a href="#" class="font-label-caps text-[10px] text-on-surface-variant/30 hover:text-primary transition-colors no-underline tracking-[0.2em] uppercase">Privacy Policy</a>
                     <a href="#" class="font-label-caps text-[10px] text-on-surface-variant/30 hover:text-primary transition-colors no-underline tracking-[0.2em] uppercase">Terms of Service</a>
@@ -1247,12 +1262,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     async function checkAuthStatus() {
-        const token = localStorage.getItem('metal_token');
-        if (!token) { showLoggedOut(); return; }
-        try {
-            const res = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
-            if (res.ok) { const user = await res.json(); showLoggedIn(user); } else { showLoggedOut(); }
-        } catch (e) { showLoggedOut(); }
+        if (window.checkAuthStatus) {
+            await window.checkAuthStatus();
+        }
     }
 
     function showLoggedIn(user) {
@@ -1414,7 +1426,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 showLoginFormErrorGlobal(data.error || 'Неверный email или пароль'); 
             }
         } catch (e) { 
-            showLoginFormErrorGlobal('Ошибка соединения с сервером'); 
+            console.error('Login error details:', e);
+            showLoginFormErrorGlobal('Ошибка соединения: ' + (e.message || 'сервер не отвечает')); 
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
@@ -1547,30 +1560,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Inject Global Fix for Horizontal Scroll — applied immediately
     const globalStyle = document.createElement('style');
-    globalStyle.id = 'global-noscroll-x';
     globalStyle.textContent = `
-        html {
+        html, body {
             overflow-x: hidden !important;
-            max-width: 100vw;
-        }
-        body {
-            overflow-x: hidden !important;
-            max-width: 100vw;
-            width: 100%;
-            position: relative;
+            max-width: 100vw !important;
             margin: 0;
             padding: 0;
-        }
-        *, *::before, *::after {
             box-sizing: border-box;
-            min-width: 0;
+            width: 100%;
+            touch-action: pan-y;
+            position: relative;
         }
-        /* Prevent any child from breaking layout */
-        img, video, iframe, svg {
-            max-width: 100%;
-        }
+        * { box-sizing: border-box; }
+        main, section, footer, div { max-width: 100vw; }
+        ::-webkit-scrollbar:horizontal { display: none !important; }
+        #globalPreloader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
     `;
-    // Inject as early as possible
     if (document.head) {
         document.head.insertBefore(globalStyle, document.head.firstChild);
     } else {
@@ -1612,6 +1617,16 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.scrollToSectionGlobal = function(selector) {
+        if (!selector) {
+            // Find current section and scroll to next
+            const sections = Array.from(document.querySelectorAll('section, main > div[id]'));
+            const currentY = window.scrollY + 150;
+            const nextSection = sections.find(s => s.offsetTop > currentY);
+            if (nextSection) {
+                window.customSmoothScrollGlobal(nextSection.offsetTop - 80, 600);
+            }
+            return;
+        }
         const target = document.querySelector(selector);
         if (!target) return;
         const targetY = target.getBoundingClientRect().top + window.pageYOffset - 80;
@@ -1619,115 +1634,58 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const handleInitialSnap = (e, p) => {
-        // Map page paths (works with /about/, /about/index.html, about.html, etc.)
-        const snapMap = [
-            { path: 'logistics', id: 'fleet-details' },
-            { path: 'fleet',     id: 'fleet-details' },
-            { path: 'services',  id: 'precision-stats' },
-            { path: 'about',     id: 'aesthetics' },
-            { path: 'contacts',  id: 'contact-details' },
-            { path: 'certificates', id: 'cert-gallery' },
-        ];
+        // Standardized snap targets for block scrolling
+        const snapMap = {
+            'index': 'hero-target',
+            'about': 'about-hero-target',
+            'services': 'services-hero-target',
+            'logistics': 'fleet-hero-target',
+            'certificates': 'certs-hero-target'
+        };
 
-        // Determine target section ID
-        const match = snapMap.find(m => p.includes(m.path));
-        // Fallback to homepage target for '/', '/index.html', or hi_tech_style
-        const isHome = p === '/' || p === '' || p.endsWith('/index.html') || p.includes('hi_tech_style');
-        const targetId = match ? match.id : (isHome ? 'power-details' : null);
+        let targetId = null;
+        if (p === '/' || p === '' || p.includes('index')) targetId = snapMap['index'];
+        else {
+            for (const [key, val] of Object.entries(snapMap)) {
+                if (p.includes(key)) {
+                    targetId = val;
+                    break;
+                }
+            }
+        }
 
         if (!targetId) return false;
-
         const target = document.getElementById(targetId);
         if (!target) return false;
 
-        // Hero zone: user hasn't scrolled past the hero yet
-        const heroZone = Math.max(target.offsetTop * 0.3, 200);
+        // Snap logic: Triggered when user is at the very top and scrolls down
+        const heroZone = target.offsetTop * 0.4;
 
-        // Snap Down: scrolling down while still in hero zone
+        // Snap Down from Hero
         if (e.deltaY > 0 && window.scrollY < heroZone) {
             e.preventDefault();
-            window.customSmoothScrollGlobal(target.offsetTop - 80, 500);
+            window.customSmoothScrollGlobal(target.offsetTop - 80, 600);
             return true;
         }
-        // Snap Up: scrolling up while just past the hero
-        if (e.deltaY < 0 && window.scrollY > 20 && window.scrollY < target.offsetTop + 150) {
+        
+        // Snap Up to Hero (if close to the top)
+        if (e.deltaY < 0 && window.scrollY > 20 && window.scrollY < target.offsetTop + 50) {
             e.preventDefault();
-            window.customSmoothScrollGlobal(0, 500);
+            window.customSmoothScrollGlobal(0, 600);
             return true;
         }
 
         return false;
     };
 
+    // NATIVE SCROLL MIGRATION: The custom snapping engine is now deprecated in favor of native browser scrolling.
+    // This allows for a more fluid experience as requested by the user.
+    /*
     window.addEventListener('wheel', (e) => {
-        const p = window.location.pathname.toLowerCase();
-        
-        // 1. ALWAYS try the "Hero -> First Section" snap first.
-        // handleInitialSnap itself checks if we are in the right scroll zone.
-        if (handleInitialSnap(e, p)) return;
-
-        // Disable snap only on complex interactive pages
-        const isExcluded = p.includes('news')      || p.includes('product')  ||
-                          p.includes('cart')      || p.includes('cabinet')  ||
-                          p.includes('catalog')   || p.includes('calculator') ||
-                          p.includes('_5')        || p.includes('_1');
-
-        // On mobile: strictly limit snapping to maintain UX, unless it's the main landing
-        if (window.innerWidth <= 768) {
-            if (isExcluded) return;
-            // Only allow snapping on homepage and main landing variants on mobile
-            if (p !== '/' && !p.includes('index') && !p.includes('hi_tech_style')) return;
-        }
-
-        // If explicitly excluded from full snapping (like Catalog), we stop here
-        if (isExcluded) return; 
-
-        // Disable snapping if search, cart or auth drawers are open
-        if (document.getElementById('globalSearchOverlay')?.classList.contains('active-search') || 
-            document.getElementById('cartPanelGlobal')?.classList.contains('translate-x-0') ||
-            document.getElementById('authPanelGlobal')?.classList.contains('translate-x-0')) {
-            return; 
-        }
-        
-        const now = Date.now();
-        if (isScrollingGlobal || now - lastScrollTimeGlobal < 50) {
-            if (Math.abs(e.deltaY) > 2) e.preventDefault();
-            return;
-        }
-
-        // Unified Snapping Logic (Same as Homepage)
-        if (Math.abs(e.deltaY) > 5) {
-            e.preventDefault();
-            lastScrollTimeGlobal = now;
-            
-            // Collect all potential snap targets
-            const snapTargets = Array.from(document.querySelectorAll('section, footer'))
-                .filter(s => s.offsetHeight > 150); 
-
-            let target = null;
-            const threshold = 100;
-
-            if (e.deltaY > 0) {
-                // Scroll Down: Find first section whose top is below viewport top
-                target = snapTargets.find(s => s.getBoundingClientRect().top > threshold);
-            } else {
-                // Scroll Up: Find last section whose top is above viewport top
-                const reversed = [...snapTargets].reverse();
-                target = reversed.find(s => s.getBoundingClientRect().top < -threshold);
-                
-                // If we're scrolling up from the first section, go to Hero (top)
-                if (!target && window.scrollY > 0) {
-                    window.customSmoothScrollGlobal(0, 500);
-                    return;
-                }
-            }
-            
-            if (target) {
-                const targetY = target.getBoundingClientRect().top + window.pageYOffset - 80;
-                window.customSmoothScrollGlobal(targetY, 500);
-            }
-        }
+        // Snapping logic removed to enable native scrolling site-wide.
     }, { passive: false });
+    */
+
 
 
     window.checkAnyPopupOpenGlobal = function() {
@@ -1823,14 +1781,16 @@ window.handleApplicationSubmit = async function(event, type = 'contact') {
         type: type
     };
 
-    // Strict Validation
+    // Flexible Validation
     const isSubscription = type === 'subscription';
-    const phoneRegex = /^\+7-\(\d{3}\)-\d{3}-\d{2}-\d{2}$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     
-    if (!isSubscription && !phoneRegex.test(data.phone)) {
-        alert('Пожалуйста, введите корректный номер телефона в формате +7-(XXX)-XXX-XX-XX');
-        return;
+    if (!isSubscription) {
+        const digits = data.phone.replace(/\D/g, '');
+        if (digits.length !== 11) {
+            alert('Пожалуйста, введите полный номер телефона (11 цифр)');
+            return;
+        }
     }
     
     if (isSubscription) {
@@ -1939,7 +1899,7 @@ window.showApplicationSuccessPopup = function(title = 'Заявка принят
                 <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </button>
             
-            <p class="mt-8 text-[10px] text-on-surface-variant/40 uppercase tracking-[0.3em]">INDUSTRIAL PRECISION CLOUD SERVICE</p>
+            <p class="mt-8 text-[10px] text-on-surface-variant/40 uppercase tracking-[0.3em]">ЖЕЛЕЗНЫЙ ДРОВОСЕК CLOUD SERVICE</p>
         </div>
     `;
     document.body.appendChild(popup);
@@ -2141,34 +2101,13 @@ window.closeDrawingModal = function() {
         document.body.style.overflow = ''; // Restore scroll AFTER animation
     }, 500);
 };
-// Phone Masking Utility
+// Phone Masking Utility - Unified with Global
 window.applyPhoneMask = function(input) {
-    input.addEventListener('input', (e) => {
-        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
-        if (!x) return;
-        if (!x[2] && x[1] !== '') {
-            e.target.value = x[1] === '7' || x[1] === '8' ? '+7 (' : '+7 (' + x[1];
-        } else {
-            e.target.value = !x[3] ? '+7 (' + x[2] : '+7 (' + x[2] + ') ' + x[3] + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : '');
-        }
-
-        // Real-time validation styling
-        if (e.target.value.length > 0 && e.target.value.length < 18) {
-            input.style.borderColor = '#ffb4ab'; // error color
-        } else {
-            input.style.borderColor = '';
-        }
-    });
-
+    if (!input.hasAttribute('oninput')) {
+        input.setAttribute('oninput', 'maskPhoneGlobal(this)');
+    }
     input.addEventListener('focus', (e) => {
-        if (!e.target.value) e.target.value = '+7 (';
-    });
-
-    input.addEventListener('blur', (e) => {
-        if (e.target.value === '+7 (') {
-            e.target.value = '';
-            input.style.borderColor = '';
-        }
+        if (!e.target.value) e.target.value = '+7';
     });
 };
 

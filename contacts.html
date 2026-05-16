@@ -133,9 +133,9 @@
 </head>
 <body class="bg-background text-on-surface font-body-md selection:bg-primary selection:text-on-primary">
 <!-- Shared Header -->
-<main class="min-h-screen">
+<main>
 <!-- Hero Section -->
-<section id="hero" class="relative min-h-screen flex flex-col border-b machined-border bg-background">
+<section id="hero" class="relative min-h-[100dvh] flex flex-col border-b machined-border bg-background">
     <div class="absolute inset-0 z-0">
         <img alt="Industrial Facility" class="w-full h-full object-cover grayscale opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbXTvW2oixr9-eQg-7brjPngDVA3y1BGv3ouFmRST6Y4VG3kWJTSvgrtlgCoh082z45DY3-EBK-ckPzbST4935hFkm4KIQ4nNtm5qzxW-0MSjjBgW7TwGuZbQSipnTHnwylNB_kYdeSJD8jbkGEkHwzF7m3DpdX38WgzGB-HupfOeh1DnKspoWtGtzBlteabeiDGWztwSMhixbqhiypwtY3mS0RqI8D7qHo21SXfJ0vpsKVgdACKWse72GJF47aQSdBg1WqAj2koY"/>
         <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
@@ -152,7 +152,7 @@
     </div>
 
     <!-- Scroll Arrow -->
-    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 z-20">
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 z-20 cursor-pointer" onclick="document.getElementById('contact-details').scrollIntoView({ behavior: 'smooth' })">
         <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
     </div>
 </section>
@@ -234,7 +234,7 @@
 </div>
 <div class="flex flex-col gap-unit">
 <label class="text-label-lg font-label-lg uppercase text-primary">Номер телефона</label>
-<input name="phone" class="bg-surface-container-low border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface transition-colors py-3" placeholder="+7 (___) ___-__-__" type="tel" required/>
+<input name="phone" class="bg-surface-container-low border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface transition-colors py-3" placeholder="Телефон (+7-(000)-000-00-00)" type="tel" required/>
 </div>
 <div class="flex flex-col gap-unit">
 <label class="text-label-lg font-label-lg uppercase text-primary">Тип проекта</label>
@@ -259,22 +259,24 @@
 </div>
 </div>
 </section>
-<!-- CTA Section -->
-<section class="max-w-[1440px] mx-auto px-margin py-stack-lg">
-<div class="machined-border bg-primary-container p-gutter flex flex-col md:flex-row items-center justify-between gap-gutter">
-<div class="max-w-xl text-on-primary-fixed">
-<h2 class="font-headline-lg text-headline-lg uppercase mb-unit">Нужна срочная консультация?</h2>
-<p class="font-body-lg text-body-lg font-bold">Свяжитесь напрямую с нашим главным инженером для сложных промышленных запросов.</p>
-</div>
-<div class="flex gap-stack-md">
-<a class="flex items-center gap-stack-sm bg-surface-container-lowest text-on-surface px-stack-lg py-stack-md machined-border hover:bg-surface transition-colors" href="tel:+79930777717">
-<span class="material-symbols-outlined">call</span>
-<span class="font-label-lg uppercase">ПРЯМАЯ ЛИНИЯ</span>
-</a>
-</div>
-</div>
-</section>
+    <!-- Final Flow: CTA and Footer -->
+    <div class="bg-surface-dim">
+        <!-- CTA Section -->
+        <section class="max-w-[1440px] mx-auto px-margin py-stack-lg">
+            <div class="machined-border bg-primary-container p-gutter flex flex-col md:flex-row items-center justify-between gap-gutter">
+                <div class="max-w-xl text-on-primary-fixed">
+                    <h2 class="font-headline-lg text-headline-lg uppercase mb-unit text-[24px] md:text-[32px]">Нужна срочная консультация?</h2>
+                    <p class="font-body-lg text-body-lg font-bold">Свяжитесь напрямую с нашим главным инженером для сложных промышленных запросов.</p>
+                </div>
+                <div class="flex gap-stack-md">
+                    <a class="flex items-center gap-stack-sm bg-surface-container-lowest text-on-surface px-stack-lg py-stack-md machined-border hover:bg-surface transition-colors" href="tel:+79930777717">
+                        <span class="material-symbols-outlined">call</span>
+                        <span class="font-label-lg uppercase">ПРЯМАЯ ЛИНИЯ</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <footer id="globalFooter" class="py-12 border-t border-outline-variant/10"></footer>
+    </div>
 </main>
-
-<footer id="globalFooter"></footer>
 </body></html>

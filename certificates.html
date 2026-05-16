@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html class="dark scroll-smooth" lang="ru"><head>
+<html class="dark" lang="ru"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Сертификаты качества | ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
@@ -122,13 +122,13 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background font-body-md selection:bg-primary/30">
+<body class="bg-background text-on-background font-body-md selection:bg-primary/30 overflow-x-hidden">
 
 <div id="globalHeader"></div>
 
 <main>
     <!-- SCREEN 1: Hero & Stats -->
-    <section class="relative min-h-[100dvh] flex flex-col pt-20 metal-grid-overlay" id="hero">
+    <section id="hero" class="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden metal-grid-overlay">
         <div class="absolute inset-0 z-0">
             <img alt="" class="w-full h-full object-cover opacity-40 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGB2aEMNQ9XYvV0hQ520-g95z1i0Jt2fIJEptfFnxt0OBIY35x8zH8ghK5xwqcvqFsFI44gO6-W4UrZ4e90lo2ZU9LnyBcsEIAG73q6EMm-MhF_r-EZLFzc_6OhtKeSSWS5Nn4E12Z9bNo016pqgTTG3m_yHlrvLjyZBbmpgq0GaX-WrQ3FXdomiXJwgzCizjh1RWiRUrXMXpra5PXKOCGZaNs0Czh7beBJ2Z-jDEvj5HZL9vxq5THX8VZUiV1A7iQAXMJO_mULL0"/>
             <div class="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background"></div>
@@ -162,14 +162,13 @@
         </div>
 
         <!-- Scroll Arrow -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#cert-gallery')">
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer z-20" onclick="document.getElementById('certs-hero-target').scrollIntoView({ behavior: 'smooth' })">
             <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
         </div>
     </section>
-    
-    <div>
+
     <!-- SCREEN 2: Certificate Gallery -->
-    <section id="cert-gallery" class="bg-surface-container-low py-section-gap px-margin-edge max-w-[1440px] mx-auto scroll-mt-20">
+    <section id="certs-hero-target" class="bg-surface-container-low pt-24 pb-12 px-margin-edge max-w-[1440px] mx-auto">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 md:mb-8 gap-4">
             <div class="max-w-2xl">
                 <span class="text-primary font-label-caps text-[10px] uppercase tracking-widest mb-2 block">БИБЛИОТЕКА СТАНДАРТОВ</span>
@@ -186,7 +185,7 @@
         
         <div id="certGrid" class="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-gutter transition-all duration-300 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
             <!-- Card 1 -->
-            <div onclick="window.location.href='/_2/certificate_view.html?category=Нержавеющая сталь&standard=ГОСТ 5632-2014'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="stainless">
+            <div onclick="window.location.href='/certificate_view.html?category=Нержавеющая сталь&standard=ГОСТ 5632-2014'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="stainless">
                 <div class="aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5] bg-surface-container-highest flex items-center justify-center p-6 lg:p-8 relative overflow-hidden">
                     <img alt="Нержавеющая сталь" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-500" src="/images/cert_stainless.png"/>
                     <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -203,7 +202,7 @@
                 </div>
             </div>
             <!-- Card 2 -->
-            <div onclick="window.location.href='/_2/certificate_view.html?category=Менеджмент качества&standard=ISO 9001:2015'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="stainless">
+            <div onclick="window.location.href='/certificate_view.html?category=Менеджмент качества&standard=ISO 9001:2015'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="stainless">
                 <div class="aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5] bg-surface-container-highest flex items-center justify-center p-6 lg:p-8 relative overflow-hidden">
                     <img alt="ISO 9001:2015" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-500" src="/images/cert_iso9001.png"/>
                     <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -220,7 +219,7 @@
                 </div>
             </div>
             <!-- Card 3 -->
-            <div onclick="window.location.href='/_2/certificate_view.html?category=Алюминиевые сплавы&standard=ГОСТ 4784-97'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="aluminum">
+            <div onclick="window.location.href='/certificate_view.html?category=Алюминиевые сплавы&standard=ГОСТ 4784-97'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="aluminum">
                 <div class="aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5] bg-surface-container-highest flex items-center justify-center p-6 lg:p-8 relative overflow-hidden">
                     <img alt="Алюминиевые сплавы" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-500" src="/images/cert_aluminum.png"/>
                     <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -237,7 +236,7 @@
                 </div>
             </div>
             <!-- Card 4 -->
-            <div onclick="window.location.href='/_2/certificate_view.html?category=Углеродистая сталь&standard=ГОСТ 380-2005'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="carbon">
+            <div onclick="window.location.href='/certificate_view.html?category=Углеродистая сталь&standard=ГОСТ 380-2005'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="carbon">
                 <div class="aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5] bg-surface-container-highest flex items-center justify-center p-6 lg:p-8 relative overflow-hidden">
                     <img alt="Углеродистая сталь" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-500" src="/images/cert_carbon.png"/>
                     <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -257,7 +256,7 @@
     </section>
 
     <!-- SCREEN 3: Internal Quality Center -->
-    <section class="min-h-screen md:min-h-screen flex items-center bg-surface-container-lowest border-y machined-border overflow-hidden">
+    <section class="min-h-[100dvh] md:min-h-[100dvh] flex items-center bg-surface-container-lowest border-y machined-border overflow-hidden">
         <div class="max-w-[1440px] mx-auto px-margin-edge grid grid-cols-1 lg:grid-cols-2 items-center gap-12 md:gap-16 w-full py-20 md:py-10">
             <div>
                 <span class="text-primary font-label-caps text-xs md:text-label-caps tracking-[0.3em] mb-4 block uppercase">ЛАБОРАТОРНЫЙ КОНТРОЛЬ</span>
@@ -291,7 +290,7 @@
     </section>
 
     <!-- SCREEN 4: CTA & Footer & Legal -->
-    <section class="min-h-screen flex flex-col justify-between bg-surface-container-lowest border-t machined-border">
+    <section class="min-h-[100dvh] flex flex-col justify-between bg-surface-container-lowest border-t machined-border">
         <div class="flex-grow flex items-center px-margin-edge max-w-[1440px] mx-auto w-full py-12">
             <div class="bg-primary text-on-primary-fixed p-12 md:p-20 relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-12 w-full machined-border shadow-2xl">
                 <div class="relative z-10 max-w-xl">
@@ -312,7 +311,6 @@
         
         <footer id="globalFooter" class="mt-auto !pt-8 !pb-8"></footer>
     </section>
-    </div>
 </main>
 
 <script>

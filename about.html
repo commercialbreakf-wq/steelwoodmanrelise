@@ -76,9 +76,9 @@
 </head>
 <body class="bg-background text-on-surface selection:bg-primary selection:text-on-primary font-body-md">
 <!-- Shared Header injected by shared-ui.js -->
-<main>
+<main class="overflow-x-hidden">
 <!-- Hero / History Section -->
-<section class="relative !p-0 min-h-screen flex flex-col justify-center" id="hero">
+<section class="relative !p-0 min-h-[100dvh] flex flex-col justify-center" id="hero">
     <div class="absolute inset-0 z-0">
         <img alt="Мастер металлообработки" class="w-full h-full object-cover grayscale opacity-30 scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxZCUQ1wR6VHSR7-94QYIpC_lqU2fuhGKlPw4H6FduJzm_C4ZyFh5H-1gAeVZ8JuxpfvC25kdEL9giF_4TAjPRJ-71SW7s6ZO-mJk-9CkvjCevwq0iVDusgEWWt3_a0QUSrEETl7fdPJrWsZNSN2LM18TSjzhQ31UBqpdMMvZmYvRmIMngX6tBNLjv7g8HYeuCTYLlVdtjRclkGXmHBBWKPdq4nLKNKBPQJZHUb0HoWyOX2j7apGYIiQAwfdbh4sn55di02W5dC2M"/>
         <div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
@@ -100,7 +100,7 @@
     </div>
 
     <!-- Scroll Arrow -->
-    <div class="absolute bottom-32 md:bottom-36 left-1/2 -translate-x-1/2 animate-bounce opacity-50 z-20">
+    <div class="absolute bottom-32 md:bottom-36 left-1/2 -translate-x-1/2 animate-bounce opacity-50 z-20 cursor-pointer" onclick="window.scrollToSectionGlobal('#about-hero-target')">
         <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
     </div>
 
@@ -128,29 +128,29 @@
 </section>
 
 <!-- Manufacturing / Gallery Section -->
-<section id="aesthetics" class="bg-surface-container-low min-h-screen flex flex-col justify-center !pt-10 !pb-10">
-<div class="px-margin-edge-mobile md:px-margin-edge max-w-container-max mx-auto w-full h-full flex flex-col justify-center">
-<div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-1 flex-shrink-0 items-end">
+<section id="about-hero-target" class="bg-surface-container-low h-[100dvh] flex flex-col justify-center overflow-hidden">
+<div class="px-margin-edge-mobile md:px-margin-edge max-w-container-max mx-auto w-full h-full flex flex-col justify-center py-20 md:py-32">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8 flex-shrink-0 items-end">
 <div class="md:col-span-8">
-<h2 class="font-display-xl text-2xl md:text-3xl lg:text-4xl leading-none uppercase">ЭСТЕТИКА ИНДУСТРИИ</h2>
+<h2 class="font-display-xl text-3xl md:text-5xl lg:text-6xl leading-none uppercase">ЭСТЕТИКА ИНДУСТРИИ</h2>
 </div>
 <div class="md:col-span-4">
-<p class="font-body-md text-[9px] md:text-[10px] text-on-surface-variant opacity-70 leading-none mb-1">
-    Безупречный порядок, лазерная резка и автоматизация.
+<p class="font-body-md text-sm md:text-base text-on-surface-variant opacity-70 leading-relaxed">
+    Безупречный порядок, лазерная резка и автоматизация технологических процессов.
 </p>
 </div>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-12 gap-2 flex-1 min-h-0 max-h-[60vh]">
-<div class="md:col-span-9 overflow-hidden rounded-xl border border-white/5 h-40 md:h-full">
-<img alt="Современный склад" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaYkCwsotEvEF2kwBQCPNBdaprIcTfQfNTSzjAnsffVEGU6BGufjjfQFigx4I11Tj0VqIovdq6BafCzQF5Mj5Qv8Lsmm7ekValwnurgkDR8QjGejP5zSS4mQZIVpcSYoagVFx_wkZCK4k_DdKRs2uAzo-El-IwFgmsin2rKzZuDObkOJeHikSh_XFhbnAGpt81DJLBa4W3zu1TOjbD8jFfi31fAJcnUpLx4JA5qnaQpQxlczS0-DSlRr-64h49Px8JjWXHzNUnkA0"/>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 flex-1 min-h-0 overflow-hidden">
+<div class="md:col-span-9 overflow-hidden rounded-3xl border border-white/5 h-full">
+<img alt="Современный склад" class="w-full h-full object-cover grayscale hover:scale-105 transition-transform duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaYkCwsotEvEF2kwBQCPNBdaprIcTfQfNTSzjAnsffVEGU6BGufjjfQFigx4I11Tj0VqIovdq6BafCzQF5Mj5Qv8Lsmm7ekValwnurgkDR8QjGejP5zSS4mQZIVpcSYoagVFx_wkZCK4k_DdKRs2uAzo-El-IwFgmsin2rKzZuDObkOJeHikSh_XFhbnAGpt81DJLBa4W3zu1TOjbD8jFfi31fAJcnUpLx4JA5qnaQpQxlczS0-DSlRr-64h49Px8JjWXHzNUnkA0"/>
 </div>
-<div class="md:col-span-3 flex flex-col gap-2 h-full">
-<div class="flex-1 overflow-hidden rounded-xl border border-white/5 h-32 md:h-auto">
-<img alt="Металлические рулоны" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsw9a_Bh8MOD9SoyVZlHpy8exk3hax8Huz2aUY33Kdbov9zj1QRAUP9SzsCh8TDRExP9D02IKmAULJrs8YmDl3JyZaKreNgfmkddo_O7ZUFTuZoKR7r3Y7ZRxbscd48GHARDqpCrazvpb0hreh38oTLeNCIF-WK_sTgrtf8FmRKZP8COymEaFACF7-AM4h-fOZMnhM0X3LR3yH4nMRen4BF0uCs9g4GyUjLW09Bxm4vT8rZrodMYAnBkJ64I-MJJuqj0U8LynyIqY"/>
+<div class="md:col-span-3 flex flex-col gap-4 h-full">
+<div class="flex-1 overflow-hidden rounded-3xl border border-white/5">
+<img alt="Металлические рулоны" class="w-full h-full object-cover grayscale hover:scale-110 transition-transform duration-1000" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsw9a_Bh8MOD9SoyVZlHpy8exk3hax8Huz2aUY33Kdbov9zj1QRAUP9SzsCh8TDRExP9D02IKmAULJrs8YmDl3JyZaKreNgfmkddo_O7ZUFTuZoKR7r3Y7ZRxbscd48GHARDqpCrazvpb0hreh38oTLeNCIF-WK_sTgrtf8FmRKZP8COymEaFACF7-AM4h-fOZMnhM0X3LR3yH4nMRen4BF0uCs9g4GyUjLW09Bxm4vT8rZrodMYAnBkJ64I-MJJuqj0U8LynyIqY"/>
 </div>
-<div class="bg-surface-container flex flex-col items-center justify-center p-2 rounded-xl border border-white/5 flex-shrink-0">
-<div class="text-xl md:text-2xl font-display-xl text-primary leading-none">0.01мм</div>
-<p class="font-label-caps text-[8px] text-on-surface-variant tracking-widest uppercase mt-0.5 opacity-50">Точность</p>
+<div class="bg-surface-container flex flex-col items-center justify-center p-8 rounded-3xl border border-white/5 flex-shrink-0">
+<div class="text-3xl md:text-4xl font-display-xl text-primary leading-none">0.01мм</div>
+<p class="font-label-caps text-[10px] text-on-surface-variant tracking-widest uppercase mt-2 opacity-50">Точность реза</p>
 </div>
 </div>
 </div>
@@ -158,97 +158,90 @@
 </section>
 
 <!-- Contacts Section -->
-<section class="flex flex-col pt-24 pb-12 px-margin-edge-mobile md:px-margin-edge max-w-container-max mx-auto border-b border-white/5" id="access-points">
-<div class="flex-1 flex flex-col justify-center">
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-<!-- Contact Info -->
-<div class="lg:col-span-5 space-y-12">
-<div>
-<span class="font-label-caps text-label-caps text-primary mb-4 block text-[10px] md:text-sm tracking-[0.2em] uppercase">Свяжитесь с нами</span>
-<h2 class="font-display-xl text-5xl md:text-8xl mb-12 uppercase leading-none">ТОЧКИ<br/>ДОСТУПА</h2>
-</div>
-<div class="space-y-8">
-<div class="flex gap-6 items-start group">
-<div class="w-12 h-12 flex-shrink-0 flex items-center justify-center border border-white/10 rounded-full group-hover:border-primary transition-all">
-<span class="material-symbols-outlined text-primary">location_on</span>
-</div>
-<div class="flex-1">
-<h4 class="font-label-caps text-[10px] text-primary mb-1 tracking-widest uppercase">АДРЕС</h4>
-<p class="text-sm md:text-base leading-relaxed opacity-80">Ленинградская область, Ломоносовский район, Виллозское городское поселение, Южная часть промзоны Горелово, Волхонское шоссе, 4</p>
-</div>
-</div>
-<div class="flex gap-6 items-start group">
-<div class="w-12 h-12 flex-shrink-0 flex items-center justify-center border border-white/10 rounded-full group-hover:border-primary transition-all">
-<span class="material-symbols-outlined text-primary">call</span>
-</div>
-<div>
-<h4 class="font-label-caps text-[10px] text-primary mb-1 tracking-widest uppercase">ТЕЛЕФОН</h4>
-<p class="text-lg md:text-2xl font-bold"><a class="no-underline text-on-surface hover:text-primary transition-colors" href="tel:+79930777717">+7 (993) 077-77-17</a></p>
-<p class="text-[10px] text-on-surface-variant opacity-60 uppercase tracking-widest">Пн–Пт: 08:00 – 20:00</p>
-</div>
-</div>
-<div class="flex gap-6 items-start group">
-<div class="w-12 h-12 flex-shrink-0 flex items-center justify-center border border-white/10 rounded-full group-hover:border-primary transition-all">
-<span class="material-symbols-outlined text-primary">mail</span>
-</div>
-<div>
-<h4 class="font-label-caps text-[10px] text-primary mb-1 tracking-widest uppercase">ЭМЕЙЛ</h4>
-<p class="text-lg md:text-2xl font-bold"><a class="no-underline text-on-surface hover:text-primary transition-colors" href="mailto:info@steelwoodman.ru">info@steelwoodman.ru</a></p>
-<p class="text-[10px] text-on-surface-variant opacity-60 uppercase tracking-widest">Отвечаем в течение часа</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Contact Form -->
-<div class="lg:col-span-7">
-<div class="bg-[#1a1816] p-8 md:p-12 rounded-[2.5rem] border border-white/5 shadow-2xl relative">
-<h3 class="font-display-xl text-3xl md:text-5xl mb-10 uppercase tracking-tight">ОСТАВЬТЕ ЗАЯВКУ</h3>
-<form class="space-y-8" onsubmit="window.handleApplicationSubmit(event, 'about_contact')">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-<div class="relative">
-<label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">ВАШЕ ИМЯ</label>
-<input class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/5 outline-none" name="name" placeholder="Иван Иванов" required="" type="text"/>
-</div>
-<div class="relative">
-<label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">КОНТАКТНЫЙ ТЕЛЕФОН</label>
-<input class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/5 outline-none" name="phone" placeholder="+7 (___) ___-__-__" required="" type="tel"/>
-</div>
-</div>
-<div class="relative">
-<label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">ЭЛЕКТРОННАЯ ПОЧТА</label>
-<input class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/5 outline-none" name="email" placeholder="example@mail.ru" type="email"/>
-</div>
-<div class="relative">
-<label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">ВАШЕ СООБЩЕНИЕ</label>
-<textarea class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/5 outline-none resize-none" name="message" placeholder="Опишите ваш запрос или вопрос..." rows="3"></textarea>
-</div>
-<button class="w-full md:w-auto px-10 py-5 bg-primary text-on-primary font-label-caps font-bold tracking-widest hover:brightness-110 transition-all duration-300 group flex items-center justify-center gap-3 rounded-full text-[12px]">
-                                ОТПРАВИТЬ ЗАПРОС
-                                <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
-</button>
-</form>
-</div>
-</div>
-</div>
-</div>
-
-
-
-
-
-
-</section>
-
-<!-- Free Scroll Area (Map & Footer) -->
-<div class="px-margin-edge-mobile md:px-margin-edge max-w-container-max mx-auto mb-20 mt-12">
-    <div class="w-full h-[300px] md:h-[400px] overflow-hidden rounded-[2.5rem] grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all duration-1000 shadow-2xl border border-white/5 relative group">
-        <div class="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary/20 rounded-2xl blur opacity-10 group-hover:opacity-40 transition duration-1000"></div>
-        <div class="relative w-full h-full">
-            <iframe allowfullscreen="true" frameborder="0" height="100%" src="https://yandex.ru/map-widget/v1/?ll=30.141121%2C59.789123&amp;mode=search&amp;ol=geo&amp;ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg1NzQ0NDU0NBJI0KDQvtGB0YHQuNGPLCDQm9C10L3QuNC90LPRgNCw0LTRgdC60LDRjyDQvtCx0LvQsNGB0YLRjCwg0JvQvtC80L7QvdC-0YHQvtCy0YHQutC40Lkg0YDQsNC50L7QvSwg0JLQuNC70LvQvtC30YHQutC-0LUg0LPQvtGA0L7QtNGB0LrQvtC1INC_0L7RgdC10LvQvtC90LjQtSwg0K7QttC90LDRjyDRh9Cw0YHRgtGMINC_0YDQvtC80LfQvtC90Ysg0JPQvtGA0LXQu0-0LLQviwg0JLQvtC70YXQvtC90YHQutC-0LUg0YjQvtGB0YHQtSwgNCIKDYpZGEIVXmteQg%2C%2C&amp;z=16" style="position:relative; filter: contrast(1.1) saturate(1.1);" width="100%"></iframe>        </div>
+<!-- SCREEN 3: Contacts & Map & Footer Merged -->
+<section class="min-h-[100dvh] flex flex-col justify-between bg-background" id="access-points">
+    <div class="flex-1 flex flex-col justify-center py-20 px-margin-edge-mobile md:px-margin-edge max-w-container-max mx-auto w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <!-- Contact Info -->
+            <div class="lg:col-span-5 space-y-12">
+                <div>
+                    <span class="font-label-caps text-label-caps text-primary mb-4 block text-[10px] md:text-sm tracking-[0.2em] uppercase">СВЯЖИТЕСЬ С НАМИ</span>
+                    <h2 class="font-display-xl text-5xl md:text-8xl mb-12 uppercase leading-none">ТОЧКИ<br/>ДОСТУПА</h2>
+                </div>
+                <div class="space-y-8">
+                    <div class="flex gap-6 items-start group">
+                        <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center border border-white/10 rounded-full group-hover:border-primary transition-all">
+                            <span class="material-symbols-outlined text-primary">location_on</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-label-caps text-[10px] text-primary mb-1 tracking-widest uppercase">АДРЕС</h4>
+                            <p class="text-sm md:text-base leading-relaxed opacity-80">Ленинградская область, Ломоносовский район, Виллозское городское поселение, Южная часть промзоны Горелово, Волхонское шоссе, 4</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6 items-start group">
+                        <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center border border-white/10 rounded-full group-hover:border-primary transition-all">
+                            <span class="material-symbols-outlined text-primary">call</span>
+                        </div>
+                        <div>
+                            <h4 class="font-label-caps text-[10px] text-primary mb-1 tracking-widest uppercase">ТЕЛЕФОН</h4>
+                            <p class="text-lg md:text-2xl font-bold"><a class="no-underline text-on-surface hover:text-primary transition-colors" href="tel:+79930777717">+7 (993) 077-77-17</a></p>
+                            <p class="text-[10px] text-on-surface-variant opacity-60 uppercase tracking-widest">Пн–Пт: 08:00 – 20:00</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6 items-start group">
+                        <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center border border-white/10 rounded-full group-hover:border-primary transition-all">
+                            <span class="material-symbols-outlined text-primary">mail</span>
+                        </div>
+                        <div>
+                            <h4 class="font-label-caps text-[10px] text-primary mb-1 tracking-widest uppercase">ЭМЕЙЛ</h4>
+                            <p class="text-lg md:text-2xl font-bold"><a class="no-underline text-on-surface hover:text-primary transition-colors" href="mailto:info@steelwoodman.ru">info@steelwoodman.ru</a></p>
+                            <p class="text-[10px] text-on-surface-variant opacity-60 uppercase tracking-widest">Отвечаем в течение часа</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Contact Form -->
+            <div class="lg:col-span-7">
+                <div class="bg-[#1a1816] p-8 md:p-12 rounded-[2.5rem] border border-white/5 shadow-2xl relative">
+                    <h3 class="font-display-xl text-3xl md:text-5xl mb-10 uppercase tracking-tight">ОСТАВЬТЕ ЗАЯВКУ</h3>
+                    <form class="space-y-8" onsubmit="window.handleApplicationSubmit(event, 'about_contact')">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="relative">
+                                <label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">ВАШЕ ИМЯ</label>
+                                <input class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/5 outline-none" name="name" placeholder="Иван Иванов" required="" type="text"/>
+                            </div>
+                            <div class="relative">
+                                <label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">КОНТАКТНЫЙ ТЕЛЕФОН</label>
+                                <input class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-on-surface-variant/50 outline-none" name="phone" placeholder="Телефон (+7-(000)-000-00-00)" required="" type="tel"/>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">ЭЛЕКТРОННАЯ ПОЧТА</label>
+                            <input class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/5 outline-none" name="email" placeholder="example@mail.ru" type="email"/>
+                        </div>
+                        <div class="relative">
+                            <label class="font-label-caps text-[10px] text-on-surface-variant mb-2 block tracking-widest uppercase font-bold">ВАШЕ СООБЩЕНИЕ</label>
+                            <textarea class="w-full bg-transparent border-b border-white/10 focus:border-primary focus:ring-0 transition-all py-3 text-on-surface placeholder:text-white/5 outline-none resize-none" name="message" placeholder="Опишите ваш запрос или вопрос..." rows="3"></textarea>
+                        </div>
+                        <button class="w-full md:w-auto px-10 py-5 bg-primary text-on-primary font-label-caps font-bold tracking-widest hover:brightness-110 transition-all duration-300 group flex items-center justify-center gap-3 rounded-full text-[12px]">
+                            ОТПРАВИТЬ ЗАПРОС
+                            <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Small -->
+        <div class="w-full h-[200px] md:h-[250px] overflow-hidden rounded-3xl mt-12 grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all duration-1000 shadow-2xl border border-white/5 relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary/20 rounded-2xl blur opacity-10 group-hover:opacity-40 transition duration-1000"></div>
+            <div class="relative w-full h-full">
+                <iframe allowfullscreen="true" frameborder="0" height="100%" src="https://yandex.ru/map-widget/v1/?ll=30.141121%2C59.789123&amp;mode=search&amp;ol=geo&amp;ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg1NzQ0NDU0NBJI0KDQvtGB0YHQuNGPLCDQm9C10L3QuNC90LPRgNCw0LTRgdC60LDRjyDQvtCx0LvQsNGB0YLRjCwg0JvQvtC80L7QvdC-0YHQvtCy0YHQutC40Lkg0YDQsNC50L7QvSwg0JLQuNC70LvQvtC30YHQutC-0LUg0LPQvtGA0L7QtNGB0LrQvtC1INC_0L7RgdC10LvQvtC90LjQtSwg0K7QttC90LDRjyDRh9Cw0YHRgtGMINC_0YDQvtC80LfQvtC90Ysg0JPQvtGA0LXQu0-0LLQviwg0JLQvtC70YXQvtC90YHQutC-0LUg0YjQvtGB0YHQtSwgNCIKDYpZGEIVXmteQg%2C%2C&amp;z=16" style="position:relative; filter: contrast(1.1) saturate(1.1);" width="100%"></iframe>
+            </div>
+        </div>
     </div>
-</div>
-</main>
-<!-- Footer injected by shared-ui.js -->
-<footer id="globalFooter"></footer>
+    
+    <footer id="globalFooter" class="mt-auto py-8"></footer>
+</section>
 </body>
 </html>

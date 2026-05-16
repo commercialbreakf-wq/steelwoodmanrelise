@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="ru">
 <head>
 <meta charset="utf-8"/>
@@ -87,22 +87,55 @@ tailwind.config = {
 <!-- Calculator -->
 <section class="glass-panel p-6 md:p-8 space-y-6 bg-surface-container/50 border border-outline-variant/10">
 <h3 class="font-label-caps text-label-caps text-primary">КАЛЬКУЛЯТОР СТОИМОСТИ</h3>
-<div>
-<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2 text-[12px] uppercase tracking-widest opacity-60">КОЛИЧЕСТВО</label>
-<div class="flex items-center bg-surface-container border border-outline-variant/10 overflow-hidden h-20 group hover:border-primary/30 transition-all">
-    <input id="calcQty" class="w-40 bg-transparent border-none text-left pl-8 font-bold text-on-surface outline-none text-[42px] h-full" type="text" value="1.00" inputmode="decimal"/>
-    <span id="calcUnit" class="text-on-surface-variant font-label-caps text-sm tracking-widest flex-1 opacity-50 uppercase">ТОНН</span>
-    <div class="flex flex-col h-full w-24 border-l border-white/5 bg-white/5">
-        <button onclick="stepQty(1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors border-b border-white/5 group/btn">
-            <span class="material-symbols-outlined text-primary text-[36px] group-hover/btn:scale-125 transition-transform">expand_less</span>
-        </button>
-        <button onclick="stepQty(-1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors group/btn">
-            <span class="material-symbols-outlined text-primary text-[36px] group-hover/btn:scale-125 transition-transform">expand_more</span>
-        </button>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Weight -->
+    <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-2 uppercase tracking-widest opacity-60">ВЕС (Т)</label>
+        <div class="flex items-center bg-surface-container border border-outline-variant/10 h-16 group hover:border-primary/30 transition-all">
+            <input id="calcWeight" class="w-full bg-transparent border-none text-left pl-4 font-bold text-on-surface outline-none text-xl" type="text" value="1.00" inputmode="decimal"/>
+            <div class="flex flex-col h-full w-12 border-l border-white/5">
+                <button onclick="stepInput('weight', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
+                    <span class="material-symbols-outlined text-primary text-xl">expand_less</span>
+                </button>
+                <button onclick="stepInput('weight', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
+                    <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
+                </button>
+            </div>
+        </div>
     </div>
-    <p id="qtyLimitMsg" class="text-[10px] text-primary font-bold mt-2 hidden animate-pulse uppercase tracking-wider">Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.</p>
+    <!-- Quantity -->
+    <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-2 uppercase tracking-widest opacity-60">КОЛ-ВО (ШТ)</label>
+        <div class="flex items-center bg-surface-container border border-outline-variant/10 h-16 group hover:border-primary/30 transition-all">
+            <input id="calcQty" class="w-full bg-transparent border-none text-left pl-4 font-bold text-on-surface outline-none text-xl" type="text" value="1" inputmode="numeric"/>
+            <div class="flex flex-col h-full w-12 border-l border-white/5">
+                <button onclick="stepInput('qty', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
+                    <span class="material-symbols-outlined text-primary text-xl">expand_less</span>
+                </button>
+                <button onclick="stepInput('qty', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
+                    <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Length -->
+    <div>
+        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-2 uppercase tracking-widest opacity-60">ДЛИНА (ММ)</label>
+        <div class="flex items-center bg-surface-container border border-outline-variant/10 h-16 group hover:border-primary/30 transition-all">
+            <input id="calcLen" class="w-full bg-transparent border-none text-left pl-4 font-bold text-on-surface outline-none text-xl" type="text" value="6000" inputmode="numeric"/>
+            <div class="flex flex-col h-full w-12 border-l border-white/5">
+                <button onclick="stepInput('len', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
+                    <span class="material-symbols-outlined text-primary text-xl">expand_less</span>
+                </button>
+                <button onclick="stepInput('len', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
+                    <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
+
 <div class="grid grid-cols-2 gap-4">
 <div class="bg-surface-container p-4">
 <span class="font-label-caps text-[10px] text-on-surface-variant block uppercase" id="priceLabel1">Цена за тонну</span>
@@ -119,7 +152,7 @@ tailwind.config = {
 <span class="text-[32px] md:text-[40px] lg:text-[48px] font-display-xl text-primary leading-none whitespace-nowrap" id="totalPrice"></span>
 </div>
 
-<button onclick="addToCart('${product.id}')" class="w-full h-16 bg-transparent border border-primary text-primary font-label-caps text-label-caps tracking-widest relative overflow-hidden group pink-glow transition-all duration-500">
+<button id="addToCartBtn" class="w-full h-16 bg-transparent border border-primary text-primary font-label-caps text-label-caps tracking-widest relative overflow-hidden group pink-glow transition-all duration-500">
 <span class="relative z-10 transition-colors duration-500 group-hover:text-on-primary">В КОРЗИНУ</span>
 <div class="absolute top-0 left-0 w-0 h-full bg-primary transition-all duration-500 group-hover:w-full -z-0"></div>
 </button>
@@ -151,23 +184,37 @@ async function init() {
   }
 
   try {
-    const res = await fetch(`/api/products/${productId}`);
-    if (!res.ok) throw new Error();
+    const fetchUrl = `/api/products/${productId}`;
+    console.log('Fetching product from:', fetchUrl);
+    const res = await fetch(fetchUrl);
+    
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('API Error:', res.status, errorData);
+      showNotFound(res.status, errorData.error || 'Ошибка сервера', `URL: ${fetchUrl}, Error: ${errorData.details || 'No details'}`);
+      return;
+    }
+    
     const product = await res.json();
+    console.log('Product loaded:', product.name);
     renderProduct(product);
     loadRelated(product.category, product.id);
   } catch (e) {
-    showNotFound();
+    console.error('Fetch error:', e);
+    showNotFound(null, 'Сетевая ошибка', e.message);
   }
 }
 
-function showNotFound() {
-  document.querySelector('main').innerHTML = `
+function showNotFound(status, error, details) {
+  let errorHtml = `
     <div class="text-center py-32">
       <p class="text-6xl mb-8">🔍</p>
       <h1 class="text-3xl font-bold mb-4">Товар не найден</h1>
+      ${error ? `<p class="text-primary mb-2">${error}</p>` : ''}
+      ${details ? `<p class="text-on-surface-variant text-sm mb-8 opacity-60">${details}</p>` : ''}
       <a href="/catalog/" class="text-primary hover:underline font-label-caps">← ВЕРНУТЬСЯ В КАТАЛОГ</a>
     </div>`;
+  document.querySelector('main').innerHTML = errorHtml;
 }
 
 let currentProduct = null;
@@ -199,82 +246,90 @@ function renderProduct(product) {
     </div>`).join('');
   document.getElementById('specsTable').innerHTML = specsHtml;
 
-  // Calculator
+  // Calculator Logic
   const hasTonPrice = product.price_ton > 0;
-  const calcUnit = document.getElementById('calcUnit');
+  const calcWeight = document.getElementById('calcWeight');
   const calcQty = document.getElementById('calcQty');
+  const calcLen = document.getElementById('calcLen');
   
   if (hasTonPrice) {
-    calcUnit.textContent = 'Т';
     document.getElementById('priceLabel1').textContent = 'Цена за тонну';
     document.getElementById('priceValue1').textContent = product.price_ton.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' ₽';
-    document.getElementById('priceLabel2').textContent = product.unit_label;
+    document.getElementById('priceLabel2').textContent = product.unit_label || 'Цена за метр';
     document.getElementById('priceValue2').textContent = product.price_unit.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' ₽';
-    calcQty.value = "1.00";
+    calcWeight.value = "1.00";
+    calcQty.value = Math.round(product.price_ton / (product.price_unit || 1));
+    calcLen.value = (parseFloat(product.length) || 6) * 1000;
   } else {
-    calcUnit.textContent = 'М²';
-    document.getElementById('priceLabel1').textContent = product.unit_label;
+    // If no ton price, hide irrelevant fields
+    calcWeight.parentElement.parentElement.classList.add('opacity-30', 'pointer-events-none');
+    document.getElementById('priceLabel1').textContent = product.unit_label || 'Цена за ед.';
     document.getElementById('priceValue1').textContent = product.price_unit.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' ₽';
     document.getElementById('priceLabel2').textContent = '';
     document.getElementById('priceValue2').textContent = '';
-    calcQty.value = "1.00";
+    calcQty.value = "1";
+    calcLen.value = "1000";
   }
 
-  function updateTotal() {
-    let qty = parseFloat(calcQty.value.replace(',', '.')) || 0;
-    const limitMsg = document.getElementById('qtyLimitMsg');
+  function updateTotal(source) {
+    const p_ton = product.price_ton || 0;
+    const p_unit = product.price_unit || 0;
+    const weight_per_unit = p_ton > 0 ? (p_unit / p_ton) : 0;
     
-    if (hasTonPrice && qty >= 1000) { 
-        qty = 1000; 
-        calcQty.value = "1000.00"; 
-        if (limitMsg) limitMsg.classList.remove('hidden');
-    } else {
-        if (limitMsg) limitMsg.classList.add('hidden');
+    let weight = parseFloat(calcWeight.value.replace(',', '.')) || 0;
+    let qty = parseInt(calcQty.value) || 0;
+    let len = parseInt(calcLen.value) || 0; // in mm
+
+    if (source === 'weight') {
+        if (weight_per_unit > 0) {
+            qty = Math.round(weight / (weight_per_unit * (len / 1000)));
+            calcQty.value = qty;
+        }
+    } else if (source === 'qty' || source === 'len') {
+        if (weight_per_unit > 0) {
+            weight = qty * weight_per_unit * (len / 1000);
+            calcWeight.value = weight.toFixed(3);
+        }
     }
-    
+
     let total;
     if (hasTonPrice) {
-      total = qty * product.price_ton;
+      total = weight * p_ton;
     } else {
-      total = qty * product.price_unit;
+      total = qty * p_unit;
     }
     
     const priceEl = document.getElementById('totalPrice');
     const priceStr = total.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
     priceEl.textContent = priceStr;
-    
-    // Auto-shrink font size if text is too long
-    if (priceStr.length > 15) priceEl.style.fontSize = '32px';
-    else if (priceStr.length > 12) priceEl.style.fontSize = '38px';
-    else priceEl.style.fontSize = ''; // Default from class
   }
   
-  window.stepQty = function(delta) {
-    const input = document.getElementById('calcQty');
-    let val = parseFloat(input.value.replace(',', '.')) || 0;
-    const step = hasTonPrice ? 0.1 : 1;
-    
-    if (hasTonPrice && delta > 0 && val >= 1000) {
-        updateTotal(); // Show message
-        return;
+  window.stepInput = function(type, delta) {
+    if (type === 'weight') {
+        let val = parseFloat(calcWeight.value.replace(',', '.')) || 0;
+        calcWeight.value = Math.max(0, val + (delta * 0.1)).toFixed(2);
+        updateTotal('weight');
+    } else if (type === 'qty') {
+        let val = parseInt(calcQty.value) || 0;
+        calcQty.value = Math.max(0, val + delta);
+        updateTotal('qty');
+    } else if (type === 'len') {
+        let val = parseInt(calcLen.value) || 0;
+        calcLen.value = Math.max(0, val + (delta * 100));
+        updateTotal('len');
     }
-    
-    val = Math.max(0, val + (delta * step));
-    if (hasTonPrice) val = Math.min(1000, val);
-    input.value = val.toFixed(2);
-    updateTotal();
   };
 
-  calcQty.addEventListener('input', updateTotal);
-  calcQty.addEventListener('blur', () => {
-      let val = parseFloat(calcQty.value.replace(',', '.')) || 0;
-      if (hasTonPrice) val = Math.min(1000, val);
-      calcQty.value = val.toFixed(2);
-      updateTotal();
-  });
+  calcWeight.addEventListener('input', () => updateTotal('weight'));
+  calcQty.addEventListener('input', () => updateTotal('qty'));
+  calcLen.addEventListener('input', () => updateTotal('len'));
+  
   updateTotal();
   
-  document.querySelector('button.pink-glow').setAttribute('onclick', 'addToCart()');
+  const buyBtn = document.getElementById('addToCartBtn');
+  if (buyBtn) {
+    buyBtn.onclick = () => addToCart();
+  }
 }
 
 async function loadRelated(category, currentId) {
@@ -297,40 +352,43 @@ async function loadRelated(category, currentId) {
 
 window.addToCart = function() {
     if (!currentProduct) return;
-    const qtyInput = document.getElementById('calcQty');
-    const qty = parseFloat(qtyInput.value) || 0;
-    if (qty <= 0) return;
+    const weight = parseFloat(document.getElementById('calcWeight').value) || 0;
+    const qty = parseInt(document.getElementById('calcQty').value) || 0;
+    const len = parseInt(document.getElementById('calcLen').value) || 0;
 
     let cart = JSON.parse(localStorage.getItem('metal_cart') || '[]');
     
     let price, unit, finalQty;
-    if (currentProduct.price_ton) {
+    if (currentProduct.price_ton > 0) {
         price = currentProduct.price_ton;
         unit = 'т';
-        finalQty = qty;
+        finalQty = weight;
     } else {
         price = currentProduct.price_unit;
-        unit = currentProduct.unit_label.split(' ')[1] || 'ед.';
+        unit = currentProduct.unit_label || 'шт';
         finalQty = qty;
     }
     
-    const existing = cart.find(item => item.id === currentProduct.id);
+    const existing = cart.find(item => item.id === currentProduct.id && item.length === len);
     if (existing) {
-      existing.qty = (parseFloat(existing.qty) + finalQty).toFixed(2);
+      existing.qty = (parseFloat(existing.qty) + finalQty).toFixed(3);
     } else {
       cart.push({ 
         id: currentProduct.id, 
-        qty: finalQty.toFixed(2), 
+        qty: finalQty.toFixed(3), 
         name: currentProduct.name, 
         price: price, 
-        unit: unit
+        unit: unit,
+        length: len,
+        img: currentProduct.img
       });
     }
+
     localStorage.setItem('metal_cart', JSON.stringify(cart));
     if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();
     if (window.toggleCartDrawerGlobal) window.toggleCartDrawerGlobal();
     
-    const btn = document.querySelector('button.pink-glow');
+    const btn = document.getElementById('addToCartBtn');
     if (btn) {
         const originalContent = btn.innerHTML;
         btn.innerHTML = '<span class="relative z-10 transition-colors duration-500 text-on-primary font-label-caps">ДОБАВЛЕНО!</span><div class="absolute top-0 left-0 w-full h-full bg-primary -z-0"></div>';

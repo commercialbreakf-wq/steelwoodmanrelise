@@ -2,11 +2,11 @@
   "name": "woodman-metal-backend",
   "version": "1.0.0",
   "description": "Backend for Iron Woodman industrial shop",
-  "main": "server.js",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server_local.js",
     "init-db": "node init-db.js",
-    "dev": "npx nodemon server.js",
+    "dev": "npx nodemon server_local.js",
     "deploy": "vercel",
     "deploy:prod": "vercel --prod"
   },

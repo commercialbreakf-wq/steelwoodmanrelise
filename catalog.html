@@ -191,11 +191,29 @@ async function fetchProducts() {
 
     try {
         const res = await fetch(`/api/products?${params.toString()}`);
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('API Error:', errorText);
+            grid.innerHTML = `<div class="col-span-full p-10 text-center border border-error/20 bg-error/5 text-error rounded-xl">
+                <span class="material-symbols-outlined text-4xl mb-4">error</span>
+                <p class="font-bold uppercase">Ошибка загрузки данных</p>
+                <p class="text-sm opacity-70">${errorText.substring(0, 100)}</p>
+                <button onclick="fetchProducts()" class="mt-4 px-6 py-2 bg-primary text-on-primary rounded-full text-sm font-bold uppercase">Повторить</button>
+            </div>`;
+            return;
+        }
+
         const data = await res.json();
         
         grid.style.opacity = '1';
         grid.classList.remove('pointer-events-none');
         
+        if (data.error) {
+            console.error('Data Error:', data.error);
+            grid.innerHTML = `<div class="col-span-full p-10 text-center text-error">${data.error}</div>`;
+            return;
+        }
+
         renderProducts(data.products);
         renderPagination(data.pagination);
         
@@ -210,6 +228,7 @@ async function fetchProducts() {
     } catch (e) {
         console.error('Failed to fetch products', e);
         grid.style.opacity = '1';
+        grid.innerHTML = `<div class="col-span-full p-10 text-center text-error">Критическая ошибка: ${e.message}</div>`;
     }
 }
 
@@ -606,7 +625,7 @@ function addToCart(id) {
 }
 
 function toggleAuthModal() {
-    window.location.href = '/';
+    if (window.toggleAuthModalGlobal) window.toggleAuthModalGlobal();
 }
 
 updateCartBadge();

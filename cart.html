@@ -77,7 +77,7 @@ tailwind.config = {
                             </div>
                             <div>
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2">ТЕЛЕФОН</label>
-                                <input type="tel" name="phone" required class="w-full bg-surface-container border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 font-body-md outline-none" placeholder="+7-(000)-000-00-00"/>
+                                <input type="tel" name="phone" required oninput="maskPhoneGlobal(this)" class="w-full bg-surface-container border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 font-body-md outline-none" placeholder="+7-(000)-000-00-00"/>
                             </div>
                             <div>
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2">EMAIL</label>

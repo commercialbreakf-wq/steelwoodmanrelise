@@ -142,7 +142,7 @@
 </head>
 <body class="bg-background text-on-background font-body-md">
 <!-- Shared Header will be injected here -->
-<main>
+<main class="overflow-x-hidden">
 <!-- Hero Section -->
 <section class="relative min-h-[100dvh] flex items-center pt-20 overflow-hidden" id="hero">
 <div class="absolute inset-0 z-0">
@@ -166,7 +166,7 @@
 </div>
 
 <!-- Scroll Arrow -->
-<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#power-details')">
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="document.getElementById('hero-target').scrollIntoView({ behavior: 'smooth' })">
     <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
 </div>
 
@@ -180,7 +180,7 @@
 </div>
 </section>
 <!-- About Summary Section -->
-<section id="power-details" class="min-h-[100dvh] flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto py-24">
+<section id="hero-target" class="min-h-[100dvh] flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto py-24">
 <div class="asymmetric-grid">
 <div class="col-span-12 md:col-span-5 space-y-8">
 <h2 class="text-[36px] leading-tight md:text-headline-lg font-headline-lg text-on-surface uppercase">СИЛА В<br/>ДЕТАЛЯХ</h2>
@@ -263,7 +263,7 @@
 
 <!-- Category 4 -->
 <a href="/catalog/?pcat=Кровля и фасад" class="group relative h-[300px] md:h-[50vh] max-h-[500px] overflow-hidden border border-outline-variant/20 bg-surface block no-underline text-inherit cursor-pointer">
-<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60" data-alt="Профнастил" src="/images/angles.png"/>
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60" data-alt="Профнастил" src="/images/products/corrugated_sheets_premium.png"/>
 <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent"></div>
 <div class="absolute bottom-0 left-0 p-6 md:p-8 w-full">
 <span class="font-label-caps text-label-caps text-primary mb-2 block tracking-widest">04 //</span>
@@ -276,9 +276,14 @@
 
 </div>
 </div>
-</section>
-<!-- Benefits Section -->
-<section class="min-h-[100dvh] flex flex-col justify-center py-section-gap-mobile md:py-section-gap px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto">
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits-target" class="relative min-h-[100dvh] flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto">
+        <!-- Scroll Arrow -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#news-target')">
+            <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
+        </div>
 <div class="text-left mb-12 md:mb-16 border-b border-outline-variant/20 pb-8">
 <span class="font-label-caps text-label-caps text-primary tracking-widest block mb-4 uppercase">Почему мы</span>
 <h2 class="text-[36px] leading-tight md:text-headline-lg font-headline-lg uppercase">ПРЕИМУЩЕСТВА КАЧЕСТВА</h2>
@@ -322,9 +327,14 @@
 </div>
 </a>
 </div>
-</section>
-<!-- News/Blog Section -->
-<section class="min-h-[100dvh] flex flex-col justify-center py-section-gap-mobile md:py-section-gap px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto border-t border-outline-variant/20">
+    </section>
+
+    <!-- News/Blog Section -->
+    <section id="news-target" class="relative min-h-[100dvh] flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto border-t border-outline-variant/20">
+        <!-- Scroll Arrow -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#cta-footer-merged')">
+            <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
+        </div>
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-6">
 <div>
 <h2 class="text-[36px] leading-tight md:text-headline-lg font-headline-lg uppercase">НОВОСТИ ОТРАСЛИ</h2>
@@ -361,44 +371,42 @@
 </a>
 </div>
 </section>
-<!-- Forms Section: Subscribe & Contact -->
-<section id="forms-section" class="py-section-gap-mobile md:py-section-gap px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto border-t border-outline-variant/20">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-<!-- Newsletter CTA -->
-<div class="bg-primary/10 border border-primary/20 p-6 md:p-8 flex flex-col justify-center">
-<div class="mb-8">
-<h2 class="text-[32px] md:text-[40px] leading-tight uppercase mb-2 text-on-surface font-headline-lg">ПОДПИШИТЕСЬ<br/>НА ОБНОВЛЕНИЯ</h2>
-<p class="font-body-md text-on-surface-variant opacity-80">Получайте актуальные предложения и новости отрасли первыми.</p>
-</div>
+<!-- Forms Section: Subscribe & Contact + Footer Merged -->
+<section id="cta-footer-merged" class="min-h-[100dvh] flex flex-col border-t border-outline-variant/20 bg-background">
+    <div class="relative flex-grow flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto py-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Newsletter CTA -->
+            <div class="bg-primary/10 border border-primary/20 p-6 md:p-8 flex flex-col justify-center">
+                <div class="mb-8">
+                    <h2 class="text-[32px] md:text-[40px] leading-tight uppercase mb-2 text-on-surface font-headline-lg font-bold">ПОДПИШИТЕСЬ<br/>НА ОБНОВЛЕНИЯ</h2>
+                    <p class="font-body-md text-on-surface-variant opacity-80">Получайте актуальные предложения и новости отрасли первыми.</p>
+                </div>
 
-<form class="flex flex-col gap-4" id="subscribeForm" onsubmit="window.handleApplicationSubmit(event, 'subscription')">
-<input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary" placeholder="Email" type="email" name="email" required/>
-<button type="submit" class="bg-primary text-surface px-8 py-3 font-label-caps text-label-caps hover:bg-primary/90 transition-all tracking-widest self-start w-full sm:w-auto uppercase font-bold">Отправить</button>
-<div id="subscribeSuccess" class="hidden"></div>
-</form>
-</div>
-<!-- Contact/Feedback Form -->
-<div class="border border-outline-variant/20 p-6 md:p-8 bg-surface">
-<div class="mb-8">
-<h2 class="text-[32px] md:text-[40px] leading-tight uppercase mb-2 text-on-surface font-headline-lg">СВЯЗАТЬСЯ<br/>С НАМИ</h2>
-<p class="font-body-md text-on-surface-variant opacity-80">Оставьте заявку, и наш менеджер свяжется с вами в ближайшее время.</p>
-</div>
+                <form class="flex flex-col gap-4" id="subscribeForm" onsubmit="window.handleApplicationSubmit(event, 'subscription')">
+                    <input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary" placeholder="Email" type="email" name="email" required/>
+                    <button type="submit" class="bg-primary text-surface px-8 py-3 font-label-caps text-label-caps hover:bg-primary/90 transition-all tracking-widest self-start w-full sm:w-auto uppercase font-bold">Отправить</button>
+                </form>
+            </div>
+            <!-- Contact/Feedback Form -->
+            <div class="border border-outline-variant/20 p-6 md:p-8 bg-surface">
+                <div class="mb-8">
+                    <h2 class="text-[32px] md:text-[40px] leading-tight uppercase mb-2 text-on-surface font-headline-lg font-bold">СВЯЗАТЬСЯ<br/>С НАМИ</h2>
+                    <p class="font-body-md text-on-surface-variant opacity-80">Оставьте заявку, и наш менеджер свяжется с вами в ближайшее время.</p>
+                </div>
 
-<form class="space-y-6" onsubmit="window.handleApplicationSubmit(event, 'main_contact')">
-<div class="space-y-4">
-<input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary font-medium" placeholder="Имя" type="text" name="name" required/>
-<input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary font-medium" placeholder="Телефон" type="tel" name="phone" required/>
-<textarea class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary h-32 resize-none font-medium" placeholder="Сообщение" name="message"></textarea>
-</div>
-<button type="submit" class="bg-primary text-surface px-8 py-3 font-label-caps text-label-caps hover:bg-primary/90 transition-all tracking-widest self-start w-full sm:w-auto uppercase font-bold">Отправить заявку</button>
-</form>
-</div>
-</div>
+                <form class="space-y-6" onsubmit="window.handleApplicationSubmit(event, 'main_contact')">
+                    <div class="space-y-4">
+                        <input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary font-medium" placeholder="Имя" type="text" name="name" required/>
+                        <input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary font-medium" placeholder="Телефон (+7-(000)-000-00-00)" type="tel" name="phone" required/>
+                        <textarea class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary h-32 resize-none font-medium" placeholder="Сообщение" name="message"></textarea>
+                    </div>
+                    <button type="submit" class="bg-primary text-surface px-8 py-3 font-label-caps text-label-caps hover:bg-primary/90 transition-all tracking-widest self-start w-full sm:w-auto uppercase font-bold">Отправить заявку</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer id="globalFooter"></footer>
 </section>
-
-</main>
-
-<footer id="globalFooter"></footer>
 
 
 <script>
