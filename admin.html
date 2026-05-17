@@ -175,7 +175,7 @@
                 
                 <!-- Tab: Dashboard -->
                 <section id="tab-dashboard" class="tab-content space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div onclick="switchTab('products')" class="glass p-8 rounded-3xl space-y-4 cursor-pointer hover:border-primary/50 transition-all">
                             <div class="flex justify-between items-start">
                                 <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -210,6 +210,18 @@
                             <div>
                                 <div id="stat-users" class="text-4xl font-display font-bold">...</div>
                                 <div class="text-xs text-on-surface-variant">Зарегистрированных пользователей</div>
+                            </div>
+                        </div>
+                        <div onclick="switchTab('leads')" class="glass p-8 rounded-3xl space-y-4 cursor-pointer hover:border-primary/50 transition-all">
+                            <div class="flex justify-between items-start">
+                                <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary">leaderboard</span>
+                                </div>
+                                <span class="text-[10px] font-display text-on-surface-variant opacity-50 uppercase tracking-widest">Лиды</span>
+                            </div>
+                            <div>
+                                <div id="stat-leads" class="text-4xl font-display font-bold">...</div>
+                                <div class="text-xs text-on-surface-variant">Новых заявок</div>
                             </div>
                         </div>
                     </div>
@@ -710,6 +722,7 @@
                 document.getElementById('stat-products').textContent = allProducts.length;
                 document.getElementById('stat-users').textContent = allUsers.length;
                 document.getElementById('stat-orders').textContent = allOrders.length;
+                document.getElementById('stat-leads').textContent = allLeads.length;
 
                 renderRecentOrders();
                 renderPopularCategories();
@@ -717,12 +730,127 @@
                 // Populate categories filter
                 const cats = [...new Set(allProducts.map(p => p.category))].sort();
                 const filter = document.getElementById('productCatFilter');
-                filter.innerHTML = '<option value="">Все категории</option>' + 
-                    cats.map(c => `<option value="${c}">${c}</option>`).join('');
+                if (filter) {
+                    filter.innerHTML = '<option value="">Все категории</option>' + 
+                        cats.map(c => `<option value="${c}">${c}</option>`).join('');
+                }
 
             } catch (e) {
                 console.error('Failed to load dashboard data', e);
             }
+        }
+
+        // --- ANALYTICS ---
+        function renderAnalytics() {
+            const container = document.getElementById('tab-analytics');
+            if (!container) return;
+
+            // Aggregate Leads: 'new', 'contacted', 'closed'
+            const leadStats = {
+                new: allLeads.filter(l => l.status === 'new').length,
+                contacted: allLeads.filter(l => l.status === 'contacted').length,
+                closed: allLeads.filter(l => l.status === 'closed').length
+            };
+
+            // Aggregate Products by category
+            const productStats = {};
+            allProducts.forEach(p => {
+                const cat = p.category || 'Без категории';
+                productStats[cat] = (productStats[cat] || 0) + 1;
+            });
+
+            // Aggregate Orders
+            const orderStats = {
+                total: allOrders.length,
+                new: allOrders.filter(o => o.status === 'new').length,
+                processing: allOrders.filter(o => o.status === 'processing').length,
+                shipped: allOrders.filter(o => o.status === 'shipped').length,
+                delivered: allOrders.filter(o => o.status === 'delivered').length,
+                cancelled: allOrders.filter(o => o.status === 'cancelled').length
+            };
+
+            renderAnalyticsCharts(leadStats, productStats, orderStats);
+        }
+
+        function renderAnalyticsCharts(leads, products, orders) {
+            const container = document.getElementById('tab-analytics');
+            
+            // Find max values for scaling bars
+            const maxLeads = Math.max(...Object.values(leads), 1);
+            const maxProducts = Math.max(...Object.values(products), 1);
+            
+            container.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <!-- Leads Funnel -->
+                    <div class="glass p-8 rounded-3xl space-y-6">
+                        <h3 class="font-display font-bold uppercase tracking-tight flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">filter_alt</span>
+                            Воронка Лидов
+                        </h3>
+                        <div class="space-y-6">
+                            ${renderBar('Новые заявки', leads.new, 'bg-primary', maxLeads)}
+                            ${renderBar('В работе / Связались', leads.contacted, 'bg-secondary', maxLeads)}
+                            ${renderBar('Закрытые / Успешные', leads.closed, 'bg-green-500', maxLeads)}
+                        </div>
+                    </div>
+                    
+                    <!-- Category Distribution -->
+                    <div class="glass p-8 rounded-3xl space-y-6">
+                        <h3 class="font-display font-bold uppercase tracking-tight flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">category</span>
+                            Товары по категориям
+                        </h3>
+                        <div class="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                            ${Object.entries(products).sort((a,b) => b[1] - a[1]).map(([name, count]) => renderBar(name, count, 'bg-primary/50', maxProducts)).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Order Statistics -->
+                    <div class="glass p-8 rounded-3xl space-y-6 lg:col-span-2">
+                        <h3 class="font-display font-bold uppercase tracking-tight flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">analytics</span>
+                            Статистика заказов (Всего: ${orders.total})
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div class="glass p-6 rounded-2xl text-center border-primary/10">
+                                <div class="text-3xl font-display font-bold text-primary">${orders.new}</div>
+                                <div class="text-[10px] uppercase opacity-50 tracking-widest mt-1">Новые</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl text-center border-secondary/10">
+                                <div class="text-3xl font-display font-bold text-secondary">${orders.processing}</div>
+                                <div class="text-[10px] uppercase opacity-50 tracking-widest mt-1">В работе</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl text-center border-blue-500/10">
+                                <div class="text-3xl font-display font-bold text-blue-400">${orders.shipped}</div>
+                                <div class="text-[10px] uppercase opacity-50 tracking-widest mt-1">Отгружены</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl text-center border-green-500/10">
+                                <div class="text-3xl font-display font-bold text-green-400">${orders.delivered}</div>
+                                <div class="text-[10px] uppercase opacity-50 tracking-widest mt-1">Доставлены</div>
+                            </div>
+                            <div class="glass p-6 rounded-2xl text-center border-error/10">
+                                <div class="text-3xl font-display font-bold text-error">${orders.cancelled}</div>
+                                <div class="text-[10px] uppercase opacity-50 tracking-widest mt-1">Отменены</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBar(label, value, colorClass, max) {
+            const percent = Math.max(5, (value / max) * 100);
+            return `
+                <div class="group">
+                    <div class="flex justify-between text-[11px] uppercase tracking-widest mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                        <span>${label}</span>
+                        <span class="font-bold text-primary">${value}</span>
+                    </div>
+                    <div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                        <div class="${colorClass} h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(255,176,204,0.3)]" style="width: ${percent}%"></div>
+                    </div>
+                </div>
+            `;
         }
 
         function renderRecentOrders() {
