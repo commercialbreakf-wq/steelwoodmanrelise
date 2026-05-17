@@ -252,7 +252,14 @@
 
                 <!-- Tab: Products -->
                 <section id="tab-products" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
+                    <!-- Taxonomy Tabs -->
+                    <div class="flex gap-4 mb-8 border-b border-outline-variant/10">
+                        <button onclick="switchTaxonomyTab('products')" id="tax-tab-products" class="px-6 py-3 text-xs font-bold uppercase tracking-widest border-b-2 border-primary text-primary transition-all">Товары</button>
+                        <button onclick="switchTaxonomyTab('categories')" id="tax-tab-categories" class="px-6 py-3 text-xs font-bold uppercase tracking-widest border-b-2 border-transparent opacity-50 hover:opacity-100 transition-all">Категории</button>
+                        <button onclick="switchTaxonomyTab('subcategories')" id="tax-tab-subcategories" class="px-6 py-3 text-xs font-bold uppercase tracking-widest border-b-2 border-transparent opacity-50 hover:opacity-100 transition-all">Подкатегории</button>
+                    </div>
+
+                    <div id="productFilterBar" class="flex justify-between items-center">
                         <div class="flex gap-4">
                             <div class="relative w-80">
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant opacity-50">search</span>
@@ -268,7 +275,7 @@
                         </button>
                     </div>
 
-                    <div class="glass rounded-3xl overflow-hidden">
+                    <div id="tax-container-products" class="glass rounded-3xl overflow-hidden">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-outline-variant/20 bg-white/5">
@@ -284,6 +291,35 @@
                             <tbody id="productsTableBody">
                                 <!-- Products here -->
                             </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Categories Table -->
+                    <div id="tax-container-categories" class="hidden glass rounded-3xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-outline-variant/20 bg-white/5">
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Название категории</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Кол-во товаров</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50 text-right">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriesTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Subcategories Table -->
+                    <div id="tax-container-subcategories" class="hidden glass rounded-3xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-outline-variant/20 bg-white/5">
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Подкатегория</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Родительская категория</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Кол-во товаров</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50 text-right">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subcategoriesTableBody"></tbody>
                         </table>
                     </div>
                 </section>
@@ -693,13 +729,92 @@
             };
             document.getElementById('currentTabTitle').textContent = titles[tabId] || 'Панель управления';
 
-            if (tabId === 'products') loadProducts();
+            if (tabId === 'products') {
+                switchTaxonomyTab('products');
+                loadProducts();
+            }
             if (tabId === 'orders') loadOrders();
             if (tabId === 'users') loadUsers();
             if (tabId === 'leads') loadLeads();
             if (tabId === 'analytics') {
                 if (window.renderAnalytics) window.renderAnalytics();
             }
+        }
+
+        function switchTaxonomyTab(tabId) {
+            // Update tab buttons
+            ['products', 'categories', 'subcategories'].forEach(id => {
+                const btn = document.getElementById('tax-tab-' + id);
+                if (!btn) return;
+                if (id === tabId) {
+                    btn.classList.add('border-primary', 'text-primary');
+                    btn.classList.remove('border-transparent', 'opacity-50');
+                } else {
+                    btn.classList.remove('border-primary', 'text-primary');
+                    btn.classList.add('border-transparent', 'opacity-50');
+                }
+                
+                // Update containers
+                const container = document.getElementById('tax-container-' + id);
+                if (container) {
+                    if (id === tabId) container.classList.remove('hidden');
+                    else container.classList.add('hidden');
+                }
+            });
+
+            // Toggle search/filter bar visibility
+            const filterBar = document.getElementById('productFilterBar');
+            if (filterBar) {
+                if (tabId === 'products') filterBar.classList.remove('hidden');
+                else filterBar.classList.add('hidden');
+            }
+
+            if (tabId === 'categories') renderCategories();
+            if (tabId === 'subcategories') renderSubcategories();
+        }
+
+        function renderCategories() {
+            const cats = {};
+            allProducts.forEach(p => {
+                cats[p.category] = (cats[p.category] || 0) + 1;
+            });
+
+            const body = document.getElementById('categoriesTableBody');
+            body.innerHTML = Object.entries(cats).map(([name, count]) => `
+                <tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-all">
+                    <td class="p-6 font-bold text-sm uppercase">${name}</td>
+                    <td class="p-6 text-sm opacity-70">${count} товаров</td>
+                    <td class="p-6 text-right">
+                        <button class="p-2 rounded-full hover:bg-primary/20 text-primary transition-all opacity-30 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSubcategories() {
+            const subs = {};
+            allProducts.forEach(p => {
+                const sub = p.subcategory || 'Без подкатегории';
+                const key = `${p.category} > ${sub}`;
+                if (!subs[key]) subs[key] = { category: p.category, subcategory: sub, count: 0 };
+                subs[key].count++;
+            });
+
+            const body = document.getElementById('subcategoriesTableBody');
+            body.innerHTML = Object.values(subs).map(s => `
+                <tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-all">
+                    <td class="p-6 font-bold text-sm uppercase">${s.subcategory}</td>
+                    <td class="p-6 text-sm opacity-70">${s.category}</td>
+                    <td class="p-6 text-sm opacity-70">${s.count} товаров</td>
+                    <td class="p-6 text-right">
+                        <button class="p-2 rounded-full hover:bg-primary/20 text-primary transition-all opacity-30 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[18px]">edit</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         // --- DASHBOARD ---
