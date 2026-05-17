@@ -316,9 +316,24 @@
 
                 <!-- Tab: Leads -->
                 <section id="tab-leads" class="tab-content hidden space-y-6">
-                    <div class="text-center py-20 opacity-50">
-                        <span class="material-symbols-outlined text-6xl mb-4 block text-primary">leaderboard</span>
-                        <p class="font-display uppercase tracking-widest text-sm text-on-surface">Раздел Лиды в разработке</p>
+                    <div class="glass rounded-3xl overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-outline-variant/20 bg-white/5">
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Имя / Тип</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Контакты</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Сообщение</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Статус</th>
+                                    <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50 text-right">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody">
+                                <!-- Leads here -->
+                                <tr>
+                                    <td colspan="5" class="p-20 text-center opacity-50 text-xs uppercase tracking-widest">Загрузка лидов...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
 
@@ -402,6 +417,7 @@
         let allProducts = [];
         let allUsers = [];
         let allOrders = [];
+        let allLeads = [];
 
         async function initAdmin() {
             const token = localStorage.getItem('metal_token');
@@ -499,9 +515,7 @@
             if (tabId === 'products') loadProducts();
             if (tabId === 'orders') loadOrders();
             if (tabId === 'users') loadUsers();
-            if (tabId === 'leads') {
-                if (window.loadLeads) window.loadLeads();
-            }
+            if (tabId === 'leads') loadLeads();
             if (tabId === 'analytics') {
                 if (window.renderAnalytics) window.renderAnalytics();
             }
@@ -512,15 +526,17 @@
             const token = localStorage.getItem('metal_token');
             try {
                 // Fetch stats from endpoints (we'll reuse the list endpoints and count items)
-                const [pRes, uRes, oRes] = await Promise.all([
+                const [pRes, uRes, oRes, lRes] = await Promise.all([
                     fetch('/api/admin/products', { headers: { 'Authorization': 'Bearer ' + token } }),
                     fetch('/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } }),
-                    fetch('/api/admin/orders', { headers: { 'Authorization': 'Bearer ' + token } })
+                    fetch('/api/admin/orders', { headers: { 'Authorization': 'Bearer ' + token } }),
+                    fetch('/api/admin/leads', { headers: { 'Authorization': 'Bearer ' + token } })
                 ]);
 
                 allProducts = await pRes.json();
                 allUsers = await uRes.json();
                 allOrders = await oRes.json();
+                allLeads = await lRes.json();
 
                 document.getElementById('stat-products').textContent = allProducts.length;
                 document.getElementById('stat-users').textContent = allUsers.length;
@@ -835,6 +851,82 @@
             } catch (e) {
                 alert('Ошибка обновления роли');
             }
+        }
+
+        // --- LEADS ---
+        async function loadLeads() {
+            const token = localStorage.getItem('metal_token');
+            try {
+                const res = await fetch('/api/admin/leads', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    allLeads = await res.json();
+                    renderLeads(allLeads);
+                }
+            } catch (e) {
+                console.error('Failed to load leads', e);
+            }
+        }
+
+        function renderLeads(leads) {
+            const body = document.getElementById('leadsTableBody');
+            if (!leads || leads.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" class="p-20 text-center opacity-50 text-xs uppercase tracking-widest">Нет активных лидов</td></tr>';
+                return;
+            }
+
+            body.innerHTML = leads.map(l => `
+                <tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-all">
+                    <td class="p-6">
+                        <div class="font-bold text-sm uppercase">${l.name || 'Без имени'}</div>
+                        <div class="text-[10px] opacity-50 uppercase tracking-widest">${l.type || 'Заявка'}</div>
+                    </td>
+                    <td class="p-6">
+                        <div class="text-sm opacity-80">${l.phone || '-'}</div>
+                        <div class="text-xs opacity-50">${l.email || '-'}</div>
+                    </td>
+                    <td class="p-6">
+                        <div class="text-xs opacity-70 line-clamp-2 max-w-xs">${l.message || 'Нет сообщения'}</div>
+                    </td>
+                    <td class="p-6">
+                        <select onchange="handleLeadStatusChange(${l.id}, this.value)" class="bg-surface-container border border-outline-variant/20 rounded-lg px-3 py-1 text-xs outline-none focus:border-primary">
+                            <option value="new" ${l.status === 'new' ? 'selected' : ''}>Новый</option>
+                            <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>Связались</option>
+                            <option value="closed" ${l.status === 'closed' ? 'selected' : ''}>Закрыт</option>
+                        </select>
+                    </td>
+                    <td class="p-6 text-right">
+                        <button onclick="viewLeadDetails(${l.id})" class="text-xs font-bold uppercase tracking-widest text-primary hover:underline">Детали</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function handleLeadStatusChange(id, newStatus) {
+            const token = localStorage.getItem('metal_token');
+            try {
+                const res = await fetch(`/api/admin/leads/${id}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (res.ok) {
+                    if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal('Статус лида обновлен');
+                    loadLeads();
+                }
+            } catch (e) {
+                alert('Ошибка обновления статуса лида');
+            }
+        }
+
+        function viewLeadDetails(id) {
+            const lead = allLeads.find(l => l.id === id);
+            if (!lead) return;
+            alert(`Лид #${id}\nИмя: ${lead.name}\nТип: ${lead.type}\n\nСообщение:\n${lead.message || 'Пусто'}`);
         }
 
         // Start
