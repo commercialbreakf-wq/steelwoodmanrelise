@@ -126,7 +126,7 @@
 
 <div id="globalHeader"></div>
 
-<main>
+<main data-hero-block-scroll data-hero-scroll-target="#certs-hero-target">
     <!-- SCREEN 1: Hero & Stats -->
     <section id="hero" class="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden metal-grid-overlay">
         <div class="absolute inset-0 z-0">
@@ -162,7 +162,7 @@
         </div>
 
         <!-- Scroll Arrow -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer z-20" onclick="document.getElementById('certs-hero-target').scrollIntoView({ behavior: 'smooth' })">
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#certs-hero-target')">
             <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
         </div>
     </section>
@@ -183,7 +183,7 @@
             </div>
         </div>
         
-        <div id="certGrid" class="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-gutter transition-all duration-300 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+        <div id="certGrid" data-vertical-wheel-pass class="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-gutter transition-all duration-300 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
             <!-- Card 1 -->
             <div onclick="window.location.href='/certificate_view.html?category=Нержавеющая сталь&standard=ГОСТ 5632-2014'" class="cert-card machined-border bg-surface-container overflow-hidden group industrial-glow w-[280px] shrink-0 md:w-auto snap-center" data-category="stainless">
                 <div class="aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5] bg-surface-container-highest flex items-center justify-center p-6 lg:p-8 relative overflow-hidden">

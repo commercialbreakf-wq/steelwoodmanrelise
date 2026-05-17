@@ -122,6 +122,9 @@ async function run() {
 
         if (isHeader) {
             currentCategory = line.replace(/сетка сетка/i, 'Сетка').trim();
+            if (currentCategory.toLowerCase() === 'полиэстер односторонний 0.4мм') {
+                currentCategory = 'Профнастил окрашенный';
+            }
             const low = lowerLine;
             if (low.includes('профнастил') || low.includes('полиэстер')) {
                 currentParentCategory = 'Кровля и фасад';

@@ -8,40 +8,126 @@ require('dotenv').config();
 const app = express();
 const SECRET_KEY = process.env.JWT_SECRET || 'your-secret-key';
 
-// Supabase Configuration
 const supabaseUrl = process.env.SUPABASE_URL || 'https://drbknuvnsyonmeudoleo.supabase.co';
-
-// IMPORTANT: Prioritize Service Role Key to bypass RLS on server-side
-const supabaseKey = 
-  process.env.SUPABASE_SERVICE_KEY || 
-  process.env.SUPABASE_SERVICE_ROLE_KEY || 
-  process.env.SUPABASE_ANON_KEY || 
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey =
+  process.env.SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error("CRITICAL ERROR: SUPABASE_URL or Keys are missing!");
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('CRITICAL: SUPABASE_URL or SUPABASE_SERVICE_KEY is missing');
+}
+if (!supabaseAnonKey) {
+  console.error('CRITICAL: SUPABASE_ANON_KEY is missing (required for Supabase Auth)');
 }
 
-const supabase = createClient(supabaseUrl || 'http://placeholder', supabaseKey || 'placeholder');
+const supabase = createClient(supabaseUrl || 'http://placeholder', supabaseServiceKey || 'placeholder');
+const supabaseAuth = createClient(supabaseUrl || 'http://placeholder', supabaseAnonKey || 'placeholder');
 
-// Middleware: Auth
-const authenticateToken = (req, res, next) => {
+const PROFILE_FIELDS = [
+  'name', 'phone', 'company_name', 'inn', 'kpp',
+  'legal_address', 'actual_address', 'position'
+];
+
+function sanitizeUser(row) {
+  if (!row) return null;
+  const { password, ...user } = row;
+  return user;
+}
+
+async function getProfileByAuthId(authId) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, email, name, phone, role, company_name, inn, kpp, legal_address, actual_address, position, created_at, auth_id')
+    .eq('auth_id', authId)
+    .maybeSingle();
+  if (error) console.error('getProfileByAuthId:', error.message);
+  return data;
+}
+
+async function waitForProfile(authId, attempts = 8) {
+  for (let i = 0; i < attempts; i++) {
+    const profile = await getProfileByAuthId(authId);
+    if (profile) return profile;
+    await new Promise((r) => setTimeout(r, 150));
+  }
+  return null;
+}
+
+async function resolveAuthSession(email, password) {
+  const { data, error } = await supabaseAuth.auth.signInWithPassword({ email, password });
+  if (!error && data.session) {
+    return { session: data.session, authUser: data.user };
+  }
+
+  const { data: legacy } = await supabase.from('users').select('*').eq('email', email).maybeSingle();
+  if (!legacy || !legacy.password || legacy.password !== password) {
+    return { error: error || new Error('Invalid credentials') };
+  }
+
+  if (!legacy.auth_id) {
+    const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name: legacy.name }
+    });
+    if (createErr && !/already|registered|exists/i.test(createErr.message)) {
+      return { error: createErr };
+    }
+    const authId = created?.user?.id;
+    if (authId) {
+      await supabase.from('users').update({ auth_id: authId, password: '' }).eq('id', legacy.id);
+    }
+  }
+
+  const retry = await supabaseAuth.auth.signInWithPassword({ email, password });
+  if (retry.error || !retry.data.session) {
+    return { error: retry.error || error || new Error('Login failed') };
+  }
+  return { session: retry.data.session, authUser: retry.data.user };
+}
+
+function attachAuth(req, profile, authUser) {
+  req.authUser = authUser;
+  req.profile = profile;
+  req.user = { id: profile.id, email: profile.email, authId: authUser.id };
+}
+
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    console.error('Auth: No token provided');
     return res.status(401).json({ error: 'Войдите в аккаунт' });
   }
 
-  jwt.verify(token, SECRET_KEY, (err, decoded) => {
-    if (err) {
-      console.error('Auth: Token verification failed:', err.message);
-      return res.status(403).json({ error: 'Сессия истекла, войдите снова' });
+  try {
+    const { data: { user: authUser }, error } = await supabaseAuth.auth.getUser(token);
+    if (!error && authUser) {
+      let profile = await getProfileByAuthId(authUser.id);
+      if (!profile) profile = await waitForProfile(authUser.id);
+      if (!profile) {
+        return res.status(404).json({ error: 'Профиль пользователя не найден' });
+      }
+      attachAuth(req, profile, authUser);
+      return next();
     }
-    req.user = decoded;
-    next();
-  });
+
+    // Legacy custom JWT (старые сессии до миграции)
+    const decoded = jwt.verify(token, SECRET_KEY);
+    const { data: profile } = await supabase.from('users').select('id, email, name, phone, role, company_name, inn, kpp, legal_address, actual_address, position, created_at, auth_id').eq('id', decoded.id).single();
+    if (profile) {
+      attachAuth(req, profile, { id: profile.auth_id || decoded.id });
+      return next();
+    }
+    return res.status(403).json({ error: 'Сессия истекла, войдите снова' });
+  } catch (e) {
+    console.error('Auth: Token verification failed:', e.message);
+    return res.status(403).json({ error: 'Сессия истекла, войдите снова' });
+  }
 };
 
 app.use(cors());
@@ -225,68 +311,223 @@ router.get('/category-filters', async (req, res) => {
   });
 });
 
-// API: Auth - Login
+// API: Auth - Login (Supabase Auth)
 router.post('/auth/login', async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Укажите email и пароль' });
+  }
   try {
-    const { data: user, error } = await supabase.from('users').select('*').eq('email', email).single();
-    if (error || !user) return res.status(401).json({ error: 'Пользователь не найден' });
-    
-    // Simple password check
-    if (password !== user.password && password !== '123456') {
-      return res.status(401).json({ error: 'Неверный пароль' });
+    const result = await resolveAuthSession(email, password);
+    if (result.error) {
+      const errMsg = result.error.message || '';
+      if (errMsg.toLowerCase().includes('confirm') || errMsg.toLowerCase().includes('email not verified')) {
+        return res.status(400).json({ 
+          error: 'email_not_confirmed', 
+          message: 'Адрес электронной почты не подтвержден. Проверьте почтовый ящик или запросите письмо повторно.',
+          email 
+        });
+      }
+      return res.status(401).json({ error: 'Неверный email или пароль' });
     }
     
-    const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '24h' });
-    res.json({ user, token });
+    if (!result.session) {
+      return res.status(401).json({ error: 'Неверный email или пароль' });
+    }
+
+    let profile = await getProfileByAuthId(result.authUser.id);
+    if (!profile) profile = await waitForProfile(result.authUser.id);
+    if (!profile) {
+      return res.status(500).json({ error: 'Профиль не создан. Попробуйте войти позже.' });
+    }
+    res.json({
+      user: sanitizeUser(profile),
+      token: result.session.access_token,
+      refresh_token: result.session.refresh_token
+    });
   } catch (e) {
     res.status(500).json({ error: 'Ошибка сервера при входе: ' + e.message });
   }
 });
 
-// API: Auth - Register
+// API: Auth - Register (Supabase Auth → auth.users + trigger → public.users)
 router.post('/auth/register', async (req, res) => {
   const { email, password, name } = req.body;
+  if (!email || !password || !name) {
+    return res.status(400).json({ error: 'Заполните имя, email и пароль' });
+  }
+
+  // Backend password strength validation
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+=\-{}[\]|\\:;"'<>,.?/~`]/.test(password);
+  const isLengthOk = password.length >= 8;
+
+  if (!hasUpper || !hasLower || !hasDigit || !hasSpecial || !isLengthOk) {
+    return res.status(400).json({ 
+      error: 'Пароль слишком слабый. Он должен содержать не менее 8 символов, заглавную и строчную буквы, одну цифру и один спецсимвол.' 
+    });
+  }
+
   try {
-    const { data, error } = await supabase.from('users').insert([{ email, password, name }]).select().single();
+    const { data: created, error } = await supabaseAuth.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name }
+      }
+    });
+
     if (error) {
-      if (error.code === '23505') return res.status(400).json({ error: 'Пользователь с такой почтой уже существует' });
+      if (/already|registered|exists/i.test(error.message)) {
+        return res.status(400).json({ error: 'Пользователь с такой почтой уже существует' });
+      }
       return res.status(500).json({ error: 'Ошибка регистрации: ' + error.message });
     }
-    const token = jwt.sign({ id: data.id, email }, SECRET_KEY, { expiresIn: '7d' });
-    res.json({ user: data, token });
+
+    const user = created.user;
+    if (!user) {
+      return res.status(500).json({ error: 'Не удалось создать аккаунт' });
+    }
+
+    let profile = await waitForProfile(user.id);
+    if (!profile) {
+      const { data: inserted, error: insertErr } = await supabase
+        .from('users')
+        .upsert({ auth_id: user.id, email, name, role: 'user' }, { onConflict: 'email' })
+        .select('id, email, name, phone, role, company_name, inn, kpp, legal_address, actual_address, position, created_at, auth_id')
+        .single();
+      if (insertErr) {
+        return res.status(500).json({ error: 'Ошибка создания профиля: ' + insertErr.message });
+      }
+      profile = inserted;
+    }
+
+    if (created.session) {
+      return res.json({
+        user: sanitizeUser(profile),
+        token: created.session.access_token,
+        refresh_token: created.session.refresh_token
+      });
+    }
+
+    res.json({
+      success: true,
+      email_confirm_required: true,
+      message: 'На указанную почту отправлено письмо для подтверждения аккаунта. Пожалуйста, подтвердите вашу почту перед входом.'
+    });
   } catch (e) {
     res.status(500).json({ error: 'Ошибка сервера при регистрации: ' + e.message });
   }
 });
 
+// API: Auth - Resend Confirmation Email
+router.post('/auth/resend-confirmation', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Укажите email' });
+  }
+  try {
+    const origin = req.headers.origin || 'https://steelwoodman.ru';
+    const { error } = await supabaseAuth.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${origin}/`
+      }
+    });
+
+    if (error) {
+      return res.status(500).json({ error: 'Ошибка отправки: ' + error.message });
+    }
+
+    res.json({ success: true, message: 'Письмо с подтверждением отправлено повторно.' });
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка сервера: ' + e.message });
+  }
+});
+
+// API: Auth - Reset Password Request (Send Recovery Link)
+router.post('/auth/reset-password-request', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Укажите email' });
+  }
+  try {
+    const origin = req.headers.origin || 'https://steelwoodman.ru';
+    const redirectTo = `${origin}/reset-password.html`;
+
+    const { error } = await supabaseAuth.auth.resetPasswordForEmail(email, {
+      redirectTo
+    });
+
+    if (error) {
+      return res.status(500).json({ error: 'Ошибка восстановления: ' + error.message });
+    }
+
+    res.json({ success: true, message: 'Ссылка для восстановления пароля отправлена на вашу почту.' });
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка сервера при сбросе пароля: ' + e.message });
+  }
+});
+
+// API: Auth - Reset Password Confirm (Protected by token)
+router.post('/auth/reset-password', authenticateToken, async (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: 'Укажите новый пароль' });
+  }
+
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+=\-{}[\]|\\:;"'<>,.?/~`]/.test(password);
+  const isLengthOk = password.length >= 8;
+
+  if (!hasUpper || !hasLower || !hasDigit || !hasSpecial || !isLengthOk) {
+    return res.status(400).json({ 
+      error: 'Пароль слишком слабый. Он должен содержать не менее 8 символов, заглавную и строчную буквы, одну цифру и один спецсимвол.' 
+    });
+  }
+
+  try {
+    const { error } = await supabase.auth.admin.updateUserById(
+      req.user.authId,
+      { password }
+    );
+
+    if (error) {
+      return res.status(500).json({ error: 'Не удалось обновить пароль: ' + error.message });
+    }
+
+    res.json({ success: true, message: 'Пароль успешно обновлен.' });
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка сервера при сбросе пароля: ' + e.message });
+  }
+});
+
 // GET: Current user info
 router.get('/auth/me', authenticateToken, async (req, res) => {
-  try {
-    const { data: user, error } = await supabase.from('users').select('*').eq('id', req.user.id).single();
-    if (error || !user) {
-      console.error('Auth/Me: User not found in DB for ID:', req.user.id, error);
-      return res.status(404).json({ error: 'Пользователь не найден в базе данных' });
-    }
-    res.json(user);
-  } catch (e) {
-    console.error('Auth/Me: Server error:', e);
-    res.status(500).json({ error: 'Ошибка сервера при получении данных пользователя' });
-  }
+  res.json(sanitizeUser(req.profile));
 });
 
 // PUT: Update profile
 router.put('/auth/profile', authenticateToken, async (req, res) => {
   try {
+    const updates = {};
+    for (const key of PROFILE_FIELDS) {
+      if (req.body[key] !== undefined) updates[key] = req.body[key];
+    }
     const { data, error } = await supabase
       .from('users')
-      .update(req.body)
-      .eq('id', req.user.id)
-      .select()
+      .update(updates)
+      .eq('id', req.profile.id)
+      .select('id, email, name, phone, role, company_name, inn, kpp, legal_address, actual_address, position, created_at, auth_id')
       .single();
-      
+
     if (error) return res.status(500).json({ error: 'Ошибка обновления: ' + error.message });
-    res.json(data);
+    res.json(sanitizeUser(data));
   } catch (e) {
     res.status(500).json({ error: 'Ошибка сервера' });
   }
@@ -308,8 +549,14 @@ router.post('/orders', async (req, res) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     try {
       const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, SECRET_KEY);
-      userId = decoded.id;
+      const { data: { user: authUser } } = await supabaseAuth.auth.getUser(token);
+      if (authUser) {
+        const profile = await getProfileByAuthId(authUser.id);
+        if (profile) userId = profile.id;
+      } else {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        userId = decoded.id;
+      }
     } catch (e) {
       console.error('Order auth error:', e.message);
     }
@@ -349,7 +596,7 @@ router.get('/orders/my', authenticateToken, async (req, res) => {
     const { data, error } = await supabase
       .from('orders')
       .select('*, order_items(*)')
-      .eq('user_id', req.user.id)
+      .eq('user_id', req.profile.id)
       .order('created_at', { ascending: false });
       
     if (error) return res.status(500).json({ error: error.message });

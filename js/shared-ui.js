@@ -64,6 +64,76 @@ window.validateProfileDataGlobal = function(data) {
     return null;
 };
 
+// --- COOKIES & JWT SESSION SYNC UTILITIES ---
+window.setCookieGlobal = function(name, value, days) {
+    let expires = "";
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + encodeURIComponent(value || "") + expires + "; path=/; SameSite=Lax";
+};
+
+window.getCookieGlobal = function(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+};
+
+window.eraseCookieGlobal = function(name) {
+    document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax";
+};
+
+window.parseJwtGlobal = function(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+};
+
+window.isTokenExpiredGlobal = function(token) {
+    const payload = window.parseJwtGlobal(token);
+    if (!payload || !payload.exp) return true;
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp < now;
+};
+
+window.syncAuthStorageAndCookiesGlobal = function() {
+    const cookieToken = window.getCookieGlobal('metal_token');
+    const cookieUser = window.getCookieGlobal('metal_user');
+    const storageToken = localStorage.getItem('metal_token');
+    const storageUser = localStorage.getItem('metal_user');
+
+    if (cookieToken && !storageToken) {
+        localStorage.setItem('metal_token', cookieToken);
+        if (cookieUser) localStorage.setItem('metal_user', cookieUser);
+    } else if (storageToken && !cookieToken) {
+        window.setCookieGlobal('metal_token', storageToken, 7);
+        if (storageUser) window.setCookieGlobal('metal_user', storageUser, 7);
+    }
+
+    const activeToken = storageToken || cookieToken;
+    if (activeToken && window.isTokenExpiredGlobal(activeToken)) {
+        localStorage.removeItem('metal_token');
+        localStorage.removeItem('metal_user');
+        localStorage.removeItem('metal_orders');
+        window.eraseCookieGlobal('metal_token');
+        window.eraseCookieGlobal('metal_user');
+    }
+};
+
 (function() {
     const preloaderStyles = `
         #globalPreloader {
@@ -193,7 +263,11 @@ window.validateProfileDataGlobal = function(data) {
 
     inject();
 
-    window.addEventListener('load', () => {
+    let preloaderDismissed = false;
+    const dismissPreloader = () => {
+        if (preloaderDismissed) return;
+        preloaderDismissed = true;
+
         const bar = document.getElementById('globalPreloaderBar');
         if (bar) bar.style.width = '100%';
 
@@ -207,7 +281,13 @@ window.validateProfileDataGlobal = function(data) {
                 }, 800);
             }
         }, 300);
-    });
+    };
+
+    window.addEventListener('load', dismissPreloader);
+    
+    // Safety fallback: if some assets (like Google Fonts or Tailwind CDN) are blocked/throttled,
+    // don't lock the user on a blank preloader screen forever.
+    setTimeout(dismissPreloader, 2500);
     // Auto-attach masks to any relevant inputs
     function attachGlobalMasks() {
         document.querySelectorAll('input[type="tel"], input[name="phone"]').forEach(input => {
@@ -394,14 +474,14 @@ window.renderCartDrawerItems = function() {
 
     let total = 0;
     container.innerHTML = cart.map((item, index) => {
-        const itemTotal = (item.price || 0) * (item.qty || 1);
+        const itemTotal = (parseFloat(item.price) || 0) * (parseFloat(item.qty) || 1);
         total += itemTotal;
         return `
             <div class="flex gap-4 p-4 bg-surface-container border border-outline-variant/10 rounded-xl group hover:border-primary/30 transition-all relative overflow-hidden">
                 <div class="flex-1">
                     <div class="text-[11px] font-bold uppercase tracking-tight text-on-surface line-clamp-1 mb-1">${item.name || item.id}</div>
                     <div class="flex justify-between items-center">
-                        <div class="text-[10px] font-label-caps text-on-surface-variant tracking-wider">${item.qty} ${item.unit || 'ед.'} × ${item.price.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽</div>
+                        <div class="text-[10px] font-label-caps text-on-surface-variant tracking-wider">${item.qty} ${item.unit || 'ед.'} × ${Number(item.price || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽</div>
                         <div class="text-xs font-bold text-primary">${itemTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽</div>
                     </div>
                 </div>
@@ -430,30 +510,79 @@ window.removeFromCartGlobal = function(index) {
 };
 
 window.checkAuthStatus = async function() {
+    // 1. Sync auth cookies and storage first
+    if (window.syncAuthStorageAndCookiesGlobal) {
+        window.syncAuthStorageAndCookiesGlobal();
+    }
+
     const token = localStorage.getItem('metal_token');
+    const cachedUserRaw = localStorage.getItem('metal_user');
     const lo = document.getElementById('authContentLoggedOut');
     const li = document.getElementById('authContentLoggedIn');
     const un = document.getElementById('userNameGlobal');
     
-    if (!token) { 
-        if(lo) lo.classList.remove('hidden'); 
-        if(li) li.classList.add('hidden'); 
+    // Helper to render auth UI immediately
+    const updateAuthUI = (user) => {
+        if (lo) lo.classList.add('hidden');
+        if (li) li.classList.remove('hidden');
+        if (un) un.textContent = user.name || user.email.split('@')[0];
+    };
+
+    const clearAuthUI = () => {
+        if (lo) lo.classList.remove('hidden');
+        if (li) li.classList.add('hidden');
+    };
+
+    // 2. Validate token locally
+    if (!token || (window.isTokenExpiredGlobal && window.isTokenExpiredGlobal(token))) { 
+        clearAuthUI();
         return; 
     }
+
+    // 3. Render cached user details instantly
+    let hasCache = false;
+    if (cachedUserRaw) {
+        try {
+            const user = JSON.parse(cachedUserRaw);
+            updateAuthUI(user);
+            hasCache = true;
+        } catch(e) {
+            console.error("Error reading cached user in checkAuthStatus:", e);
+        }
+    }
+
+    // 4. Background verification (silent & non-blocking)
     try {
         const res = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
         if (res.ok) { 
-            const user = await res.json(); 
-            if(lo) lo.classList.add('hidden');
-            if(li) li.classList.remove('hidden');
-            if(un) un.textContent = user.name || user.email.split('@')[0];
-        } else { 
-            if(lo) lo.classList.remove('hidden'); 
-            if(li) li.classList.add('hidden'); 
+            const user = await res.json();
+            // Cache user
+            localStorage.setItem('metal_user', JSON.stringify(user));
+            if (window.setCookieGlobal) {
+                window.setCookieGlobal('metal_user', JSON.stringify(user), 7);
+            }
+            updateAuthUI(user);
+        } else {
+            // Token is invalid on server side (e.g. user deleted or pass changed)
+            if (window.handleLogoutGlobal) {
+                window.handleLogoutGlobal();
+            } else {
+                localStorage.removeItem('metal_token');
+                localStorage.removeItem('metal_user');
+                localStorage.removeItem('metal_orders');
+                if (window.eraseCookieGlobal) {
+                    window.eraseCookieGlobal('metal_token');
+                    window.eraseCookieGlobal('metal_user');
+                }
+            }
+            clearAuthUI();
         }
-    } catch (e) { 
-        if(lo) lo.classList.remove('hidden'); 
-        if(li) li.classList.add('hidden'); 
+    } catch (e) {
+        // Network error (offline mode) - keep showing the cached profile if we have it!
+        console.warn("Silent auth check failed (offline mode):", e);
+        if (!hasCache) {
+            clearAuthUI();
+        }
     }
 };
 
@@ -625,7 +754,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             </a>
                             <div class="pl-7 flex flex-col gap-2.5 border-l border-white/5 ml-2">
                                 <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил окрашенный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Профнастил окрашенный</a>
-                                <a href="/catalog/?pcat=Кровля и фасад&cat=Полиэстер" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Полиэстер</a>
                                 <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил оцинкованный" class="text-xs text-on-surface-variant hover:text-primary no-underline uppercase tracking-wider">Профнастил оцинкованный</a>
                             </div>
                         </div>
@@ -722,7 +850,6 @@ document.addEventListener('DOMContentLoaded', function() {
           </div></div>
           <div class="mega-submenu" data-parent="krovlya"><div class="mega-submenu-title">Кровля и фасад</div><div class="mega-submenu-grid">
             <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил окрашенный" class="mega-sub-link">Профнастил окрашенный</a>
-            <a href="/catalog/?pcat=Кровля и фасад&cat=Полиэстер" class="mega-sub-link">Полиэстер</a>
             <a href="/catalog/?pcat=Кровля и фасад&cat=Профнастил оцинкованный" class="mega-sub-link">Профнастил оцинкованный</a>
           </div></div>
           <div class="mega-submenu mega-submenu-default is-active" data-parent="default"><div class="mega-default-content">
@@ -763,10 +890,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2 tracking-widest uppercase">EMAIL</label>
                                 <input type="email" id="loginEmailGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
                             </div>
-                            <div>
+                            <div class="relative">
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2 tracking-widest uppercase">ПАРОЛЬ</label>
-                                <input type="password" id="loginPassGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
+                                <div class="relative flex items-center">
+                                    <input type="password" id="loginPassGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 pr-10 pl-0 outline-none font-body-md"/>
+                                    <button type="button" onclick="togglePassVisibilityGlobal('loginPassGlobal', this)" class="absolute right-0 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-white/5">
+                                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                        <div class="flex justify-between items-center mt-[-10px]">
+                            <button onclick="switchAuthGlobal('forgot')" class="text-on-surface-variant hover:text-primary text-[10px] font-label-caps uppercase transition-colors tracking-wider">ЗАБЫЛИ ПАРОЛЬ?</button>
                         </div>
                         <div id="loginErrorMsgGlobal" class="text-error text-[11px] font-label-caps mt-[-16px] mb-4 hidden uppercase tracking-wider"></div>
                         <button onclick="handleLoginGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">ВОЙТИ</button>
@@ -784,15 +919,68 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2 tracking-widest uppercase">EMAIL</label>
                                 <input type="email" id="regEmailGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
                             </div>
-                            <div>
+                            <div class="relative">
                                 <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2 tracking-widest uppercase">ПАРОЛЬ</label>
-                                <input type="password" id="regPassGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
+                                <div class="relative flex items-center">
+                                    <input type="password" id="regPassGlobal" oninput="validatePasswordStrengthGlobal(this.value)" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 pr-10 pl-0 outline-none font-body-md"/>
+                                    <button type="button" onclick="togglePassVisibilityGlobal('regPassGlobal', this)" class="absolute right-0 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2 rounded-full hover:bg-white/5">
+                                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                    </button>
+                                </div>
+                                <div class="mt-4 space-y-3 p-4 bg-surface-container/30 border border-outline-variant/10 rounded-xl">
+                                    <div class="flex justify-between items-center text-[10px] font-label-caps tracking-wider">
+                                        <span class="text-on-surface-variant">СЛОЖНОСТЬ:</span>
+                                        <span id="strengthTextGlobal" class="text-error font-bold">ОЧЕНЬ СЛАБЫЙ</span>
+                                    </div>
+                                    <div class="h-1 bg-white/10 rounded overflow-hidden">
+                                        <div id="strengthBarGlobal" class="h-full w-0 bg-error transition-all duration-300"></div>
+                                    </div>
+                                    <ul class="text-[11px] space-y-2 mt-2">
+                                        <li id="rule-length" class="flex items-center gap-2 text-on-surface-variant opacity-50 transition-all duration-200">
+                                            <span class="rule-icon material-symbols-outlined text-[14px]">circle</span>
+                                            <span>Не менее 8 символов</span>
+                                        </li>
+                                        <li id="rule-upper" class="flex items-center gap-2 text-on-surface-variant opacity-50 transition-all duration-200">
+                                            <span class="rule-icon material-symbols-outlined text-[14px]">circle</span>
+                                            <span>Минимум одна заглавная (A-Z)</span>
+                                        </li>
+                                        <li id="rule-lower" class="flex items-center gap-2 text-on-surface-variant opacity-50 transition-all duration-200">
+                                            <span class="rule-icon material-symbols-outlined text-[14px]">circle</span>
+                                            <span>Минимум одна строчная (a-z)</span>
+                                        </li>
+                                        <li id="rule-digit" class="flex items-center gap-2 text-on-surface-variant opacity-50 transition-all duration-200">
+                                            <span class="rule-icon material-symbols-outlined text-[14px]">circle</span>
+                                            <span>Минимум одна цифра (0-9)</span>
+                                        </li>
+                                        <li id="rule-special" class="flex items-center gap-2 text-on-surface-variant opacity-50 transition-all duration-200">
+                                            <span class="rule-icon material-symbols-outlined text-[14px]">circle</span>
+                                            <span>Минимум один спецсимвол (!@#$)</span>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                         <div id="regErrorMsgGlobal" class="text-error text-[11px] font-label-caps mt-[-16px] mb-4 hidden uppercase tracking-wider"></div>
-                        <button onclick="handleRegisterGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all">СОЗДАТЬ АККАУНТ</button>
+                        <button id="regSubmitBtnGlobal" disabled onclick="handleRegisterGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all opacity-50 cursor-not-allowed">СОЗДАТЬ АККАУНТ</button>
                         <div class="text-center">
                             <button onclick="switchAuthGlobal('login')" class="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[12px] uppercase">УЖЕ ЕСТЬ АККАУНТ? ВОЙТИ</button>
+                        </div>
+                    </div>
+                    <div id="forgotFormGlobal" class="space-y-8 hidden">
+                        <header class="mb-6">
+                            <div class="font-display-xl text-[24px] uppercase leading-tight mb-2">ВОССТАНОВЛЕНИЕ <span class="text-primary">ДОСТУПА</span></div>
+                            <p class="text-on-surface-variant text-xs font-label-caps">ВВЕДИТЕ ВАШ EMAIL ДЛЯ СБРОСА ПАРОЛЯ</p>
+                        </header>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="font-label-caps text-[11px] text-on-surface-variant block mb-2 tracking-widest uppercase">EMAIL</label>
+                                <input type="email" id="forgotEmailGlobal" class="w-full bg-transparent border-0 border-b border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors text-on-surface py-3 px-0 outline-none font-body-md"/>
+                            </div>
+                        </div>
+                        <div id="forgotErrorMsgGlobal" class="text-error text-[11px] font-label-caps mt-[-16px] mb-4 hidden uppercase tracking-wider"></div>
+                        <button onclick="handleForgotGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all">ОТПРАВИТЬ ССЫЛКУ</button>
+                        <div class="text-center">
+                            <button onclick="switchAuthGlobal('login')" class="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[12px] uppercase">НАЗАД К ВХОДУ</button>
                         </div>
                     </div>
                 </div>
@@ -872,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="space-y-4">
                         <div class="flex gap-3">
                             <span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
-                            <span class="text-sm text-on-surface-variant leading-relaxed opacity-80">ЛО, промзона Горелово, Волхонское шоссе, 4</span>
+                            <span class="text-sm text-on-surface-variant leading-relaxed opacity-80">ЛО, промзона Горелово, 6</span>
                         </div>
                         <div class="flex gap-3">
                             <span class="material-symbols-outlined text-primary text-[20px]">call</span>
@@ -1255,11 +1443,91 @@ document.addEventListener('DOMContentLoaded', function() {
     window.switchAuthGlobal = function(type) {
         const login = document.getElementById('loginFormGlobal');
         const reg = document.getElementById('registerFormGlobal');
-        if (login && reg) {
-            login.classList.toggle('hidden', type === 'register');
-            reg.classList.toggle('hidden', type === 'login');
+        const forgot = document.getElementById('forgotFormGlobal');
+        if (login && reg && forgot) {
+            login.classList.toggle('hidden', type !== 'login');
+            reg.classList.toggle('hidden', type !== 'register');
+            forgot.classList.toggle('hidden', type !== 'forgot');
         }
     };
+
+    window.togglePassVisibilityGlobal = function(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (input.type === 'password') {
+            input.type = 'text';
+            if (icon) icon.textContent = 'visibility_off';
+        } else {
+            input.type = 'password';
+            if (icon) icon.textContent = 'visibility';
+        }
+    };
+
+    window.validatePasswordStrengthGlobal = function(password) {
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasDigit = /\d/.test(password);
+        const hasSpecial = /[!@#$%^&*()_+=\-{}[\]|\\:;"'<>,.?/~`]/.test(password);
+        const isLengthOk = password.length >= 8;
+
+        updateChecklistItemGlobal('rule-length', isLengthOk);
+        updateChecklistItemGlobal('rule-upper', hasUpper);
+        updateChecklistItemGlobal('rule-lower', hasLower);
+        updateChecklistItemGlobal('rule-digit', hasDigit);
+        updateChecklistItemGlobal('rule-special', hasSpecial);
+
+        let score = 0;
+        if (isLengthOk) score += 20;
+        if (hasUpper) score += 20;
+        if (hasLower) score += 20;
+        if (hasDigit) score += 20;
+        if (hasSpecial) score += 20;
+
+        const bar = document.getElementById('strengthBarGlobal');
+        const text = document.getElementById('strengthTextGlobal');
+        if (bar) {
+            bar.style.width = score + '%';
+            if (score <= 40) {
+                bar.style.backgroundColor = '#ff5f5f';
+                if (text) text.textContent = 'СЛАБЫЙ ПАРОЛЬ';
+                if (text) text.style.color = '#ff5f5f';
+            } else if (score <= 80) {
+                bar.style.backgroundColor = '#ffbe5f';
+                if (text) text.textContent = 'СРЕДНИЙ ПАРОЛЬ';
+                if (text) text.style.color = '#ffbe5f';
+            } else {
+                bar.style.backgroundColor = '#ffb0cc';
+                if (text) text.textContent = 'ОТЛИЧНЫЙ ПАРОЛЬ';
+                if (text) text.style.color = '#ffb0cc';
+            }
+        }
+
+        const regBtn = document.getElementById('regSubmitBtnGlobal');
+        if (regBtn) {
+            regBtn.disabled = score < 100;
+            if (score < 100) {
+                regBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                regBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+    };
+
+    function updateChecklistItemGlobal(id, isValid) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const icon = el.querySelector('.rule-icon');
+        if (isValid) {
+            el.classList.remove('text-on-surface-variant', 'opacity-50');
+            el.classList.add('text-primary');
+            if (icon) icon.textContent = 'check_circle';
+        } else {
+            el.classList.remove('text-primary');
+            el.classList.add('text-on-surface-variant', 'opacity-50');
+            if (icon) icon.textContent = 'circle';
+        }
+    }
 
     async function checkAuthStatus() {
         if (window.checkAuthStatus) {
@@ -1375,9 +1643,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.handleLoginGlobal = async function() {
         const email = document.getElementById('loginEmailGlobal').value;
         const password = document.getElementById('loginPassGlobal').value;
-        const btn = document.querySelector('#loginFormGlobal button');
+        const btn = document.querySelector('#loginFormGlobal button[onclick^="handleLoginGlobal"]');
         const errEl = document.getElementById('loginErrorMsgGlobal');
-        const originalText = btn.innerHTML;
+        const originalText = btn ? btn.innerHTML : 'ВОЙТИ';
         
         // Clear previous errors
         if (errEl) errEl.classList.add('hidden');
@@ -1405,8 +1673,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        btn.disabled = true;
-        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+        }
 
         try {
             const res = await fetch('/api/auth/login', {
@@ -1418,19 +1688,102 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.ok) {
                 localStorage.setItem('metal_token', data.token);
                 localStorage.setItem('metal_user', JSON.stringify(data.user));
+                if (window.setCookieGlobal) {
+                    window.setCookieGlobal('metal_token', data.token, 7);
+                    window.setCookieGlobal('metal_user', JSON.stringify(data.user), 7);
+                }
                 showSuccessPopupGlobal(`Успешный вход! Добрый день, ${data.user.name || 'пользователь'}!`);
                 setTimeout(() => {
                     window.location.href = '/cabinet/';
                 }, 1500);
             } else { 
-                showLoginFormErrorGlobal(data.error || 'Неверный email или пароль'); 
+                if (data.error === 'email_not_confirmed') {
+                    showLoginFormErrorGlobal(
+                        `${data.message || 'Email не подтвержден.'} ` +
+                        `<button type="button" onclick="handleResendConfirmation('${email}')" class="mt-3 w-full py-2 bg-primary/20 border border-primary/30 text-primary font-label-caps text-[10px] tracking-widest hover:bg-primary hover:text-white transition-all uppercase rounded">Отправить подтверждение повторно</button>`
+                    );
+                } else {
+                    showLoginFormErrorGlobal(data.error || 'Неверный email или пароль'); 
+                }
             }
         } catch (e) { 
             console.error('Login error details:', e);
             showLoginFormErrorGlobal('Ошибка соединения: ' + (e.message || 'сервер не отвечает')); 
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+    };
+
+    window.handleResendConfirmation = async function(email) {
+        const errEl = document.getElementById('loginErrorMsgGlobal');
+        if (errEl) errEl.classList.add('hidden');
+        
+        try {
+            const res = await fetch('/api/auth/resend-confirmation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showSuccessPopupGlobal('Письмо с подтверждением отправлено! Проверьте ваш почтовый ящик.');
+            } else {
+                showLoginFormErrorGlobal(data.error || 'Не удалось отправить письмо');
+            }
+        } catch (e) {
+            showLoginFormErrorGlobal('Ошибка сервера при отправке');
+        }
+    };
+
+    window.handleForgotGlobal = async function() {
+        const email = document.getElementById('forgotEmailGlobal').value;
+        const btn = document.querySelector('#forgotFormGlobal button[onclick^="handleForgotGlobal"]');
+        const errEl = document.getElementById('forgotErrorMsgGlobal');
+        const originalText = btn ? btn.innerHTML : 'ОТПРАВИТЬ ССЫЛКУ';
+        
+        if (errEl) errEl.classList.add('hidden');
+        if (!email) {
+            if (errEl) {
+                errEl.textContent = 'Пожалуйста, введите ваш email';
+                errEl.classList.remove('hidden');
+            }
+            return;
+        }
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+        }
+
+        try {
+            const res = await fetch('/api/auth/reset-password-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showSuccessPopupGlobal('Ссылка для восстановления отправлена на вашу почту!');
+                switchAuthGlobal('login');
+            } else {
+                if (errEl) {
+                    errEl.textContent = data.error || 'Ошибка восстановления';
+                    errEl.classList.remove('hidden');
+                }
+            }
+        } catch (e) {
+            if (errEl) {
+                errEl.textContent = 'Ошибка соединения с сервером';
+                errEl.classList.remove('hidden');
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     };
 
@@ -1438,8 +1791,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const name = document.getElementById('regNameGlobal').value;
         const email = document.getElementById('regEmailGlobal').value;
         const password = document.getElementById('regPassGlobal').value;
-        const btn = document.querySelector('#registerFormGlobal button');
+        const btn = document.getElementById('regSubmitBtnGlobal') || document.querySelector('#registerFormGlobal button');
         const errEl = document.getElementById('regErrorMsgGlobal');
+        const originalText = btn ? btn.innerHTML : 'СОЗДАТЬ АККАУНТ';
         
         if (errEl) errEl.classList.add('hidden');
 
@@ -1458,9 +1812,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        btn.disabled = true;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+        }
 
         try {
             const res = await fetch('/api/auth/register', {
@@ -1470,27 +1825,46 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const data = await res.json();
             if (res.ok) {
-                localStorage.setItem('metal_token', data.token);
-                localStorage.setItem('metal_user', JSON.stringify(data.user));
-                showSuccessPopupGlobal(`Регистрация успешна! Добро пожаловать, ${data.user.name || 'пользователь'}!`);
-                setTimeout(() => {
-                    window.location.href = '/cabinet/';
-                }, 1500);
+                if (data.email_confirm_required) {
+                    showSuccessPopupGlobal('Регистрация успешна! Письмо с подтверждением отправлено на вашу почту.');
+                    switchAuthGlobal('login');
+                } else {
+                    localStorage.setItem('metal_token', data.token);
+                    localStorage.setItem('metal_user', JSON.stringify(data.user));
+                    if (window.setCookieGlobal) {
+                        window.setCookieGlobal('metal_token', data.token, 7);
+                        window.setCookieGlobal('metal_user', JSON.stringify(data.user), 7);
+                    }
+                    showSuccessPopupGlobal(`Регистрация успешна! Добро пожаловать, ${data.user.name || 'пользователь'}!`);
+                    setTimeout(() => {
+                        window.location.href = '/cabinet/';
+                    }, 1500);
+                }
             } else {
                 showRegisterFormErrorGlobal(data.error || 'Ошибка при регистрации');
             }
         } catch (e) { 
             showRegisterFormErrorGlobal('Ошибка сервера');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     };
 
     window.handleLogoutGlobal = function() {
         localStorage.removeItem('metal_token');
         localStorage.removeItem('metal_user');
+        localStorage.removeItem('metal_orders');
+        if (window.eraseCookieGlobal) {
+            window.eraseCookieGlobal('metal_token');
+            window.eraseCookieGlobal('metal_user');
+        }
         showLoggedOut();
+        if (window.location.pathname.includes('cabinet.html')) {
+            window.location.href = '/';
+        }
     };
 
     // Global Click to Close Panels
@@ -1552,11 +1926,16 @@ document.addEventListener('DOMContentLoaded', function() {
     window.updateGlobalCartBadge = updateGlobalCartBadge;
     window.addEventListener('storage', updateGlobalCartBadge);
 
-    if (window.location.pathname.includes('cabinet.html')) { checkAuthStatus(); }
+    checkAuthStatus();
 
     // --- GLOBAL SCROLL & SNAPPING ENGINE ---
+    const SCROLL_DURATION_MS = 800;
+    const SCROLL_HEADER_OFFSET = 80;
+    const BLOCK_SCROLL_PATH_RE = /\/(index\.html)?$|\/(services|calculator|about|logistics|fleet|certificates|contacts)(\/|\.html)?$/i;
+
     let isScrollingGlobal = false;
-    let lastScrollTimeGlobal = 0;
+    let lastBlockScrollAt = 0;
+    let touchStartY = null;
 
     // Inject Global Fix for Horizontal Scroll — applied immediately
     const globalStyle = document.createElement('style');
@@ -1589,8 +1968,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const diff = targetY - startY;
         let start = null;
 
-        // Optimized duration for a more premium, responsive feel
-        const finalDuration = duration || 500;
+        const finalDuration = duration ?? SCROLL_DURATION_MS;
 
         function step(timestamp) {
             if (!start) start = timestamp;
@@ -1613,80 +1991,150 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.scrollToTopGlobal = function() {
-        window.customSmoothScrollGlobal(0, 600);
+        window.customSmoothScrollGlobal(0, SCROLL_DURATION_MS);
+    };
+
+    const isBlockScrollPage = () => {
+        if (document.querySelector('main[data-hero-block-scroll], main[data-block-scroll]')) return true;
+        const p = window.location.pathname;
+        return BLOCK_SCROLL_PATH_RE.test(p) || p === '/' || p.endsWith('/');
+    };
+
+    const isHeroBlockScrollPage = () => !!document.querySelector('main[data-hero-block-scroll]');
+
+    const isBlockScrollSection = (el) => {
+        if (!el || el.tagName !== 'SECTION') return false;
+        const cls = el.className || '';
+        return /min-h-\[100dvh\]|min-h-screen|h-\[100dvh\]|h-screen/.test(cls) || el.id === 'cta-footer-merged';
+    };
+
+    const getBlockScrollSections = () => {
+        const mainHero = document.querySelector('main[data-hero-block-scroll]');
+        if (mainHero) {
+            const hero = mainHero.querySelector(':scope > section#hero') || mainHero.querySelector(':scope > section:first-of-type');
+            if (!hero) return [];
+            const targetSel = mainHero.getAttribute('data-hero-scroll-target');
+            const target = targetSel
+                ? document.querySelector(targetSel)
+                : hero.nextElementSibling;
+            if (target && target.tagName === 'SECTION') return [hero, target];
+            return [hero];
+        }
+        const main = document.querySelector('main');
+        if (!main) return [];
+        return Array.from(main.querySelectorAll(':scope > section')).filter(isBlockScrollSection);
+    };
+
+    const getSectionScrollY = (section) => Math.max(0, section.offsetTop - SCROLL_HEADER_OFFSET);
+
+    const getCurrentBlockIndex = (sections) => {
+        const anchor = window.scrollY + window.innerHeight * 0.35;
+        let idx = 0;
+        for (let i = 0; i < sections.length; i++) {
+            if (sections[i].offsetTop <= anchor + 40) idx = i;
+        }
+        return idx;
+    };
+
+    const sectionFitsViewport = (section) => section.offsetHeight <= window.innerHeight + 24;
+
+    const isAtSectionBottom = (section) => {
+        const bottom = section.offsetTop + section.offsetHeight;
+        return window.scrollY + window.innerHeight >= bottom - 24;
+    };
+
+    const isAtSectionTop = (section) => window.scrollY <= getSectionScrollY(section) + 24;
+
+    const scrollToBlockIndex = (sections, index) => {
+        if (!sections.length || index < 0 || index >= sections.length) return;
+        window.customSmoothScrollGlobal(getSectionScrollY(sections[index]), SCROLL_DURATION_MS);
     };
 
     window.scrollToSectionGlobal = function(selector) {
+        const sections = getBlockScrollSections();
         if (!selector) {
-            // Find current section and scroll to next
-            const sections = Array.from(document.querySelectorAll('section, main > div[id]'));
-            const currentY = window.scrollY + 150;
-            const nextSection = sections.find(s => s.offsetTop > currentY);
-            if (nextSection) {
-                window.customSmoothScrollGlobal(nextSection.offsetTop - 80, 600);
-            }
+            const idx = getCurrentBlockIndex(sections);
+            if (idx < sections.length - 1) scrollToBlockIndex(sections, idx + 1);
             return;
         }
         const target = document.querySelector(selector);
         if (!target) return;
-        const targetY = target.getBoundingClientRect().top + window.pageYOffset - 80;
-        window.customSmoothScrollGlobal(targetY, 600);
+        const blockIdx = sections.indexOf(target);
+        if (blockIdx >= 0) {
+            scrollToBlockIndex(sections, blockIdx);
+            return;
+        }
+        const targetY = target.getBoundingClientRect().top + window.pageYOffset - SCROLL_HEADER_OFFSET;
+        window.customSmoothScrollGlobal(targetY, SCROLL_DURATION_MS);
     };
 
-    const handleInitialSnap = (e, p) => {
-        // Standardized snap targets for block scrolling
-        const snapMap = {
-            'index': 'hero-target',
-            'about': 'about-hero-target',
-            'services': 'services-hero-target',
-            'logistics': 'fleet-hero-target',
-            'certificates': 'certs-hero-target'
-        };
+    const handleBlockWheel = (e) => {
+        if (!isBlockScrollPage() || isScrollingGlobal) return false;
+        if (Date.now() - lastBlockScrollAt < SCROLL_DURATION_MS - 80) return false;
 
-        let targetId = null;
-        if (p === '/' || p === '' || p.includes('index')) targetId = snapMap['index'];
-        else {
-            for (const [key, val] of Object.entries(snapMap)) {
-                if (p.includes(key)) {
-                    targetId = val;
-                    break;
-                }
-            }
-        }
+        const sections = getBlockScrollSections();
+        if (sections.length < 2) return false;
 
-        if (!targetId) return false;
-        const target = document.getElementById(targetId);
-        if (!target) return false;
+        const idx = getCurrentBlockIndex(sections);
+        const current = sections[idx];
+        const delta = e.deltaY;
 
-        // Snap logic: Triggered when user is at the very top and scrolls down
-        const heroZone = target.offsetTop * 0.4;
-
-        // Snap Down from Hero
-        if (e.deltaY > 0 && window.scrollY < heroZone) {
+        if (delta > 0) {
+            if (isHeroBlockScrollPage() && idx >= 1) return false;
+            if (!sectionFitsViewport(current) && !isAtSectionBottom(current)) return false;
+            if (idx >= sections.length - 1) return false;
             e.preventDefault();
-            window.customSmoothScrollGlobal(target.offsetTop - 80, 600);
+            lastBlockScrollAt = Date.now();
+            scrollToBlockIndex(sections, idx + 1);
             return true;
         }
-        
-        // Snap Up to Hero (if close to the top)
-        if (e.deltaY < 0 && window.scrollY > 20 && window.scrollY < target.offsetTop + 50) {
+
+        if (delta < 0) {
+            if (!sectionFitsViewport(current) && !isAtSectionTop(current)) return false;
+            if (idx <= 0) {
+                if (window.scrollY > 8) {
+                    e.preventDefault();
+                    lastBlockScrollAt = Date.now();
+                    window.customSmoothScrollGlobal(0, SCROLL_DURATION_MS);
+                    return true;
+                }
+                return false;
+            }
             e.preventDefault();
-            window.customSmoothScrollGlobal(0, 600);
+            lastBlockScrollAt = Date.now();
+            scrollToBlockIndex(sections, idx - 1);
             return true;
         }
 
         return false;
     };
 
-    // NATIVE SCROLL MIGRATION: The custom snapping engine is now deprecated in favor of native browser scrolling.
-    // This allows for a more fluid experience as requested by the user.
-    /*
     window.addEventListener('wheel', (e) => {
-        // Snapping logic removed to enable native scrolling site-wide.
+        if (window.checkAnyPopupOpenGlobal && window.checkAnyPopupOpenGlobal()) return;
+        handleBlockWheel(e);
     }, { passive: false });
-    */
 
+    window.addEventListener('touchstart', (e) => {
+        if (!isBlockScrollPage() || e.touches.length !== 1) return;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
 
+    window.addEventListener('touchend', (e) => {
+        if (!isBlockScrollPage() || touchStartY === null || !e.changedTouches.length) return;
+        const deltaY = touchStartY - e.changedTouches[0].clientY;
+        touchStartY = null;
+        if (Math.abs(deltaY) < 60) return;
+        handleBlockWheel({ deltaY, preventDefault: () => {} });
+    }, { passive: true });
+
+    document.querySelectorAll('[data-vertical-wheel-pass]').forEach((el) => {
+        el.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+            if (el.scrollWidth <= el.clientWidth + 1) return;
+            e.preventDefault();
+            window.scrollBy({ top: e.deltaY, left: 0, behavior: 'auto' });
+        }, { passive: false });
+    });
 
     window.checkAnyPopupOpenGlobal = function() {
         const popupSelectors = [
@@ -1699,7 +2147,8 @@ document.addEventListener('DOMContentLoaded', function() {
             '#drawingUploadModal',
             '#applicationSuccessPopup',
             '#applicationErrorPopup',
-            '.liquid-glass' // Generic class for my premium modals
+            '#globalErrorPopup',
+            '.fixed .liquid-glass' // Only match premium modals inside fixed viewport containers
         ];
         return popupSelectors.some(s => document.querySelector(s));
     };
@@ -2145,4 +2594,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     observer.observe(document.body, { childList: true, subtree: true });
+});
+
+// URL Actions (e.g. ?action=login)
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'login') {
+        setTimeout(() => {
+            if (typeof window.toggleAuthModalGlobal === 'function') {
+                window.toggleAuthModalGlobal();
+            }
+        }, 300);
+    }
 });

@@ -85,6 +85,7 @@ const pageRoutes = [
   { path: '/cart', file: 'cart.html' },
   { path: '/cabinet', file: 'cabinet.html' },
   { path: '/product', file: 'product.html' },
+  { path: '/reset-password', file: 'reset-password.html' },
 ];
 
 pageRoutes.forEach(({ path: routePath, file }) => {
@@ -140,7 +141,7 @@ app.use((req, res) => {
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    console.log(`Supabase URL: ${SUPABASE_URL}`);
+    console.log(`Supabase URL: ${process.env.SUPABASE_URL}`);
     console.log(`API available at http://localhost:${port}/api/products`);
   });
 }

@@ -61,14 +61,46 @@ CREATE TABLE IF NOT EXISTS order_items (
   price NUMERIC
 );
 
--- 6. Users Table
+-- 6. Users Table (profile; auth in auth.users via Supabase Auth)
 CREATE TABLE IF NOT EXISTS users (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
+  auth_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,
+  password TEXT DEFAULT '',
   name TEXT,
+  phone TEXT,
+  role TEXT DEFAULT 'user',
+  company_name TEXT,
+  inn TEXT,
+  kpp TEXT,
+  legal_address TEXT,
+  actual_address TEXT,
+  position TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Sync auth.users → public.users on signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
+BEGIN
+  INSERT INTO public.users (auth_id, email, name, role)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
+    'user'
+  )
+  ON CONFLICT (email) DO UPDATE SET
+    auth_id = EXCLUDED.auth_id,
+    name = COALESCE(EXCLUDED.name, public.users.name);
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- Enable RLS (Optional but recommended)
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
