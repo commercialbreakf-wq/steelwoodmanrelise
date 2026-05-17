@@ -130,6 +130,16 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
+const authenticateAdmin = async (req, res, next) => {
+  await authenticateToken(req, res, () => {
+    if (req.profile && req.profile.role === 'admin') {
+      next();
+    } else {
+      res.status(403).json({ error: 'Доступ запрещен: требуется роль администратора' });
+    }
+  });
+};
+
 app.use(cors());
 app.use(express.json());
 
@@ -157,9 +167,80 @@ app.get('/api/test-root', (req, res) => {
 
 const router = express.Router();
 
+// --- ADMIN API ---
 
+// Products Management
+router.get('/admin/products', authenticateAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
 
-// API: Health Check
+router.post('/admin/products', authenticateAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('products').insert([req.body]).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+router.put('/admin/products/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase.from('products').update(req.body).eq('id', id).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+router.delete('/admin/products/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
+});
+
+// Users Management
+router.get('/admin/users', authenticateAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+router.put('/admin/users/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { data, error } = await supabase.from('users').update(req.body).eq('id', id).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// Orders Management
+router.get('/admin/orders', authenticateAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+router.put('/admin/orders/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const { data, error } = await supabase.from('orders').update({ status }).eq('id', id).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// Leads Management
+router.get('/admin/leads', authenticateAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+router.put('/admin/leads/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const { data, error } = await supabase.from('leads').update({ status }).eq('id', id).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// --- PUBLIC API ---
 router.get('/health', async (req, res) => {
   try {
     const { count: productCount, error: productError } = await supabase.from('products').select('*', { count: 'exact', head: true });
