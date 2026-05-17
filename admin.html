@@ -451,6 +451,15 @@
                 <!-- Step 1: Action Selection -->
                 <div id="wizard-step-1" class="wizard-step space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <button id="btnEditCurrent" onclick="startWizardEdit()" class="glass p-10 rounded-3xl flex flex-col items-center gap-4 hover:border-primary/50 transition-all group hidden">
+                            <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all">
+                                <span class="material-symbols-outlined text-primary text-3xl">edit</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-display font-bold uppercase tracking-widest text-sm">Редактировать текущий</div>
+                                <div class="text-[10px] opacity-50 mt-1">Изменить поля существующего товара</div>
+                            </div>
+                        </button>
                         <button onclick="startWizardNew()" class="glass p-10 rounded-3xl flex flex-col items-center gap-4 hover:border-primary/50 transition-all group">
                             <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all">
                                 <span class="material-symbols-outlined text-primary text-3xl">add_circle</span>
@@ -510,12 +519,21 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="text-[10px] font-display uppercase tracking-widest opacity-50 mb-1 block">Изображение (URL)</label>
-                                <input type="text" id="wiz-image" oninput="updateWizPreview()" class="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-3 outline-none focus:border-primary text-sm"/>
+                                <label class="text-[10px] font-display uppercase tracking-widest opacity-50 mb-1 block">Изображение (URL или файл)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="wiz-image" oninput="updateWizPreview()" class="flex-1 bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-3 outline-none focus:border-primary text-sm"/>
+                                    <button type="button" onclick="document.getElementById('wiz-image-file').click()" class="px-4 py-3 bg-white/5 border border-outline-variant/20 rounded-xl hover:bg-white/10 transition-all flex items-center gap-2" title="Загрузить файл">
+                                        <span class="material-symbols-outlined text-[18px]">upload</span>
+                                    </button>
+                                </div>
+                                <input type="file" id="wiz-image-file" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Step 3: Smart Specs (Dynamic) -->
+                <div id="wizard-step-3" class="wizard-step hidden space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300"></div>
 
                 <!-- Step 4: Цены и Вес -->
                 <div id="wizard-step-4" class="wizard-step hidden space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -647,14 +665,14 @@
 
             try {
                 const user = JSON.parse(userRaw);
-                if (user.role !== 'admin') {
+                if (!user || user.role !== 'admin') {
                     // Not an admin, go home
                     window.location.href = '/';
                     return;
                 }
                 
                 // Set admin info
-                document.getElementById('adminName').textContent = user.name || user.email;
+                document.getElementById('adminName').textContent = user.name || user.email || 'Admin';
                 
                 // Hide login, show dashboard
                 document.getElementById('adminLoginOverlay').style.display = 'none';
@@ -663,7 +681,10 @@
                 // Load data
                 loadDashboardData();
             } catch (e) {
-                window.location.href = '/';
+                console.error('Auth check failed:', e);
+                localStorage.removeItem('metal_token');
+                localStorage.removeItem('metal_user');
+                showLogin();
             }
         }
 
@@ -1011,6 +1032,7 @@
         // --- PRODUCT WIZARD ---
         let currentWizardStep = 1;
         let wizardData = {};
+        let wizardMode = 'new'; // 'new', 'edit', 'clone'
 
         function openProductModal(prodId = null) {
             const modal = document.getElementById('productModal');
@@ -1025,17 +1047,21 @@
         function initWizard(prodId = null) {
             currentWizardStep = 1;
             wizardData = {};
+            wizardMode = prodId ? 'edit' : 'new';
             
             // Populate category dropdown
             const cats = [...new Set(allProducts.map(p => p.category))].sort();
             const wizCat = document.getElementById('wiz-cat');
             wizCat.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
 
+            const btnEditCurrent = document.getElementById('btnEditCurrent');
+            const step1Grid = document.querySelector('#wizard-step-1 .grid');
+
             if (prodId) {
                 const p = allProducts.find(x => x.id === prodId);
                 if (p) {
                     wizardData = { ...p };
-                    wizardData.id_original = p.id; // Mark as edit
+                    wizardData.id_original = p.id; // Keep original ID for PUT
                     
                     // Parse specs if it's a string
                     if (typeof wizardData.specs === 'string') {
@@ -1049,11 +1075,20 @@
                     fillWizardStep2();
                     fillWizardStep4();
                     document.getElementById('modalTitle').textContent = 'Редактировать: ' + p.name;
-                    currentWizardStep = 2; // Skip step 1 for editing
+                    
+                    // Show "Edit Current" button and use 3-column grid
+                    btnEditCurrent.classList.remove('hidden');
+                    step1Grid.classList.remove('md:grid-cols-2');
+                    step1Grid.classList.add('md:grid-cols-3');
                 }
             } else {
                 document.getElementById('modalTitle').textContent = 'Новый товар';
                 document.getElementById('cloneSearchArea').classList.add('hidden');
+                
+                // Hide "Edit Current" button and use 2-column grid
+                btnEditCurrent.classList.add('hidden');
+                step1Grid.classList.remove('md:grid-cols-3');
+                step1Grid.classList.add('md:grid-cols-2');
             }
 
             showWizardStep(currentWizardStep);
@@ -1061,7 +1096,13 @@
 
         function showWizardStep(step) {
             document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
-            document.getElementById('wizard-step-' + step).classList.remove('hidden');
+            const target = document.getElementById('wizard-step-' + step);
+            if (target) {
+                target.classList.remove('hidden');
+            } else {
+                console.error('Wizard step not found:', step);
+                return;
+            }
             
             // Update Indicator
             for (let i = 1; i <= 5; i++) {
@@ -1098,20 +1139,25 @@
         }
 
         function nextStep() {
-            if (currentWizardStep === 2) {
-                saveWizardStep2();
-                renderSmartSpecs(wizardData.category);
-            }
-            if (currentWizardStep === 4) {
-                saveWizardStep4();
-                renderWizardPreview();
-            }
-            
-            if (currentWizardStep < 5) {
-                currentWizardStep++;
-                showWizardStep(currentWizardStep);
-            } else {
-                handleWizardSubmit();
+            try {
+                if (currentWizardStep === 2) {
+                    if (!saveWizardStep2()) return; // Stop if validation fails
+                    renderSmartSpecs(wizardData.category);
+                }
+                if (currentWizardStep === 4) {
+                    saveWizardStep4();
+                    renderWizardPreview();
+                }
+                
+                if (currentWizardStep < 5) {
+                    currentWizardStep++;
+                    showWizardStep(currentWizardStep);
+                } else {
+                    handleWizardSubmit();
+                }
+            } catch (e) {
+                console.error('Wizard error at step ' + currentWizardStep, e);
+                alert('Произошла ошибка при переходе. Проверьте консоль.');
             }
         }
 
@@ -1122,8 +1168,25 @@
             }
         }
 
+        function startWizardEdit() {
+            currentWizardStep = 2;
+            showWizardStep(2);
+        }
+
         function startWizardNew() {
-            wizardData = {};
+            // If we were editing, but user clicks "Create New", clear original ID
+            if (wizardMode === 'edit') {
+                wizardData = {};
+                wizardMode = 'new';
+                document.getElementById('modalTitle').textContent = 'Новый товар';
+                fillWizardStep2(); // Clear fields
+                
+                // Also hide Edit Current button and revert grid
+                document.getElementById('btnEditCurrent').classList.add('hidden');
+                const step1Grid = document.querySelector('#wizard-step-1 .grid');
+                step1Grid.classList.remove('md:grid-cols-3');
+                step1Grid.classList.add('md:grid-cols-2');
+            }
             currentWizardStep = 2;
             showWizardStep(2);
         }
@@ -1138,7 +1201,7 @@
 
         function filterCloneProducts() {
             const q = document.getElementById('cloneSearchInput').value.toLowerCase();
-            const results = allProducts.filter(p => p.name.toLowerCase().includes(q)).slice(0, 10);
+            const results = allProducts.filter(p => p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q)).slice(0, 10);
             
             document.getElementById('cloneResults').innerHTML = results.map(p => `
                 <div onclick="selectCloneProduct('${p.id}')" class="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-primary/10 cursor-pointer transition-all border border-transparent hover:border-primary/30">
@@ -1155,15 +1218,55 @@
             const p = allProducts.find(x => x.id === prodId);
             if (!p) return;
             
-            // Copy everything except ID/Slug
+            // Copy everything
             wizardData = { ...p };
-            wizardData.id_original = p.id; // Store original ID for reference if needed
-            delete wizardData.id;
+            
+            // Parse specs if it's a string (important for cloning)
+            if (typeof wizardData.specs === 'string') {
+                try {
+                    const parsed = JSON.parse(wizardData.specs);
+                    wizardData.specs = Array.isArray(parsed) ? Object.fromEntries(parsed) : parsed;
+                } catch(e) { wizardData.specs = {}; }
+            }
+
+            delete wizardData.id_original; 
+            delete wizardData.id; // Clear slug for new product
             wizardData.name = p.name + ' (КОПИЯ)';
+            wizardMode = 'clone';
             
             fillWizardStep2();
+            fillWizardStep4();
             currentWizardStep = 2;
             showWizardStep(2);
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите файл изображения (png, jpg, webp, etc.)');
+                return;
+            }
+
+            // Optional: Size limit check (e.g., 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимальный размер 2МБ');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                wizardData.image = base64;
+                
+                // Visual indicator in the text input
+                const input = document.getElementById('wiz-image');
+                input.value = '[Файл загружен: ' + file.name + ']';
+                
+                updateWizPreview();
+            };
+            reader.readAsDataURL(file);
         }
 
         function fillWizardStep2() {
@@ -1175,10 +1278,30 @@
         }
 
         function saveWizardStep2() {
-            wizardData.name = document.getElementById('wiz-name').value;
-            wizardData.category = document.getElementById('wiz-cat').value;
-            wizardData.id = document.getElementById('wiz-slug').value;
-            wizardData.image = document.getElementById('wiz-image').value;
+            const name = document.getElementById('wiz-name').value.trim();
+            const category = document.getElementById('wiz-cat').value;
+            const slug = document.getElementById('wiz-slug').value.trim();
+            const imageInput = document.getElementById('wiz-image').value.trim();
+
+            if (!name) {
+                alert('Введите наименование');
+                return false;
+            }
+            if (!category) {
+                alert('Выберите категорию');
+                return false;
+            }
+
+            wizardData.name = name;
+            wizardData.category = category;
+            wizardData.id = slug;
+            
+            // Only update image if it's NOT the placeholder text
+            if (!imageInput.startsWith('[Файл загружен')) {
+                wizardData.image = imageInput;
+            }
+            
+            return true;
         }
 
         function fillWizardStep4() {
@@ -1191,11 +1314,10 @@
 
         function saveWizardStep4() {
             wizardData.price_ton = parseFloat(document.getElementById('wiz-price-ton').value) || 0;
-            wizardData.weight = document.getElementById('wiz-weight').value; // Keep as string for DB flexibility or parse if needed
+            wizardData.weight = document.getElementById('wiz-weight').value;
             wizardData.unit_label = document.getElementById('wiz-unit-label').value;
             wizardData.min_order = document.getElementById('wiz-min-order').value;
             
-            // Calculate price_unit
             const w = parseFloat(wizardData.weight) || 0;
             if (wizardData.price_ton && w) {
                 wizardData.price_unit = (wizardData.price_ton / 1000) * w;
@@ -1222,7 +1344,7 @@
             const specsHtml = wizardData.specs ? Object.entries(wizardData.specs).map(([k, v]) => `
                 <div class="flex justify-between py-2 border-b border-outline-variant/10">
                     <span class="text-[10px] uppercase opacity-50">${k}</span>
-                    <span class="text-sm font-medium">${v}</span>
+                    <span class="text-sm font-medium">${v || '-'}</span>
                 </div>
             `).join('') : '<p class="text-xs opacity-40">Характеристики не указаны</p>';
 
@@ -1230,7 +1352,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-6">
                         <div class="glass p-6 rounded-3xl border-primary/20 bg-primary/5">
-                            <h4 class="text-[10px] font-display uppercase tracking-widest text-primary mb-4">Основное</h4>
+                            <h4 class="text-[10px] font-display uppercase tracking-widest text-primary mb-4">Основное (${wizardMode === 'edit' ? 'Редактирование' : 'Создание'})</h4>
                             <div class="space-y-2">
                                 <div class="text-xl font-display font-bold uppercase">${wizardData.name}</div>
                                 <div class="text-xs opacity-50">${wizardData.category}</div>
@@ -1245,7 +1367,7 @@
                         </div>
                     </div>
                     <div class="space-y-6">
-                        <div class="aspect-video glass rounded-3xl overflow-hidden">
+                        <div class="aspect-video glass rounded-3xl overflow-hidden bg-white/5">
                             <img src="${wizardData.image || '/images/logo_icon.png'}" class="w-full h-full object-contain ${wizardData.image ? '' : 'opacity-20'}" alt="Preview">
                         </div>
                         <div class="glass p-6 rounded-3xl border-primary/20">
@@ -1253,15 +1375,15 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <div class="text-[10px] uppercase opacity-50">Тонна</div>
-                                    <div class="text-lg font-display font-bold text-primary">${Number(wizardData.price_ton).toLocaleString()} ₽</div>
+                                    <div class="text-lg font-display font-bold text-primary">${Number(wizardData.price_ton || 0).toLocaleString()} ₽</div>
                                 </div>
                                 <div>
                                     <div class="text-[10px] uppercase opacity-50">Ед. (${wizardData.unit_label})</div>
-                                    <div class="text-lg font-display font-bold text-primary">${Number(wizardData.price_unit).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽</div>
+                                    <div class="text-lg font-display font-bold text-primary">${Number(wizardData.price_unit || 0).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽</div>
                                 </div>
                                 <div>
                                     <div class="text-[10px] uppercase opacity-50">Вес ед.</div>
-                                    <div class="text-sm font-bold">${wizardData.weight} кг</div>
+                                    <div class="text-sm font-bold">${wizardData.weight || 0} кг</div>
                                 </div>
                                 <div>
                                     <div class="text-[10px] uppercase opacity-50">Мин. заказ</div>
@@ -1288,19 +1410,18 @@
 
         async function handleWizardSubmit() {
             const token = localStorage.getItem('metal_token');
-            // If editing, wizardData.id_original was set in initWizard or clone
-            const prodId = wizardData.id_original; 
+            const isEdit = wizardMode === 'edit';
+            const prodId = isEdit ? wizardData.id_original : null; 
             
-            // Final prep: convert specs to JSON string if it's an object
             const payload = { ...wizardData };
-            delete payload.id_original; // Don't send this to the server
+            delete payload.id_original;
 
             if (payload.specs && typeof payload.specs === 'object') {
                 payload.specs = JSON.stringify(Object.entries(payload.specs));
             }
             
-            const url = prodId ? `/api/admin/products/${prodId}` : '/api/admin/products';
-            const method = prodId ? 'PUT' : 'POST';
+            const url = isEdit ? `/api/admin/products/${prodId}` : '/api/admin/products';
+            const method = isEdit ? 'PUT' : 'POST';
 
             try {
                 const res = await fetch(url, {
@@ -1314,11 +1435,11 @@
                 
                 if (res.ok) {
                     closeProductModal();
-                    loadDashboardData();
-                    if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal('Товар успешно сохранен');
+                    await loadDashboardData();
+                    if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal(isEdit ? 'Товар обновлен' : 'Товар создан');
                 } else {
                     const err = await res.json();
-                    alert('Ошибка: ' + err.error);
+                    alert('Ошибка: ' + (err.error || 'Неизвестная ошибка'));
                 }
             } catch (e) {
                 alert('Ошибка соединения');
@@ -1334,10 +1455,15 @@
 
         function renderProducts(products) {
             const body = document.getElementById('productsTableBody');
-            body.innerHTML = products.map(p => `
-                <tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-all ${selectedProductIds.has(p.id) ? 'bg-primary/5' : ''}">
+            body.innerHTML = products.map(p => {
+                const isSelected = selectedProductIds.has(p.id);
+                return `
+                <tr onclick="handleRowClick(event, '${p.id}')" 
+                    class="border-b border-outline-variant/10 hover:bg-white/5 transition-all cursor-pointer group ${isSelected ? 'bg-primary/5' : ''}">
                     <td class="p-6">
-                        <input type="checkbox" onchange="toggleProductSelection('${p.id}')" ${selectedProductIds.has(p.id) ? 'checked' : ''} class="rounded bg-surface-container border-outline-variant/30 text-primary focus:ring-primary focus:ring-offset-0 product-checkbox"/>
+                        <div class="w-5 h-5 rounded border border-outline-variant/30 flex items-center justify-center transition-all ${isSelected ? 'bg-primary border-primary' : 'group-hover:border-primary/50'}">
+                            ${isSelected ? '<span class="material-symbols-outlined text-on-primary text-[16px] font-bold">check</span>' : ''}
+                        </div>
                     </td>
                     <td class="p-6">
                         <div class="font-bold text-sm uppercase">${p.name}</div>
@@ -1345,8 +1471,13 @@
                     </td>
                     <td class="p-6 text-sm opacity-70">${p.category}</td>
                     <td class="p-6 text-sm">
-                        <div class="text-primary font-bold">${Number(p.price_ton || 0).toLocaleString()} ₽</div>
-                        <div class="text-[10px] opacity-50">${Number(p.price_unit || 0).toLocaleString()} ₽ ${p.unit_label || ''}</div>
+                        <div id="price-container-${p.id}" onclick="startInlineEdit(event, '${p.id}')" class="hover:bg-primary/10 rounded-lg p-2 transition-all cursor-edit group/price">
+                            <div class="text-primary font-bold flex items-center gap-1">
+                                ${Number(p.price_ton || 0).toLocaleString()} ₽
+                                <span class="material-symbols-outlined text-[14px] opacity-0 group-hover/price:opacity-100 transition-opacity">edit</span>
+                            </div>
+                            <div class="text-[10px] opacity-50">${Number(p.price_unit || 0).toLocaleString()} ₽ ${p.unit_label || ''}</div>
+                        </div>
                     </td>
                     <td class="p-6 text-right space-x-2">
                         <button onclick="openProductModal('${p.id}')" class="p-2 rounded-full hover:bg-primary/20 text-primary transition-all">
@@ -1357,8 +1488,97 @@
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `;}).join('');
             updateBulkActionBar();
+        }
+
+        function startInlineEdit(event, id) {
+            event.stopPropagation();
+            const p = allProducts.find(x => x.id === id);
+            if (!p) return;
+
+            const container = document.getElementById(`price-container-${id}`);
+            const currentPrice = p.price_ton || 0;
+
+            container.onclick = (e) => e.stopPropagation(); // Prevent re-triggering startInlineEdit
+            container.innerHTML = `
+                <div class="flex flex-col gap-2 animate-in fade-in duration-200">
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="inline-price-input-${id}" value="${currentPrice}" 
+                               class="w-24 bg-surface-container border border-primary/50 rounded-lg px-2 py-1 text-xs outline-none focus:ring-1 focus:ring-primary"
+                               onkeyup="if(event.key==='Enter') saveInlinePrice('${id}')"
+                               onclick="event.stopPropagation()">
+                        <button onclick="saveInlinePrice('${id}')" class="p-1 rounded-full bg-primary text-on-primary hover:bg-primary/90 transition-all">
+                            <span class="material-symbols-outlined text-[16px]">check</span>
+                        </button>
+                        <button onclick="cancelInlineEdit()" class="p-1 rounded-full bg-surface-container border border-outline-variant/30 hover:bg-white/5 transition-all">
+                            <span class="material-symbols-outlined text-[16px]">close</span>
+                        </button>
+                    </div>
+                    <div class="text-[10px] opacity-50 uppercase tracking-widest">Цена за тонну</div>
+                </div>
+            `;
+            
+            // Focus the input
+            setTimeout(() => {
+                const input = document.getElementById(`inline-price-input-${id}`);
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }, 50);
+        }
+
+        function cancelInlineEdit() {
+            renderProducts(getFilteredProducts());
+        }
+
+        async function saveInlinePrice(id) {
+            const input = document.getElementById(`inline-price-input-${id}`);
+            if (!input) return;
+
+            const newPrice = parseFloat(input.value);
+            if (isNaN(newPrice)) return;
+
+            const p = allProducts.find(x => x.id === id);
+            if (!p) return;
+
+            // Calculate new unit price
+            const weight = parseFloat(p.weight) || 0;
+            const newUnitPrice = weight ? (newPrice / 1000) * weight : 0;
+
+            const token = localStorage.getItem('metal_token');
+            try {
+                const res = await fetch(`/api/admin/products/${id}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ 
+                        price_ton: newPrice,
+                        price_unit: newUnitPrice
+                    })
+                });
+
+                if (res.ok) {
+                    if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal('Цена обновлена');
+                    await loadDashboardData();
+                    renderProducts(getFilteredProducts());
+                } else {
+                    const err = await res.json();
+                    alert('Ошибка: ' + err.error);
+                    cancelInlineEdit();
+                }
+            } catch (e) {
+                alert('Ошибка соединения');
+                cancelInlineEdit();
+            }
+        }
+
+        function handleRowClick(event, id) {
+            if (event.target.closest('button')) return;
+            toggleProductSelection(id);
         }
 
         function toggleProductSelection(id) {
@@ -1445,7 +1665,8 @@
                 await Promise.all(promises);
                 if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal(`Обновлено ${ids.length} товаров`);
                 selectedProductIds.clear();
-                loadDashboardData();
+                await loadDashboardData();
+                renderProducts(getFilteredProducts());
             } catch (e) {
                 alert('Ошибка при массовом обновлении');
             }
@@ -1495,39 +1716,40 @@
                 await Promise.all(promises);
                 if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal(`Удалено ${ids.length} товаров`);
                 selectedProductIds.clear();
-                loadDashboardData();
-            } catch (e) {
+                await loadDashboardData();
+                renderProducts(getFilteredProducts());
+                } catch (e) {
                 alert('Ошибка при массовом удалении');
-            }
-        }
+                }
+                }
 
-        function filterProducts() {
-            const search = document.getElementById('productSearch').value.toLowerCase();
-            const cat = document.getElementById('productCatFilter').value;
-            
-            const filtered = allProducts.filter(p => {
+                function filterProducts() {
+                const search = document.getElementById('productSearch').value.toLowerCase();
+                const cat = document.getElementById('productCatFilter').value;
+
+                const filtered = allProducts.filter(p => {
                 const matchesSearch = p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search);
                 const matchesCat = !cat || p.category === cat;
                 return matchesSearch && matchesCat;
-            });
-            
-            renderProducts(filtered);
-        }
+                });
 
-        async function handleProductDelete(id) {
-            if (!confirm(`Удалить товар "${id}"?`)) return;
-            const token = localStorage.getItem('metal_token');
-            try {
+                renderProducts(filtered);
+                }
+
+                async function handleProductDelete(id) {
+                if (!confirm(`Удалить товар "${id}"?`)) return;
+                const token = localStorage.getItem('metal_token');
+                try {
                 const res = await fetch(`/api/admin/products/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 if (res.ok) {
-                    loadDashboardData();
+                    await loadDashboardData();
+                    renderProducts(getFilteredProducts());
                     if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal('Товар удален');
                 }
-            } catch (e) {
-                alert('Ошибка при удалении');
+                } catch (e) {                alert('Ошибка при удалении');
             }
         }
 
