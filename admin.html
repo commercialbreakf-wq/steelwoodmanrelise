@@ -260,6 +260,9 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b border-outline-variant/20 bg-white/5">
+                                    <th class="p-6 w-12">
+                                        <input type="checkbox" id="selectAllProducts" onchange="toggleAllProducts(this.checked)" class="rounded bg-surface-container border-outline-variant/30 text-primary focus:ring-primary focus:ring-offset-0"/>
+                                    </th>
                                     <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">ID / Название</th>
                                     <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Категория</th>
                                     <th class="p-6 text-[10px] font-display uppercase tracking-widest opacity-50">Цена (Тонна/Ед)</th>
@@ -347,6 +350,31 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- BULK ACTION BAR -->
+    <div id="bulkActionBar" class="fixed bottom-8 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-2xl flex items-center gap-6 shadow-2xl z-[5500] animate-in fade-in slide-in-from-bottom-8 duration-300 hidden">
+        <div class="flex items-center gap-3 pr-6 border-r border-outline-variant/20">
+            <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs" id="selectedCountBadge">0</div>
+            <span class="text-[10px] font-display uppercase tracking-widest opacity-50">Выбрано</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="bulkUpdatePricePrompt()" class="flex items-center gap-2 px-4 py-2 hover:bg-primary/10 text-primary rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
+                <span class="material-symbols-outlined text-[18px]">payments</span>
+                Изменить цену (%)
+            </button>
+            <button onclick="exportProductsToCSV()" class="flex items-center gap-2 px-4 py-2 hover:bg-white/5 text-on-surface-variant rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                Экспорт в CSV
+            </button>
+            <button onclick="bulkDeleteProducts()" class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 text-error rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+                Удалить
+            </button>
+        </div>
+        <button onclick="clearSelection()" class="ml-4 p-2 rounded-full hover:bg-white/5 text-on-surface-variant transition-all">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
     </div>
 
     <!-- PRODUCT WIZARD MODAL (Replaces old Product Modal) -->
@@ -1055,6 +1083,8 @@
         }
 
         // --- PRODUCTS ---
+        let selectedProductIds = new Set();
+
         async function loadProducts() {
             renderProducts(allProducts);
         }
@@ -1062,7 +1092,10 @@
         function renderProducts(products) {
             const body = document.getElementById('productsTableBody');
             body.innerHTML = products.map(p => `
-                <tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-all">
+                <tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-all ${selectedProductIds.has(p.id) ? 'bg-primary/5' : ''}">
+                    <td class="p-6">
+                        <input type="checkbox" onchange="toggleProductSelection('${p.id}')" ${selectedProductIds.has(p.id) ? 'checked' : ''} class="rounded bg-surface-container border-outline-variant/30 text-primary focus:ring-primary focus:ring-offset-0 product-checkbox"/>
+                    </td>
                     <td class="p-6">
                         <div class="font-bold text-sm uppercase">${p.name}</div>
                         <div class="text-[10px] opacity-40 font-mono">${p.id}</div>
@@ -1082,6 +1115,147 @@
                     </td>
                 </tr>
             `).join('');
+            updateBulkActionBar();
+        }
+
+        function toggleProductSelection(id) {
+            if (selectedProductIds.has(id)) {
+                selectedProductIds.delete(id);
+            } else {
+                selectedProductIds.add(id);
+            }
+            renderProducts(getFilteredProducts());
+        }
+
+        function toggleAllProducts(checked) {
+            const products = getFilteredProducts();
+            if (checked) {
+                products.forEach(p => selectedProductIds.add(p.id));
+            } else {
+                products.forEach(p => selectedProductIds.delete(p.id));
+            }
+            renderProducts(products);
+        }
+
+        function getFilteredProducts() {
+            const search = document.getElementById('productSearch').value.toLowerCase();
+            const cat = document.getElementById('productCatFilter').value;
+            return allProducts.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(search) || p.id.toLowerCase().includes(search);
+                const matchesCat = !cat || p.category === cat;
+                return matchesSearch && matchesCat;
+            });
+        }
+
+        function clearSelection() {
+            selectedProductIds.clear();
+            document.getElementById('selectAllProducts').checked = false;
+            renderProducts(getFilteredProducts());
+        }
+
+        function updateBulkActionBar() {
+            const bar = document.getElementById('bulkActionBar');
+            const badge = document.getElementById('selectedCountBadge');
+            const count = selectedProductIds.size;
+            
+            if (count > 0) {
+                badge.textContent = count;
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        async function bulkUpdatePricePrompt() {
+            const percent = prompt('Введите процент изменения цены (например, 10 или -5):');
+            if (percent === null || percent === "" || isNaN(percent)) return;
+            
+            const pVal = parseFloat(percent);
+            const token = localStorage.getItem('metal_token');
+            const ids = Array.from(selectedProductIds);
+            
+            if (!confirm(`Обновить цену для ${ids.length} товаров на ${pVal}%?`)) return;
+
+            try {
+                const promises = ids.map(async id => {
+                    const p = allProducts.find(x => x.id === id);
+                    if (!p) return;
+                    
+                    const newPrice = Math.round(p.price_ton * (1 + pVal / 100));
+                    // Also need to recalc price_unit
+                    const w = parseFloat(p.weight) || 0;
+                    const newUnitPrice = w ? (newPrice / 1000) * w : 0;
+
+                    return fetch(`/api/admin/products/${id}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({ 
+                            price_ton: newPrice,
+                            price_unit: newUnitPrice
+                        })
+                    });
+                });
+
+                await Promise.all(promises);
+                if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal(`Обновлено ${ids.length} товаров`);
+                selectedProductIds.clear();
+                loadDashboardData();
+            } catch (e) {
+                alert('Ошибка при массовом обновлении');
+            }
+        }
+
+        function exportProductsToCSV() {
+            const ids = Array.from(selectedProductIds);
+            const products = allProducts.filter(p => ids.includes(p.id));
+            
+            if (products.length === 0) return;
+
+            const headers = ['ID', 'Name', 'Category', 'Price Ton', 'Price Unit', 'Weight', 'Unit'];
+            const rows = products.map(p => [
+                p.id,
+                `"${p.name.replace(/"/g, '""')}"`,
+                p.category,
+                p.price_ton,
+                p.price_unit,
+                p.weight,
+                p.unit_label
+            ]);
+
+            const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `products_export_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function bulkDeleteProducts() {
+            const ids = Array.from(selectedProductIds);
+            if (!confirm(`Удалить ${ids.length} выбранных товаров? Это действие необратимо.`)) return;
+            
+            const token = localStorage.getItem('metal_token');
+            try {
+                const promises = ids.map(id => fetch(`/api/admin/products/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                }));
+
+                await Promise.all(promises);
+                if (window.showSuccessPopupGlobal) window.showSuccessPopupGlobal(`Удалено ${ids.length} товаров`);
+                selectedProductIds.clear();
+                loadDashboardData();
+            } catch (e) {
+                alert('Ошибка при массовом удалении');
+            }
         }
 
         function filterProducts() {
