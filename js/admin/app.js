@@ -2,6 +2,8 @@ import { renderLayout } from './ui.js';
 import { state } from './state.js';
 import { renderProductTable } from './components/table.js';
 import { openDrawer } from './components/drawer.js';
+import { renderBulkToolbar } from './components/bulk-toolbar.js';
+import { mergePriceListData } from './import-engine.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Admin App Initializing...');
@@ -28,10 +30,87 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="w-8 h-8 border-2 border-[#ffb0cc]/20 border-t-[#ffb0cc] rounded-full animate-spin"></div>
                     </div>
                 </div>
+
+                <div id="bulk-toolbar-container" class="hidden"></div>
             </div>
         `;
 
         const tableContainer = document.getElementById('products-table-container');
+        const toolbarContainer = document.getElementById('bulk-toolbar-container');
+        let selectedIds = [];
+
+        const updateToolbar = () => {
+            renderBulkToolbar(toolbarContainer, selectedIds, {
+                onUpdatePrice: async (value) => {
+                    const updates = selectedIds.map(id => {
+                        const product = state.products.find(p => p.vid === id);
+                        let newPrice = product.vprice;
+                        
+                        if (value.endsWith('%')) {
+                            const percent = parseFloat(value) / 100;
+                            newPrice = Math.round(product.vprice * (1 + percent));
+                        } else if (value.startsWith('+') || value.startsWith('-')) {
+                            newPrice = product.vprice + parseFloat(value);
+                        } else {
+                            newPrice = parseFloat(value);
+                        }
+                        
+                        return { vid: id, vprice: newPrice };
+                    });
+                    
+                    try {
+                        await state.bulkUpdateProducts(updates);
+                        selectedIds = [];
+                        updateToolbar();
+                    } catch (err) {
+                        alert('Ошибка при обновлении: ' + err.message);
+                    }
+                },
+                onToggleStatus: async () => {
+                    const updates = selectedIds.map(id => {
+                        const product = state.products.find(p => p.vid === id);
+                        const newStatus = product.vstatus === 'active' ? 'archived' : 'active';
+                        return { vid: id, vstatus: newStatus };
+                    });
+                    
+                    try {
+                        await state.bulkUpdateProducts(updates);
+                        selectedIds = [];
+                        updateToolbar();
+                    } catch (err) {
+                        alert('Ошибка при обновлении: ' + err.message);
+                    }
+                },
+                onImportPrice: async (file) => {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        try {
+                            const incomingData = JSON.parse(e.target.result);
+                            const updates = mergePriceListData(state.products, incomingData);
+                            if (updates.length > 0) {
+                                await state.bulkUpdateProducts(updates);
+                                alert(`Обновлено ${updates.length} товаров`);
+                            } else {
+                                alert('Нет данных для обновления (все товары соответствуют или не найдены)');
+                            }
+                        } catch (err) {
+                            alert('Ошибка при разборе файла (ожидается JSON): ' + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                },
+                onClose: () => {
+                    selectedIds = [];
+                    // Clear checkboxes in UI
+                    const checkboxes = document.querySelectorAll('.product-checkbox, #select-all-products');
+                    checkboxes.forEach(cb => {
+                        cb.checked = false;
+                        cb.indeterminate = false;
+                    });
+                    updateToolbar();
+                }
+            });
+        };
 
         const updateTable = (products) => {
             renderProductTable(tableContainer, products, {
@@ -41,7 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 },
                 onSelectionChange: (ids) => {
-                    console.log('Selected products:', ids);
+                    selectedIds = ids;
+                    updateToolbar();
                 }
             });
         };
