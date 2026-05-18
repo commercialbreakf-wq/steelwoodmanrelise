@@ -28,7 +28,7 @@ export async function renderOrdersView(container, state) {
 
     const tableContainer = document.getElementById('orders-table-container');
     
-    let currentStatus = 'new';
+    let currentStatus = '';
     let sortKey = 'created_at';
     let sortOrder = 'desc';
 
@@ -86,7 +86,12 @@ function renderOrdersWithFilters(container, orders, state, filterOptions = {}) {
 
     const getStatusCount = (status) => {
         if (!status) return orders.length;
-        return orders.filter(o => (o.status || 'new').toLowerCase().trim() === status.toLowerCase().trim()).length;
+        const s = status.toLowerCase().trim();
+        return orders.filter(o => {
+            const os = (o.status || 'new').toLowerCase().trim();
+            if (s === 'new') return os === 'new' || os === 'новый';
+            return os === s;
+        }).length;
     };
 
     container.innerHTML = `
@@ -96,11 +101,11 @@ function renderOrdersWithFilters(container, orders, state, filterOptions = {}) {
                 <span class="material-symbols-outlined text-[#ffb0cc] text-sm">donut_large</span>
                 <span class="text-[10px] uppercase tracking-widest text-[#d7c1c7] opacity-60 font-bold font-['Space Grotesk']">Статус:</span>
             </div>
-            <button type="button" class="order-status-tab px-4 py-2 rounded-xl text-xs uppercase font-bold tracking-widest font-['Space Grotesk'] transition-all shrink-0 ${currentStatus === 'new' ? 'bg-[#ffb0cc] text-[#0f0e0c]' : 'bg-white/5 text-[#d7c1c7] hover:bg-white/10'}" data-status="new">
-                Новые <span class="${currentStatus === 'new' ? 'opacity-60' : 'text-[#ffb0cc]'} ml-1">${getStatusCount('new')}</span>
-            </button>
             <button type="button" class="order-status-tab px-4 py-2 rounded-xl text-xs uppercase font-bold tracking-widest font-['Space Grotesk'] transition-all shrink-0 ${currentStatus === '' ? 'bg-[#ffb0cc] text-[#0f0e0c]' : 'bg-white/5 text-[#d7c1c7] hover:bg-white/10'}" data-status="">
                 Все <span class="opacity-60 ml-1">${getStatusCount('')}</span>
+            </button>
+            <button type="button" class="order-status-tab px-4 py-2 rounded-xl text-xs uppercase font-bold tracking-widest font-['Space Grotesk'] transition-all shrink-0 ${currentStatus === 'new' ? 'bg-[#ffb0cc] text-[#0f0e0c]' : 'bg-white/5 text-[#d7c1c7] hover:bg-white/10'}" data-status="new">
+                Новые <span class="${currentStatus === 'new' ? 'opacity-60' : 'text-[#ffb0cc]'} ml-1">${getStatusCount('new')}</span>
             </button>
             <button type="button" class="order-status-tab px-4 py-2 rounded-xl text-xs uppercase font-bold tracking-widest font-['Space Grotesk'] transition-all shrink-0 ${currentStatus === 'processing' ? 'bg-[#ffb0cc] text-[#0f0e0c]' : 'bg-white/5 text-[#d7c1c7] hover:bg-white/10'}" data-status="processing">
                 В обработке <span class="opacity-60 ml-1">${getStatusCount('processing')}</span>
@@ -153,9 +158,11 @@ function renderOrdersWithFilters(container, orders, state, filterOptions = {}) {
         });
 
         const filtered = sortedOrders.filter(o => {
-            const status = (o.status || 'new').toLowerCase().trim();
-            const filterStatus = (currentStatus || '').toLowerCase().trim();
-            return !filterStatus || status === filterStatus;
+            const os = (o.status || 'new').toLowerCase().trim();
+            const fs = (currentStatus || '').toLowerCase().trim();
+            if (!fs) return true;
+            if (fs === 'new') return os === 'new' || os === 'новый';
+            return os === fs;
         });
 
         renderOrdersTable(contentContainer, filtered, state, { sortKey, sortOrder, onSort: (key) => {
