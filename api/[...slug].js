@@ -55,24 +55,27 @@ async function warmProducts() {
   }
 }
 
-async function invalidateProductCache(productIds) {
-  if (!productIds || productIds.length === 0) return;
-  console.log(`[CACHE] Granularly invalidating ${productIds.length} products...`);
-  try {
-    const { data, error } = await supabase.from('products').select('*').in('id', productIds);
-    if (!error && data) {
-      data.forEach(updatedProduct => {
-        const idx = allProductsInMemory.findIndex(p => String(p.id) === String(updatedProduct.id));
-        if (idx !== -1) {
-          allProductsInMemory[idx] = updatedProduct;
-        } else {
-          allProductsInMemory.unshift(updatedProduct);
-        }
-      });
-      console.log(`[CACHE] Granularly updated ${data.length} products in memory.`);
+async function updateProductCache(products) {
+  if (!products || products.length === 0) return;
+  const productsArray = Array.isArray(products) ? products : [products];
+  
+  productsArray.forEach(updatedProduct => {
+    const idx = allProductsInMemory.findIndex(p => String(p.id) === String(updatedProduct.id));
+    if (idx !== -1) {
+      allProductsInMemory[idx] = updatedProduct;
+    } else {
+      allProductsInMemory.unshift(updatedProduct);
     }
-  } catch (e) {
-    console.error('[CACHE] Granular invalidation failed:', e.message);
+  });
+  console.log(`[CACHE] Granularly updated ${productsArray.length} products in memory.`);
+}
+
+function removeFromProductCache(productId) {
+  if (!productId) return;
+  const initialCount = allProductsInMemory.length;
+  allProductsInMemory = allProductsInMemory.filter(p => String(p.id) !== String(productId));
+  if (allProductsInMemory.length < initialCount) {
+    console.log(`[CACHE] Removed product ${productId} from memory.`);
   }
 }
 
@@ -319,24 +322,23 @@ router.get('/admin/products', authenticateAdmin, async (req, res) => {
 });
 
 router.post('/admin/products', authenticateAdmin, async (req, res) => {
-  const { data, error } = await supabase.from('products').insert([req.body]).select().single();
+  const newProduct = { ...req.body };
+  if (!newProduct.id || isNaN(newProduct.id)) {
+    delete newProduct.id;
+  }
+  const { data, error } = await supabase.from('products').insert([newProduct]).select().single();
   if (error) return res.status(500).json({ error: error.message });
-  allProductsInMemory.unshift(data);
-  warmProducts();
+  updateProductCache(data);
   res.json(data);
 });
 
 router.put('/admin/products/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
-  const { data, error } = await supabase.from('products').update(req.body).eq('id', id).select().single();
+  const updateData = { ...req.body };
+  if (updateData.id) delete updateData.id;
+  const { data, error } = await supabase.from('products').update(updateData).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
-  const idx = allProductsInMemory.findIndex(p => String(p.id) === String(id));
-  if (idx !== -1) {
-    allProductsInMemory[idx] = { ...allProductsInMemory[idx], ...data };
-  } else {
-    allProductsInMemory.unshift(data);
-  }
-  warmProducts();
+  updateProductCache(data);
   res.json(data);
 });
 
@@ -344,9 +346,71 @@ router.delete('/admin/products/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { error } = await supabase.from('products').delete().eq('id', id);
   if (error) return res.status(500).json({ error: error.message });
-  allProductsInMemory = allProductsInMemory.filter(p => String(p.id) !== String(id));
-  warmProducts();
+  removeFromProductCache(id);
   res.json({ success: true });
+});
+
+router.post('/admin/bulk-update', authenticateAdmin, async (req, res) => {
+  const { updates } = req.body;
+  if (!Array.isArray(updates) || updates.length === 0) {
+    return res.status(400).json({ error: 'Updates must be a non-empty array' });
+  }
+
+  try {
+    if (allProductsInMemory.length === 0) {
+      await warmProducts();
+    }
+
+    const fullUpdates = updates.map(update => {
+      const existing = allProductsInMemory.find(p => String(p.id) === String(update.id)) || {};
+      return {
+        ...existing,
+        ...update
+      };
+    });
+
+    // Supabase upsert handles multiple rows
+    const { data, error } = await supabase
+      .from('products')
+      .upsert(fullUpdates, { onConflict: 'id' })
+      .select();
+
+    if (error) {
+      console.error('[API] Bulk update error:', error.message);
+      return res.status(500).json({ error: error.message });
+    }
+
+    if (data && data.length > 0) {
+      // Use the data returned from Supabase to update the cache directly
+      updateProductCache(data);
+    }
+
+    res.json({ success: true, count: data ? data.length : 0 });
+  } catch (e) {
+    console.error('[API] Bulk update exception:', e.message);
+    res.status(500).json({ error: 'Internal server error during bulk update' });
+  }
+});
+
+router.post('/admin/bulk-delete', authenticateAdmin, async (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: 'ids must be a non-empty array' });
+  }
+
+  try {
+    const { error } = await supabase.from('products').delete().in('id', ids);
+    if (error) {
+      console.error('[API] Bulk delete error:', error.message);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    ids.forEach(id => removeFromProductCache(id));
+    res.json({ success: true, count: ids.length });
+  } catch (e) {
+    console.error('[API] Bulk delete exception:', e.message);
+    res.status(500).json({ error: 'Internal server error during bulk delete' });
+  }
 });
 
 // Users Management
@@ -387,21 +451,34 @@ router.delete('/admin/users/:id', authenticateAdmin, async (req, res) => {
 
 // Orders Management
 router.get('/admin/orders', authenticateAdmin, async (req, res) => {
-  if (allOrdersInMemory.length === 0) {
-    await warmOrders();
+  try {
+    const { data, error } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
+    if (!error && data) {
+      allOrdersInMemory = data;
+    }
+    console.log(`[CACHE] Serving ${allOrdersInMemory.length} admin orders (freshly fetched).`);
+    res.json(allOrdersInMemory);
+  } catch (e) {
+    console.error('[API] Error fetching admin orders:', e.message);
+    res.json(allOrdersInMemory);
   }
-  console.log(`[CACHE] Serving ${allOrdersInMemory.length} admin orders from memory.`);
-  res.json(allOrdersInMemory);
 });
 
 router.put('/admin/orders/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
-  const { data, error } = await supabase.from('orders').update({ status }).eq('id', id).select().single();
+  const { status, invoice_url, messages } = req.body;
+  const updateData = {};
+  if (status !== undefined) updateData.status = status;
+  if (invoice_url !== undefined) updateData.invoice_url = invoice_url;
+  if (messages !== undefined) updateData.messages = messages;
+
+  const { data, error } = await supabase.from('orders').update(updateData).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
   const idx = allOrdersInMemory.findIndex(o => String(o.id) === String(id));
   if (idx !== -1) {
     allOrdersInMemory[idx] = { ...allOrdersInMemory[idx], ...data };
+  } else {
+    allOrdersInMemory.unshift(data);
   }
   warmOrders();
   res.json(data);
@@ -409,10 +486,10 @@ router.put('/admin/orders/:id', authenticateAdmin, async (req, res) => {
 
 router.delete('/admin/orders/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
-  
+  console.log(`[API] Admin DELETE Order: ${id}`);
+
   // First delete referencing order_items rows
-  const { error: itemsError } = await supabase.from('order_items').delete().eq('order_id', id);
-  if (itemsError) return res.status(500).json({ error: itemsError.message });
+  const { error: itemsError } = await supabase.from('order_items').delete().eq('order_id', id);  if (itemsError) return res.status(500).json({ error: itemsError.message });
 
   // Then delete the order itself
   const { error } = await supabase.from('orders').delete().eq('id', id);
@@ -423,23 +500,55 @@ router.delete('/admin/orders/:id', authenticateAdmin, async (req, res) => {
   res.json({ success: true });
 });
 
+router.post('/admin/orders/batch-update', authenticateAdmin, async (req, res) => {
+  const { ids, status } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: 'No IDs provided' });
+  const { error } = await supabase.from('orders').update({ status }).in('id', ids);
+  if (error) return res.status(500).json({ error: error.message });
+  await warmOrders();
+  res.json({ success: true });
+});
+
+router.post('/admin/orders/batch-delete', authenticateAdmin, async (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: 'No IDs provided' });
+  const { error: itemsError } = await supabase.from('order_items').delete().in('order_id', ids);
+  if (itemsError) return res.status(500).json({ error: itemsError.message });
+  const { error } = await supabase.from('orders').delete().in('id', ids);
+  if (error) return res.status(500).json({ error: error.message });
+  await warmOrders();
+  res.json({ success: true });
+});
+
 // Leads Management
 router.get('/admin/leads', authenticateAdmin, async (req, res) => {
-  if (allLeadsInMemory.length === 0) {
-    await warmLeads();
+  try {
+    const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      allLeadsInMemory = data;
+    }
+    console.log(`[CACHE] Serving ${allLeadsInMemory.length} admin leads (freshly fetched).`);
+    res.json(allLeadsInMemory);
+  } catch (e) {
+    console.error('[API] Error fetching admin leads:', e.message);
+    res.json(allLeadsInMemory);
   }
-  console.log(`[CACHE] Serving ${allLeadsInMemory.length} admin leads from memory.`);
-  res.json(allLeadsInMemory);
 });
 
 router.put('/admin/leads/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
-  const { data, error } = await supabase.from('leads').update({ status }).eq('id', id).select().single();
+  const { status, messages } = req.body;
+  const updateData = {};
+  if (status !== undefined) updateData.status = status;
+  if (messages !== undefined) updateData.messages = messages;
+
+  const { data, error } = await supabase.from('leads').update(updateData).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
   const idx = allLeadsInMemory.findIndex(l => String(l.id) === String(id));
   if (idx !== -1) {
     allLeadsInMemory[idx] = { ...allLeadsInMemory[idx], ...data };
+  } else {
+    allLeadsInMemory.unshift(data);
   }
   warmLeads();
   res.json(data);
@@ -447,11 +556,90 @@ router.put('/admin/leads/:id', authenticateAdmin, async (req, res) => {
 
 router.delete('/admin/leads/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
+  console.log(`[API] Admin DELETE Lead: ${id}`);
   const { error } = await supabase.from('leads').delete().eq('id', id);
   if (error) return res.status(500).json({ error: error.message });
   allLeadsInMemory = allLeadsInMemory.filter(l => String(l.id) !== String(id));
   warmLeads();
   res.json({ success: true });
+});
+
+router.post('/admin/leads/batch-update', authenticateAdmin, async (req, res) => {
+  const { ids, status } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: 'No IDs provided' });
+  const { error } = await supabase.from('leads').update({ status }).in('id', ids);
+  if (error) return res.status(500).json({ error: error.message });
+  await warmLeads();
+  res.json({ success: true });
+});
+
+router.post('/admin/leads/batch-delete', authenticateAdmin, async (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) return res.status(400).json({ error: 'No IDs provided' });
+  const { error } = await supabase.from('leads').delete().in('id', ids);
+  if (error) return res.status(500).json({ error: error.message });
+  await warmLeads();
+  res.json({ success: true });
+});
+
+router.get('/admin/chat-topics', authenticateAdmin, async (req, res) => {
+  try {
+    const [ordersRes, leadsRes] = await Promise.all([
+      supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }),
+      supabase.from('leads').select('*').order('created_at', { ascending: false })
+    ]);
+    if (!ordersRes.error && ordersRes.data) allOrdersInMemory = ordersRes.data;
+    if (!leadsRes.error && leadsRes.data) allLeadsInMemory = leadsRes.data;
+  } catch(e) {
+    console.error('[API] Error fetching chat topics:', e.message);
+  }
+
+  const parseMessages = (msgs) => {
+    if (!msgs) return [];
+    if (typeof msgs === 'string') {
+      try { return JSON.parse(msgs); } catch(e) { return []; }
+    }
+    if (Array.isArray(msgs)) return msgs;
+    return [];
+  };
+
+  const orders = allOrdersInMemory.map(o => ({
+    id: o.id,
+    type: 'order',
+    title: `Заказ #${o.id} (${o.customer_name || 'Клиент'})`,
+    customer_name: o.customer_name,
+    customer_phone: o.customer_phone,
+    customer_email: o.customer_email,
+    total: o.total,
+    created_at: o.created_at,
+    messages: parseMessages(o.messages)
+  }));
+
+  const leads = allLeadsInMemory.map(l => ({
+    id: l.id,
+    type: 'lead',
+    title: `Обращение #${l.id} (${l.name || 'Клиент'}) — ${l.type || 'Вопрос'}`,
+    customer_name: l.name,
+    customer_phone: l.phone,
+    customer_email: l.email,
+    total: 0,
+    created_at: l.created_at,
+    messages: parseMessages(l.messages)
+  }));
+
+  const combined = [...orders, ...leads].sort((a, b) => {
+    let lastA = new Date(a.created_at).getTime();
+    let lastB = new Date(b.created_at).getTime();
+    if (a.messages.length > 0 && a.messages[a.messages.length - 1] && a.messages[a.messages.length - 1].timestamp) {
+      lastA = new Date(a.messages[a.messages.length - 1].timestamp).getTime();
+    }
+    if (b.messages.length > 0 && b.messages[b.messages.length - 1] && b.messages[b.messages.length - 1].timestamp) {
+      lastB = new Date(b.messages[b.messages.length - 1].timestamp).getTime();
+    }
+    return (isNaN(lastB) ? 0 : lastB) - (isNaN(lastA) ? 0 : lastA);
+  });
+
+  res.json(combined);
 });
 
 
@@ -483,7 +671,8 @@ router.get('/filters', async (req, res) => {
     await warmProducts();
   }
 
-  const counts = allProductsInMemory.reduce((acc, r) => {
+  const activeProducts = allProductsInMemory.filter(p => p.vstatus !== 'archived');
+  const counts = activeProducts.reduce((acc, r) => {
     const key = `${r.parent_category}|${r.category}`;
     acc[key] = (acc[key] || 0) + 1;
     return acc;
@@ -515,7 +704,7 @@ router.get('/products', async (req, res) => {
     await warmProducts();
   }
 
-  let list = [...allProductsInMemory];
+  let list = allProductsInMemory.filter(p => p.vstatus !== 'archived');
 
   // Apply filters in-memory
   if (category) {
@@ -635,7 +824,7 @@ router.get('/category-filters', async (req, res) => {
   }
 
   const categoryLower = category.toLowerCase();
-  const matched = allProductsInMemory.filter(p => p.category && p.category.toLowerCase().startsWith(categoryLower));
+  const matched = allProductsInMemory.filter(p => p.vstatus !== 'archived' && p.category && p.category.toLowerCase().startsWith(categoryLower));
 
   const result = {
     vids: [...new Set(matched.map(r => r.vid))].filter(Boolean).sort(),
@@ -906,15 +1095,27 @@ router.post('/orders', async (req, res) => {
       customer_phone: phone, 
       customer_email: email, 
       customer_inn: inn,
-      user_id: userId 
+      user_id: userId,
+      status: 'new'
     }])
     .select().single();
   if (error) return res.status(500).json({ error: error.message });
   
-  const orderItems = items.map(item => ({
-    order_id: order.id, product_id: item.id.toString(), product_name: item.name, quantity: item.quantity, price: item.price
-  }));
-  await supabase.from('order_items').insert(orderItems);
+  if (items && items.length > 0) {
+    const orderItems = items.map(item => ({
+      order_id: order.id,
+      product_id: String(item.id),
+      product_name: item.name || String(item.id),
+      quantity: Math.max(1, Math.round(parseFloat(item.quantity || item.qty || 1))),
+      price: parseFloat(item.price || 0)
+    }));
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+    if (itemsError) {
+      console.error('[API] Failed to insert order_items for order', order.id, ':', itemsError.message);
+    } else {
+      console.log(`[API] Inserted ${orderItems.length} order_items for order #${order.id}`);
+    }
+  }
 
   const itemsHtml = items.map(item => `<li>${item.name || item.id} x ${item.quantity} - ${item.price} ₽</li>`).join('');
   transporter.sendMail({
@@ -949,12 +1150,41 @@ router.get('/orders/my', authenticateToken, async (req, res) => {
   }
 });
 
+// PUT: User order messages
+router.put('/orders/my/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { messages } = req.body;
+  
+  try {
+    const { data: order, error: fetchError } = await supabase.from('orders').select('id, messages').eq('id', id).eq('user_id', req.profile.id).single();
+    if (fetchError || !order) return res.status(404).json({ error: 'Order not found' });
+    
+    if (messages !== undefined) {
+      const { data, error } = await supabase.from('orders').update({ messages }).eq('id', id).select().single();
+      if (error) return res.status(500).json({ error: error.message });
+      const idx = allOrdersInMemory.findIndex(o => String(o.id) === String(id));
+      if (idx !== -1) {
+        allOrdersInMemory[idx] = { ...allOrdersInMemory[idx], ...data };
+      } else {
+        allOrdersInMemory.unshift(data);
+      }
+      warmOrders();
+      res.json(data);
+    } else {
+      res.json(order);
+    }
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 // API: Leads
 router.post('/leads', async (req, res) => {
-  const { name, phone, email, message, type } = req.body;
+  const { name, phone, email, message, type, project_type } = req.body;
+  const initialMessages = message ? [{ sender: 'client', text: message, timestamp: new Date().toISOString() }] : [];
   
   const { error } = await supabase.from('leads').insert([{ 
-    name, phone, email, message, type: type || 'callback' 
+    name, phone, email, message, type: type || 'callback', project_type, messages: initialMessages 
   }]);
   
   if (error) return res.status(500).json({ error: error.message });
@@ -962,11 +1192,57 @@ router.post('/leads', async (req, res) => {
   transporter.sendMail({
     from: 'commercialbreakf@gmail.com', to: ADMIN_EMAILS.join(', '),
     subject: `Новая заявка: ${type || 'callback'}`,
-    html: `<p>Имя: ${name}</p><p>Телефон: ${phone}</p><p>Email: ${email}</p><p>Сообщение: ${message}</p>`
+    html: `<p>Имя: ${name}</p><p>Телефон: ${phone}</p><p>Email: ${email}</p><p>Тип проекта: ${project_type || 'Не указан'}</p><p>Сообщение: ${message}</p>`
   }).catch(e => console.error(e));
 
   clearLeadsCache();
   res.json({ success: true });
+});
+
+// GET: User leads/appeals
+router.get('/leads/my', authenticateToken, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*')
+      .ilike('email', req.profile.email)
+      .order('created_at', { ascending: false });
+      
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка сервера при загрузке обращений' });
+  }
+});
+
+// PUT: User lead messages
+router.put('/leads/my/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { messages } = req.body;
+  
+  try {
+    const { data: lead, error: fetchError } = await supabase.from('leads').select('id, email, messages').eq('id', id).single();
+    if (fetchError || !lead || lead.email.toLowerCase() !== req.profile.email.toLowerCase()) {
+      return res.status(404).json({ error: 'Обращение не найдено' });
+    }
+    
+    if (messages !== undefined) {
+      const { data, error } = await supabase.from('leads').update({ messages }).eq('id', id).select().single();
+      if (error) return res.status(500).json({ error: error.message });
+      const idx = allLeadsInMemory.findIndex(l => String(l.id) === String(id));
+      if (idx !== -1) {
+        allLeadsInMemory[idx] = { ...allLeadsInMemory[idx], ...data };
+      } else {
+        allLeadsInMemory.unshift(data);
+      }
+      warmLeads();
+      res.json(data);
+    } else {
+      res.json(lead);
+    }
+  } catch (e) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
 });
 
 // Mount router on both /api and / to handle different rewrite/invocation scenarios
