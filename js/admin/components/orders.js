@@ -228,6 +228,7 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
                         
                         const statusClasses = {
                             'new': 'bg-blue-500/5 border-l-4 border-l-blue-500/50',
+                            'новый': 'bg-blue-500/5 border-l-4 border-l-blue-500/50',
                             'processing': 'bg-yellow-500/5 border-l-4 border-l-yellow-500/50',
                             'completed': 'bg-green-500/5 border-l-4 border-l-green-500/50',
                             'cancelled': 'bg-red-500/5 border-l-4 border-l-red-500/50'
@@ -236,6 +237,7 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
 
                         const selectClasses = {
                             'new': 'text-blue-400 border-blue-500/30',
+                            'новый': 'text-blue-400 border-blue-500/30',
                             'processing': 'text-yellow-400 border-yellow-500/30',
                             'completed': 'text-green-400 border-green-500/30',
                             'cancelled': 'text-red-400 border-red-500/30'
@@ -276,7 +278,7 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
                             </td>
                             <td class="py-4 px-6">
                                 <select data-id="${order.id}" class="status-select bg-[#151311] border rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-[#ffb0cc] transition-all ${selectClass}">
-                                    <option value="new" ${status === 'new' ? 'selected' : ''}>Новый</option>
+                                    <option value="new" ${status === 'new' || status === 'новый' ? 'selected' : ''}>Новый</option>
                                     <option value="processing" ${status === 'processing' ? 'selected' : ''}>В обработке</option>
                                     <option value="completed" ${status === 'completed' ? 'selected' : ''}>Завершен</option>
                                     <option value="cancelled" ${status === 'cancelled' ? 'selected' : ''}>Отменен</option>
