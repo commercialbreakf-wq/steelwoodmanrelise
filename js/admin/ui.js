@@ -120,6 +120,7 @@ function renderSidebar() {
         { id: 'dashboard', label: 'Дашборд', icon: 'dashboard' },
         { id: 'products', label: 'Товары', icon: 'inventory_2' },
         { id: 'orders', label: 'Заказы', icon: 'shopping_cart' },
+        { id: 'support', label: 'Поддержка', icon: 'forum' },
         { id: 'users', label: 'Клиенты', icon: 'group' },
         { id: 'leads', label: 'Лиды', icon: 'leaderboard' },
         { id: 'analytics', label: 'Аналитика', icon: 'insights' }
