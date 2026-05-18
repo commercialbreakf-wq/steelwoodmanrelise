@@ -9,21 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Simple view switcher for now
     const initViewSwitcher = () => {
         const navItems = document.querySelectorAll('.nav-item');
-        if (navItems.length === 0) {
-            // If layout isn't fully ready, retry once
-            setTimeout(initViewSwitcher, 10);
-            return;
-        }
-
+        
         navItems.forEach(btn => {
             btn.addEventListener('click', () => {
                 const view = btn.dataset.view;
+                const label = btn.dataset.label;
                 console.log('Switching to view:', view);
                 
                 // Update title
                 const titleEl = document.getElementById('admin-title');
                 if (titleEl) {
-                    titleEl.textContent = btn.innerText.trim();
+                    titleEl.textContent = label;
                 }
 
                 // Highlight active button
@@ -37,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="flex items-center justify-center h-full opacity-30">
                             <div class="text-center">
                                 <span class="material-symbols-outlined text-6xl mb-4">construction</span>
-                                <div class="font-['Space_Grotesk'] uppercase tracking-widest">Раздел "${btn.innerText.trim()}" в разработке</div>
+                                <div class="font-['Space Grotesk'] uppercase tracking-widest">Раздел "${label}" в разработке</div>
                             </div>
                         </div>
                     `;
@@ -47,7 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Default active view
         const dashboardBtn = document.querySelector('[data-view="dashboard"]');
-        if (dashboardBtn) dashboardBtn.click();
+        if (dashboardBtn) {
+            dashboardBtn.click();
+        }
     };
 
     initViewSwitcher();
