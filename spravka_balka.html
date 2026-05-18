@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html class="dark" lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Вес балки (двутавра): Таблица ГОСТ | Железный Дровосек</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="/js/shared-ui.js?v=3"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "outline-variant": "#534347",
+                    "surface-container-lowest": "#0f0e0c",
+                    "on-surface-variant": "#d7c1c7",
+                    "surface-tint": "#ffb0cc",
+                    "on-surface": "#e7e2dd",
+                    "surface-container-low": "#1d1b19",
+                    "primary": "#ffb0cc",
+                    "secondary": "#ffb1c0",
+                    "surface": "#151311",
+                    "background": "#151311",
+            },
+            "fontFamily": {
+                    "body": ["Inter", "sans-serif"],
+                    "display": ["Space Grotesk", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+      .glass-card { background: rgba(21, 19, 17, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(231, 226, 221, 0.05); }
+      .pink-slide {
+        position: relative; overflow: hidden; z-index: 1;
+      }
+      .pink-slide::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+        background: #ffb0cc; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1;
+      }
+      .pink-slide:hover::after { transform: translateX(100%); }
+      .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+      .table-container::-webkit-scrollbar-thumb { background: #ffb0cc; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-surface">
+    <main class="min-h-screen flex flex-col pt-24">
+        <section class="px-6 md:px-16 py-8 md:py-12 max-w-7xl mx-auto w-full">
+            <nav class="flex items-center gap-2 text-xs font-display font-bold tracking-widest text-on-surface-variant uppercase mb-8">
+                <a href="/spravka.html" class="hover:text-primary transition-colors">Справочник</a>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                <span class="text-primary">Балка</span>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                <div class="lg:col-span-4 space-y-8 order-2 lg:order-1">
+                    <div class="glass-card p-8 rounded-3xl border-primary/20 bg-primary/5">
+                        <h1 class="text-3xl md:text-5xl font-display font-bold uppercase leading-tight mb-6">БАЛКА<br/><span class="text-primary">ДВУТАВРОВАЯ</span></h1>
+                        <p class="text-on-surface-variant text-sm leading-relaxed mb-8">
+                            Справочные таблицы весов стальных горячекатаных двутавров согласно ГОСТ 26020-83 и СТО АСЧМ 20-93.
+                        </p>
+                        <div class="aspect-square bg-surface border border-white/5 rounded-2xl flex items-center justify-center p-8 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+                            <svg class="w-full h-full text-primary opacity-80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 20H80V30H55V70H80V80H20V70H45V30H20V20Z" stroke="currentColor" stroke-width="2"/>
+                                <text x="50" y="55" text-anchor="middle" fill="currentColor" font-size="8" font-family="Space Grotesk" font-weight="bold">I</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 order-1 lg:order-2">
+                    <div class="glass-card overflow-hidden rounded-3xl border-white/10">
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-white/5 border-b border-white/10">
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Маркировка</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Высота (h), мм</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Вес 1 м.п., кг</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Метров в тонне</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5 font-mono">
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">10Б1</td>
+                                        <td class="p-6 text-on-surface-variant">100</td>
+                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">9.46</td>
+                                        <td class="p-6 text-on-surface-variant">105.7</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">12Б1</td>
+                                        <td class="p-6 text-on-surface-variant">120</td>
+                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">11.50</td>
+                                        <td class="p-6 text-on-surface-variant">86.9</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">14Б1</td>
+                                        <td class="p-6 text-on-surface-variant">140</td>
+                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">13.70</td>
+                                        <td class="p-6 text-on-surface-variant">73.0</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">16Б1</td>
+                                        <td class="p-6 text-on-surface-variant">160</td>
+                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">15.80</td>
+                                        <td class="p-6 text-on-surface-variant">63.3</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">18Б1</td>
+                                        <td class="p-6 text-on-surface-variant">180</td>
+                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">18.80</td>
+                                        <td class="p-6 text-on-surface-variant">53.2</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">20Б1</td>
+                                        <td class="p-6 text-on-surface-variant">200</td>
+                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">21.30</td>
+                                        <td class="p-6 text-on-surface-variant">46.9</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer id="globalFooter"></footer>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="dark" lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Справочник металлопроката: Размеры и вес | Железный Дровосек</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="/js/shared-ui.js?v=3"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "outline-variant": "#534347",
+                    "surface-container-lowest": "#0f0e0c",
+                    "on-surface-variant": "#d7c1c7",
+                    "surface-tint": "#ffb0cc",
+                    "on-surface": "#e7e2dd",
+                    "surface-container-low": "#1d1b19",
+                    "primary": "#ffb0cc",
+                    "secondary": "#ffb1c0",
+                    "surface": "#151311",
+                    "background": "#151311",
+            },
+            "fontFamily": {
+                    "body": ["Inter", "sans-serif"],
+                    "display": ["Space Grotesk", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+      .glass-card { background: rgba(21, 19, 17, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(231, 226, 221, 0.05); }
+      .pink-slide {
+        position: relative; overflow: hidden; z-index: 1;
+      }
+      .pink-slide::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+        background: #ffb0cc; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1;
+      }
+      .pink-slide:hover::after { transform: translateX(100%); }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-surface">
+    <!-- Shared Header -->
+    <main class="min-h-screen flex flex-col pt-24">
+        <!-- Hero Section -->
+        <section class="px-6 md:px-16 py-12 md:py-24 max-w-7xl mx-auto w-full">
+            <div class="space-y-6">
+                <span class="font-display text-xs font-bold tracking-[0.3em] text-primary uppercase">Техническая база</span>
+                <h1 class="text-4xl md:text-7xl font-display font-bold uppercase leading-tight tracking-tight">
+                    ИНЖЕНЕРНЫЙ<br/><span class="text-primary">СПРАВОЧНИК</span>
+                </h1>
+                <p class="text-on-surface-variant max-w-2xl text-lg opacity-80 leading-relaxed">
+                    Полная база теоретических весов, размеров и характеристик металлопроката согласно ГОСТ. Точные данные для ваших расчетов и проектирования.
+                </p>
+            </div>
+
+            <!-- Bento Grid of Categories -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mt-16 md:mt-24">
+                
+                <!-- Category: Armature -->
+                <a href="/spravka_armatura.html" class="md:col-span-8 group relative aspect-[16/9] md:aspect-auto md:h-[400px] glass-card overflow-hidden block">
+                    <img src="/images/rebar.png" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" alt="Арматура"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+                    <div class="absolute inset-0 p-8 flex flex-col justify-end">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">01 //</span>
+                        <h3 class="text-3xl md:text-5xl font-display font-bold uppercase mb-4">АРМАТУРА</h3>
+                        <p class="text-on-surface-variant max-w-md line-clamp-2">Теоретический вес 1 метра арматуры А1 и А3, количество метров в тонне и площади сечения.</p>
+                    </div>
+                </a>
+
+                <!-- Category: Beam -->
+                <a href="/spravka_balka.html" class="md:col-span-4 group relative aspect-square md:aspect-auto glass-card overflow-hidden block">
+                    <img src="/images/beams.png" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" alt="Балка"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+                    <div class="absolute inset-0 p-8 flex flex-col justify-end">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">02 //</span>
+                        <h3 class="text-3xl font-display font-bold uppercase mb-2">БАЛКА</h3>
+                        <p class="text-on-surface-variant text-sm">Двутавры Б, К, Ш, М.</p>
+                    </div>
+                </a>
+
+                <!-- Category: Channel -->
+                <a href="/spravka_shveller.html" class="md:col-span-4 group relative aspect-square md:aspect-auto glass-card overflow-hidden block">
+                    <div class="absolute inset-0 p-8 flex flex-col justify-end bg-white/5 group-hover:bg-primary/5 transition-colors duration-500">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">03 //</span>
+                        <h3 class="text-3xl font-display font-bold uppercase mb-2">ШВЕЛЛЕР</h3>
+                        <p class="text-on-surface-variant text-sm">Стальные швеллеры П и У.</p>
+                    </div>
+                </a>
+
+                <!-- Category: Angle -->
+                <a href="/spravka_ugolok.html" class="md:col-span-4 group relative aspect-square md:aspect-auto glass-card overflow-hidden block">
+                    <div class="absolute inset-0 p-8 flex flex-col justify-end bg-white/5 group-hover:bg-primary/5 transition-colors duration-500">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">04 //</span>
+                        <h3 class="text-3xl font-display font-bold uppercase mb-2">УГОЛОК</h3>
+                        <p class="text-on-surface-variant text-sm">Равнополочный и неравнополочный.</p>
+                    </div>
+                </a>
+
+                <!-- Category: Sheet -->
+                <a href="/spravka_list.html" class="md:col-span-4 group relative aspect-square md:aspect-auto glass-card overflow-hidden block">
+                    <img src="/images/sheets.png" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" alt="Лист"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+                    <div class="absolute inset-0 p-8 flex flex-col justify-end">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">05 //</span>
+                        <h3 class="text-3xl font-display font-bold uppercase mb-2">ЛИСТ</h3>
+                        <p class="text-on-surface-variant text-sm">Х/К, Г/К, Рифленый.</p>
+                    </div>
+                </a>
+
+                <!-- Category: Tubes -->
+                <a href="/spravka_truba_prof.html" class="md:col-span-6 group relative aspect-video md:aspect-auto md:h-[300px] glass-card overflow-hidden block">
+                    <img src="/images/tubes.png" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" alt="Трубы"/>
+                    <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+                    <div class="absolute inset-0 p-8 flex flex-col justify-end">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">06 //</span>
+                        <h3 class="text-3xl font-display font-bold uppercase mb-2">ТРУБА ПРОФИЛЬНАЯ</h3>
+                        <p class="text-on-surface-variant text-sm">Квадратного и прямоугольного сечения.</p>
+                    </div>
+                </a>
+
+                <!-- Category: Round Tubes -->
+                <a href="/spravka_truba_krug.html" class="md:col-span-6 group relative aspect-video md:aspect-auto md:h-[300px] glass-card overflow-hidden block">
+                    <div class="absolute inset-0 p-8 flex flex-col justify-end bg-white/5 group-hover:bg-primary/5 transition-colors duration-500 border border-white/5">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">07 //</span>
+                        <h3 class="text-3xl font-display font-bold uppercase mb-2">ТРУБА КРУГЛАЯ</h3>
+                        <p class="text-on-surface-variant text-sm">ВГП, электросварная, бесшовная.</p>
+                    </div>
+                </a>
+
+                <!-- Category: Sorted Metal -->
+                <a href="/spravka_sort.html" class="md:col-span-12 group relative aspect-video md:aspect-auto md:h-[200px] glass-card overflow-hidden block">
+                    <div class="absolute inset-0 p-8 flex flex-col justify-center items-center bg-white/5 group-hover:bg-primary/5 transition-colors duration-500">
+                        <span class="text-primary font-display text-xs font-bold tracking-widest mb-2">08 //</span>
+                        <h3 class="text-3xl md:text-5xl font-display font-bold uppercase mb-2 text-center">СОРТОВОЙ ПРОКАТ</h3>
+                        <p class="text-on-surface-variant text-sm text-center">Квадрат стальной, Круг, Полоса г/к.</p>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="px-6 md:px-16 py-24 bg-surface-container-lowest border-y border-white/5">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="max-w-xl text-center md:text-left">
+                    <h2 class="text-3xl md:text-5xl font-display font-bold uppercase mb-6">НУЖЕН ТОЧНЫЙ<br/><span class="text-primary">РАСЧЕТ?</span></h2>
+                    <p class="text-on-surface-variant opacity-80">Используйте наш онлайн-калькулятор для мгновенного перевода метров в тонны и расчета стоимости заказа.</p>
+                </div>
+                <a href="/calculator/" class="pink-slide px-12 py-5 border border-primary text-primary font-display font-bold tracking-widest hover:text-surface transition-colors duration-500 whitespace-nowrap">
+                    ПЕРЕЙТИ В КАЛЬКУЛЯТОР
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shared Footer -->
+    <footer id="globalFooter"></footer>
+</body>
+</html>

@@ -22,6 +22,319 @@
     }
 })();
 
+// --- PREMIUM IRON WOODMAN GLOBAL MODAL OVERRIDES FOR ALERT & CONFIRM ---
+window.confirm = function(message) {
+    return new Promise((resolve) => {
+        const modalWrapper = document.createElement('div');
+        modalWrapper.className = 'fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
+        
+        const isDestructive = /удалить|безвозвратно|необратимо/i.test(message);
+        const title = isDestructive ? 'Подтверждение удаления' : 'Системный запрос';
+        const icon = isDestructive ? 'delete_forever' : 'help_center';
+        
+        const iconColorClass = isDestructive ? 'text-[#ff4a7a]' : 'text-[#ffb0cc]';
+        const iconBgClass = isDestructive ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
+        const topGlowStyle = isDestructive ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #ffb0cc, transparent);';
+        const btnClass = isDestructive ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#ffb0cc] hover:bg-white text-[#0f0e0c] shadow-lg shadow-[#ffb0cc]/10';
+
+        modalWrapper.innerHTML = `
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
+            <div class="relative w-full max-w-md bg-[#151311]/95 border border-white/10 rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] flex flex-col transform scale-95 transition-all duration-300 min-h-0 overflow-hidden modal-content">
+                <!-- Header glow / accent bar -->
+                <div class="absolute top-0 left-0 right-0 h-1 opacity-80" style="${topGlowStyle}"></div>
+                
+                <div class="p-8 pb-6 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 rounded-3xl ${iconBgClass} border flex items-center justify-center ${iconColorClass} mb-6 shadow-inner animate-pulse">
+                        <span class="material-symbols-outlined text-3xl">${icon}</span>
+                    </div>
+                    <h3 class="font-['Space Grotesk'] text-xl font-bold tracking-tight text-[#e7e2dd] mb-3">
+                        ${title}
+                    </h3>
+                    <p class="text-sm text-[#d7c1c7] opacity-90 leading-relaxed font-medium px-2">
+                        ${message}
+                    </p>
+                </div>
+                
+                <div class="p-8 pt-4 flex items-center justify-center gap-4 bg-[#151311] border-t border-white/5 shrink-0">
+                    <button type="button" class="flex-1 px-6 py-4 rounded-2xl border border-white/10 hover:bg-white/5 transition-all text-xs font-bold uppercase tracking-widest text-[#d7c1c7] cancel-btn active:scale-95">
+                        Отмена
+                    </button>
+                    <button type="button" class="flex-1 px-6 py-4 rounded-2xl ${btnClass} transition-all text-xs font-bold uppercase tracking-widest shadow-xl active:scale-95 confirm-btn">
+                        Подтвердить
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modalWrapper);
+        
+        requestAnimationFrame(() => {
+            modalWrapper.classList.remove('opacity-0');
+            modalWrapper.querySelector('.modal-content').classList.remove('scale-95');
+        });
+        
+        const close = (result) => {
+            modalWrapper.classList.add('opacity-0');
+            const content = modalWrapper.querySelector('.modal-content');
+            if (content) content.classList.add('scale-95');
+            setTimeout(() => {
+                modalWrapper.remove();
+                resolve(result);
+            }, 300);
+        };
+        
+        modalWrapper.querySelector('.modal-backdrop').onclick = () => close(false);
+        modalWrapper.querySelector('.cancel-btn').onclick = () => close(false);
+        modalWrapper.querySelector('.confirm-btn').onclick = () => close(true);
+    });
+};
+
+window.alert = function(message) {
+    return new Promise((resolve) => {
+        const modalWrapper = document.createElement('div');
+        modalWrapper.className = 'fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
+        
+        const isError = /ошибка|error|fail|неверн|пустым/i.test(message);
+        const title = isError ? 'Системная ошибка' : 'Уведомление';
+        const icon = isError ? 'error' : 'info';
+        
+        const iconColorClass = isError ? 'text-[#ff4a7a]' : 'text-[#ffb0cc]';
+        const iconBgClass = isError ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
+        const topGlowStyle = isError ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #ffb0cc, transparent);';
+        const btnClass = isError ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#ffb0cc] hover:bg-white text-[#0f0e0c] shadow-lg shadow-[#ffb0cc]/10';
+
+        modalWrapper.innerHTML = `
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
+            <div class="relative w-full max-w-md bg-[#151311]/95 border border-white/10 rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] flex flex-col transform scale-95 transition-all duration-300 min-h-0 overflow-hidden modal-content">
+                <div class="absolute top-0 left-0 right-0 h-1 opacity-80" style="${topGlowStyle}"></div>
+                
+                <div class="p-8 pb-6 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 rounded-3xl ${iconBgClass} border flex items-center justify-center ${iconColorClass} mb-6 shadow-inner animate-pulse">
+                        <span class="material-symbols-outlined text-3xl">${icon}</span>
+                    </div>
+                    <h3 class="font-['Space Grotesk'] text-xl font-bold tracking-tight text-[#e7e2dd] mb-3">
+                        ${title}
+                    </h3>
+                    <p class="text-sm text-[#d7c1c7] opacity-90 leading-relaxed font-medium px-2">
+                        ${message}
+                    </p>
+                </div>
+                
+                <div class="p-8 pt-4 flex items-center justify-center bg-[#151311] border-t border-white/5 shrink-0">
+                    <button type="button" class="w-full px-6 py-4 rounded-2xl ${btnClass} transition-all text-xs font-bold uppercase tracking-widest shadow-xl active:scale-95 alert-btn">
+                        Понятно
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modalWrapper);
+        
+        requestAnimationFrame(() => {
+            modalWrapper.classList.remove('opacity-0');
+            modalWrapper.querySelector('.modal-content').classList.remove('scale-95');
+        });
+        
+        const close = () => {
+            modalWrapper.classList.add('opacity-0');
+            const content = modalWrapper.querySelector('.modal-content');
+            if (content) content.classList.add('scale-95');
+            setTimeout(() => {
+                modalWrapper.remove();
+                resolve();
+            }, 300);
+        };
+        
+        modalWrapper.querySelector('.modal-backdrop').onclick = close;
+        modalWrapper.querySelector('.alert-btn').onclick = close;
+    });
+};
+
+window.showToast = function(message, type = 'success', title = null) {
+    // Ensure toast container exists
+    let container = document.getElementById('iron-toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'iron-toast-container';
+        container.className = 'fixed top-6 right-6 z-[999999] flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0';
+        document.body.appendChild(container);
+    }
+
+    // Determine styles based on type
+    let icon = 'check_circle';
+    let iconColor = 'text-[#10b981]';
+    let iconBg = 'bg-[#10b981]/10 border-[#10b981]/20';
+    let borderColor = 'border-l-[#10b981]';
+    let defaultTitle = 'Успешно';
+
+    if (type === 'error') {
+        icon = 'error';
+        iconColor = 'text-[#ff4a7a]';
+        iconBg = 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20';
+        borderColor = 'border-l-[#ff4a7a]';
+        defaultTitle = 'Ошибка';
+    } else if (type === 'info') {
+        icon = 'info';
+        iconColor = 'text-[#ffb0cc]';
+        iconBg = 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
+        borderColor = 'border-l-[#ffb0cc]';
+        defaultTitle = 'Уведомление';
+    } else if (type === 'warning') {
+        icon = 'warning';
+        iconColor = 'text-[#f59e0b]';
+        iconBg = 'bg-[#f59e0b]/10 border-[#f59e0b]/20';
+        borderColor = 'border-l-[#f59e0b]';
+        defaultTitle = 'Внимание';
+    }
+
+    const toastTitle = title || defaultTitle;
+
+    const toastEl = document.createElement('div');
+    toastEl.className = `pointer-events-auto bg-[#151311]/95 backdrop-blur-md border border-white/10 border-l-4 ${borderColor} rounded-2xl p-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] flex items-start gap-3.5 transform translate-x-full opacity-0 transition-all duration-500 ease-out`;
+    
+    toastEl.innerHTML = `
+        <div class="w-10 h-10 rounded-xl ${iconBg} border flex items-center justify-center ${iconColor} shrink-0 shadow-inner mt-0.5">
+            <span class="material-symbols-outlined text-xl">${icon}</span>
+        </div>
+        <div class="flex-1 min-w-0 pr-1">
+            <h4 class="font-['Space Grotesk'] text-sm font-bold text-[#e7e2dd] tracking-tight truncate">
+                ${toastTitle}
+            </h4>
+            <p class="text-xs text-[#d7c1c7] opacity-90 mt-1 leading-relaxed break-words">
+                ${message}
+            </p>
+        </div>
+        <button type="button" class="text-[#d7c1c7] hover:text-white opacity-50 hover:opacity-100 transition-opacity p-1 -mt-1 -mr-1 toast-close-btn">
+            <span class="material-symbols-outlined text-base">close</span>
+        </button>
+    `;
+
+    container.appendChild(toastEl);
+
+    // Animate in
+    requestAnimationFrame(() => {
+        toastEl.classList.remove('translate-x-full', 'opacity-0');
+        toastEl.classList.add('translate-x-0', 'opacity-100');
+    });
+
+    const dismiss = () => {
+        toastEl.classList.remove('translate-x-0', 'opacity-100');
+        toastEl.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => toastEl.remove(), 500);
+    };
+
+    toastEl.querySelector('.toast-close-btn').onclick = dismiss;
+
+    // Auto dismiss after 4 seconds
+    setTimeout(dismiss, 4000);
+};
+
+window.ORDER_STATUS_OPTIONS = [
+    { value: 'new', label: 'Новый', color: '#3b82f6', desc: 'Заказ только поступил, ожидает проверки менеджером', icon: 'fiber_new' },
+    { value: 'in_progress', label: 'В работе', color: '#f59e0b', desc: 'Менеджер взял заказ в работу, согласование деталей', icon: 'engineering' },
+    { value: 'processing', label: 'В обработке', color: '#a855f7', desc: 'Заказ комплектуется и готовится к отгрузке', icon: 'inventory_2' },
+    { value: 'completed', label: 'Завершен', color: '#10b981', desc: 'Заказ успешно выполнен и закрыт', icon: 'check_circle' },
+    { value: 'waiting_client', label: 'Ожидание', color: '#ec4899', desc: 'Ожидается ответ или оплата от клиента', icon: 'hourglass_top' },
+    { value: 'cancelled', label: 'Отменен', color: '#ef4444', desc: 'Заказ отменен по инициативе клиента или менеджера', icon: 'cancel' }
+];
+
+window.LEAD_STATUS_OPTIONS = [
+    { value: 'new', label: 'Новый', color: '#3b82f6', desc: 'Новое обращение/заявка на расчет', icon: 'fiber_new' },
+    { value: 'in_progress', label: 'В работе', color: '#f59e0b', desc: 'Производится технический расчет и оценка', icon: 'calculate' },
+    { value: 'waiting_client', label: 'Ожидание клиента', color: '#ec4899', desc: 'КП отправлено, ожидается обратная связь', icon: 'hourglass_top' },
+    { value: 'success', label: 'Успешно закрыта', color: '#10b981', desc: 'Сделка подтверждена, переведена в заказ', icon: 'handshake' },
+    { value: 'cancelled', label: 'Отказ', color: '#ef4444', desc: 'Отказ клиента или нецелевое обращение', icon: 'cancel' }
+];
+
+window.USER_ROLE_OPTIONS = [
+    { value: 'user', label: 'USER (Пользователь)', color: '#3b82f6', desc: 'Обычный доступ к каталогу и заказам', icon: 'person' },
+    { value: 'admin', label: 'ADMIN (Администратор)', color: '#ec4899', desc: 'Полный доступ к панели управления и настройкам', icon: 'shield_person' }
+];
+
+window.openStatusSelectModal = function(options, currentStatus, title = 'Выберите новый статус') {
+    return new Promise((resolve) => {
+        const modalWrapper = document.createElement('div');
+        modalWrapper.className = 'fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
+        
+        const cardsHtml = options.map(opt => {
+            const isSelected = opt.value === currentStatus;
+            const borderClass = isSelected ? `border-[${opt.color}] bg-[${opt.color}]/10` : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20';
+            const shadowClass = isSelected ? `shadow-lg shadow-[${opt.color}]/20` : '';
+            return `
+                <button type="button" data-value="${opt.value}" class="status-option-card w-full p-4 rounded-2xl border ${borderClass} ${shadowClass} flex items-center gap-4 transition-all active:scale-95 text-left group">
+                    <div class="w-12 h-12 rounded-xl bg-[#151311] border border-white/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform" style="color: ${opt.color}; border-color: ${opt.color}40;">
+                        <span class="material-symbols-outlined text-2xl">${opt.icon || 'radio_button_unchecked'}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-['Space Grotesk'] text-sm font-bold tracking-tight uppercase" style="color: ${opt.color};">${opt.label}</span>
+                            ${isSelected ? `<span class="material-symbols-outlined text-sm animate-pulse" style="color: ${opt.color};">task_alt</span>` : ''}
+                        </div>
+                        <p class="text-xs text-[#d7c1c7] opacity-80 leading-relaxed truncate">${opt.desc || ''}</p>
+                    </div>
+                </button>
+            `;
+        }).join('');
+
+        modalWrapper.innerHTML = `
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
+            <div class="relative w-full max-w-md bg-[#151311]/95 border border-white/10 rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] flex flex-col transform scale-95 transition-all duration-300 min-h-0 overflow-hidden modal-content">
+                <div class="absolute top-0 left-0 right-0 h-1 opacity-80 background-gradient" style="background: linear-gradient(90deg, transparent, #ffb0cc, transparent);"></div>
+                
+                <div class="p-8 pb-6 flex items-center justify-between border-b border-white/5 shrink-0">
+                    <div>
+                        <h3 class="font-['Space Grotesk'] text-xl font-bold tracking-tight text-[#e7e2dd]">
+                            ${title}
+                        </h3>
+                        <p class="text-xs text-[#d7c1c7] opacity-60 mt-1">Выберите один из доступных этапов</p>
+                    </div>
+                    <button type="button" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-[#d7c1c7] hover:text-white transition-all cancel-icon-btn active:scale-95 shrink-0">
+                        <span class="material-symbols-outlined text-base">close</span>
+                    </button>
+                </div>
+                
+                <div class="p-8 py-6 flex-1 overflow-y-auto custom-scrollbar space-y-3 min-h-0 max-h-[60vh]">
+                    ${cardsHtml}
+                </div>
+                
+                <div class="p-8 pt-4 flex items-center justify-center bg-[#151311] border-t border-white/5 shrink-0">
+                    <button type="button" class="w-full px-6 py-4 rounded-2xl border border-white/10 hover:bg-white/5 transition-all text-xs font-bold uppercase tracking-widest text-[#d7c1c7] cancel-btn active:scale-95">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modalWrapper);
+        
+        requestAnimationFrame(() => {
+            modalWrapper.classList.remove('opacity-0');
+            modalWrapper.querySelector('.modal-content').classList.remove('scale-95');
+        });
+        
+        const close = (result) => {
+            modalWrapper.classList.add('opacity-0');
+            const content = modalWrapper.querySelector('.modal-content');
+            if (content) content.classList.add('scale-95');
+            setTimeout(() => {
+                modalWrapper.remove();
+                resolve(result);
+            }, 300);
+        };
+        
+        modalWrapper.querySelector('.modal-backdrop').onclick = () => close(null);
+        modalWrapper.querySelector('.cancel-icon-btn').onclick = () => close(null);
+        modalWrapper.querySelector('.cancel-btn').onclick = () => close(null);
+        
+        modalWrapper.querySelectorAll('.status-option-card').forEach(card => {
+            card.onclick = () => {
+                const val = card.dataset.value;
+                close(val);
+            };
+        });
+    });
+};
+
 window.maskPhoneGlobal = function(input) {
     let val = input.value.replace(/\D/g, '');
     if (val.startsWith('7')) val = val.substring(1);
@@ -496,18 +809,31 @@ window.renderCartDrawerItems = function() {
     container.innerHTML = cart.map((item, index) => {
         const itemTotal = (parseFloat(item.price) || 0) * (parseFloat(item.qty) || 1);
         total += itemTotal;
+        const qtyDisplay = Number(item.qty).toFixed(2);
         return `
-            <div class="flex gap-4 p-4 bg-surface-container border border-outline-variant/10 rounded-xl group hover:border-primary/30 transition-all relative overflow-hidden">
-                <div class="flex-1">
-                    <div class="text-[11px] font-bold uppercase tracking-tight text-on-surface line-clamp-1 mb-1">${item.name || item.id}</div>
-                    <div class="flex justify-between items-center">
-                        <div class="text-[10px] font-label-caps text-on-surface-variant tracking-wider">${item.qty} ${item.unit || 'ед.'} × ${Number(item.price || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽</div>
-                        <div class="text-xs font-bold text-primary">${itemTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽</div>
+            <div onclick="window.openProductModalGlobal('${item.id}')" class="flex flex-col gap-3 p-4 bg-surface-container border border-outline-variant/10 rounded-xl group hover:border-primary/30 transition-all relative overflow-hidden cursor-pointer">
+                <div class="flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                        <div class="text-[11px] font-bold uppercase tracking-tight text-on-surface line-clamp-1 mb-1">${item.name || item.id}</div>
+                        <div class="text-[10px] font-label-caps text-on-surface-variant tracking-wider">${Number(item.price || 0).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽ / ${item.unit || 'т.'}</div>
                     </div>
+                    <button onclick="event.stopPropagation(); removeFromCartGlobal(${index})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-error/10 text-on-surface-variant hover:text-error transition-all group/del relative z-10">
+                        <span class="material-symbols-outlined text-[16px]">close</span>
+                    </button>
                 </div>
-                <button onclick="removeFromCartGlobal(${index})" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-error/10 text-on-surface-variant hover:text-error transition-all group/del">
-                    <span class="material-symbols-outlined text-[16px]">close</span>
-                </button>
+                
+                    <div class="flex justify-between items-center pt-2 border-t border-white/5">
+                        <div class="flex items-center border border-white/10 rounded-lg overflow-hidden h-8 bg-white/5" onclick="event.stopPropagation()">
+                            <button onclick="window.changeCartQtyGlobal(${index}, -1)" class="w-8 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors">
+                                <span class="material-symbols-outlined text-sm">remove</span>
+                            </button>
+                            <input type="text" value="${qtyDisplay}" onchange="window.setCartQtyGlobal(${index}, this.value)" class="w-12 bg-transparent border-0 text-center font-bold text-on-surface focus:ring-0 p-0 text-[11px] outline-none"/>
+                            <button onclick="window.changeCartQtyGlobal(${index}, 1)" class="w-8 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                        </div>
+                        <div class="text-xs font-bold text-primary whitespace-nowrap min-w-[80px] text-right">${itemTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽</div>
+                    </div>
             </div>
         `;
     }).join('');
@@ -527,6 +853,31 @@ window.removeFromCartGlobal = function(index) {
     if (typeof updateCartUI === 'function') {
         updateCartUI();
     }
+};
+
+window.changeCartQtyGlobal = function(index, delta) {
+    const cart = JSON.parse(localStorage.getItem('metal_cart') || '[]');
+    if (!cart[index]) return;
+    
+    let currentQty = parseFloat(cart[index].qty) || 0;
+    const step = 1;
+    
+    cart[index].qty = Math.max(1, currentQty + (delta * step)).toFixed(2);
+    localStorage.setItem('metal_cart', JSON.stringify(cart));
+    
+    window.renderCartDrawerItems();
+    if (typeof updateCartUI === 'function') updateCartUI();
+};
+
+window.setCartQtyGlobal = function(index, val) {
+    const cart = JSON.parse(localStorage.getItem('metal_cart') || '[]');
+    if (!cart[index]) return;
+    
+    cart[index].qty = Math.max(0.01, parseFloat(val.replace(',', '.')) || 0.01).toFixed(2);
+    localStorage.setItem('metal_cart', JSON.stringify(cart));
+    
+    window.renderCartDrawerItems();
+    if (typeof updateCartUI === 'function') updateCartUI();
 };
 
 window.checkAuthStatus = async function() {
@@ -607,6 +958,47 @@ window.checkAuthStatus = async function() {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    const isAdmin = window.location.pathname.includes('/admin') || window.location.pathname.includes('admin.html');
+    if (isAdmin) {
+        const style = `
+        <style>
+            #floatingChatBtnGlobal { z-index: 5000; }
+            #scrollTopBtnGlobal {
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: translateY(20px);
+            }
+            #scrollTopBtnGlobal.visible {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
+            /* --- PREMIUM PINK SCROLLBAR --- */
+            ::-webkit-scrollbar { width: 8px; height: 8px; }
+            ::-webkit-scrollbar-track { background: #151311; }
+            ::-webkit-scrollbar-thumb { background: #ca7093; border-radius: 10px; border: 2px solid #151311; }
+            ::-webkit-scrollbar-thumb:hover { background: #ffb0cc; }
+            * { scrollbar-width: thin; scrollbar-color: #ca7093 #151311; }
+            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 176, 204, 0.3); }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ffb0cc; }
+        </style>
+        `;
+        const adminFloatingBtns = `
+        <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-[96px] right-8 z-[5000] w-14 h-14 bg-[#ffb0cc] border border-[#ffb0cc]/30 text-[#0f0e0c] flex items-center justify-center hover:bg-white transition-all shadow-2xl shadow-[#ffb0cc]/30 group rounded-2xl">
+            <span class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform">forum</span>
+            <span id="floatingChatBadgeGlobal" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center hidden animate-pulse">!</span>
+        </button>
+
+        <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#1d1b19] border border-[#ffb0cc] text-[#ffb0cc] flex items-center justify-center hover:bg-[#ffb0cc] hover:text-[#1d1b19] transition-all shadow-2xl shadow-[#ffb0cc]/20 group">
+            <span class="material-symbols-outlined text-[28px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
+        </button>
+        `;
+        document.head.insertAdjacentHTML('beforeend', style);
+        document.body.insertAdjacentHTML('beforeend', adminFloatingBtns);
+        return;
+    }
 
     const headerHtml = `
     <div id="scrollProgressGlobal"></div>
@@ -630,6 +1022,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="catalog-menu-wrapper relative" id="catalogMenuWrapperGlobal">
                     <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 flex items-center gap-1 cursor-pointer no-underline" id="catalogBtnGlobal" href="/catalog">КАТАЛОГ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
                 </div>
+                <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline" href="/spravka.html">СПРАВОЧНИК</a>
                 <div class="about-menu-wrapper relative h-full flex items-center" id="aboutMenuWrapperGlobal">
                     <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline flex items-center gap-1 cursor-pointer" id="aboutBtnGlobal" href="/about.html">О КОМПАНИИ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
                 </div>
@@ -694,6 +1087,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         </a>
                     </div>
                 </div>
+
+                <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/spravka.html">
+                    <span class="material-symbols-outlined text-primary text-xl">menu_book</span>
+                    СПРАВОЧНИК
+                </a>
 
                 <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/news">
                     <span class="material-symbols-outlined text-primary text-xl">newspaper</span>
@@ -1024,6 +1422,11 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
+    <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-[96px] right-8 z-[5000] w-14 h-14 bg-primary border border-primary/30 text-on-primary flex items-center justify-center hover:brightness-110 transition-all shadow-2xl shadow-primary/30 group rounded-2xl">
+        <span class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform">forum</span>
+        <span id="floatingChatBadgeGlobal" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center hidden animate-pulse">!</span>
+    </button>
+
     <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#1d1b19] border border-[#ffb0cc] text-[#ffb0cc] flex items-center justify-center hover:bg-[#ffb0cc] hover:text-[#1d1b19] transition-all shadow-2xl shadow-[#ffb0cc]/20 group">
         <span class="material-symbols-outlined text-[28px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
     </button>
@@ -1057,6 +1460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <ul class="space-y-4">
                         <li><a href="/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ГЛАВНАЯ</a></li>
                         <li><a href="/catalog" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАТАЛОГ</a></li>
+                        <li><a href="/spravka.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">СПРАВОЧНИК</a></li>
                         <li><a href="/about" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">О КОМПАНИИ</a></li>
                         <li><a href="/news" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">НОВОСТИ</a></li>
                         <li><a href="/contacts" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КОНТАКТЫ</a></li>
@@ -1955,6 +2359,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const loginForm = document.getElementById('loginFormGlobal');
+            if (loginForm && !loginForm.classList.contains('hidden')) {
+                window.handleLoginGlobal(e);
+            }
+        }
+    });
+
+    document.getElementById('loginEmailGlobal')?.addEventListener('input', () => document.getElementById('loginErrorMsgGlobal')?.classList.add('hidden'));
+    document.getElementById('loginPassGlobal')?.addEventListener('input', () => document.getElementById('loginErrorMsgGlobal')?.classList.add('hidden'));
+    
     updateGlobalCartBadge();
     window.updateGlobalCartBadge = updateGlobalCartBadge;
     window.addEventListener('storage', updateGlobalCartBadge);
@@ -2260,7 +2676,8 @@ window.handleApplicationSubmit = async function(event, type = 'contact') {
         phone: formData.get('phone') || formData.get('customerPhone') || 'Не указано',
         email: formData.get('email') || formData.get('customerEmail') || 'Не указано',
         message: formData.get('message') || formData.get('specifications') || '',
-        type: type
+        type: type === 'quote' ? 'Технический расчет' : type,
+        project_type: formData.get('project_type') || ''
     };
 
     // Flexible Validation
@@ -2486,6 +2903,186 @@ window.closeContactModalGlobal = function() {
         document.body.style.overflow = ''; // Restore scroll AFTER animation
     }, 500);
 };
+
+// Global Product Modal
+window.openProductModalGlobal = async function(productId) {
+    const existing = document.getElementById('globalProductModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'globalProductModal';
+    modal.className = 'fixed inset-0 z-[6000] flex items-center justify-center p-4 pointer-events-none';
+    modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" id="productModalOverlay" onclick="window.closeProductModalGlobal()"></div>
+        <div class="relative liquid-glass p-6 md:p-12 max-w-4xl w-full rounded-[2rem] opacity-0 transition-all duration-500 ease-out pointer-events-auto flex items-center justify-center min-h-[400px] overflow-hidden" id="productModalPanel">
+             <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+        document.getElementById('productModalOverlay').classList.remove('opacity-0');
+        const panel = document.getElementById('productModalPanel');
+        panel.classList.remove('opacity-0');
+        panel.classList.add('modal-animate-in');
+    }, 10);
+
+    try {
+        const res = await fetch(`/api/products/${productId}`);
+        if (!res.ok) throw new Error('Product not found');
+        const p = await res.json();
+        
+        const panel = document.getElementById('productModalPanel');
+        const img = window.getProductImage ? window.getProductImage(p.category) : (p.image || p.img || '/images/products/hot_rolled_sheets_premium_1778423920658.png');
+        
+        panel.innerHTML = `
+            <button onclick="window.closeProductModalGlobal()" class="absolute top-6 right-6 md:top-8 md:right-8 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 w-full pt-4 md:pt-0">
+                <div class="aspect-square w-full overflow-hidden rounded-2xl bg-surface-container border border-outline-variant/10 shadow-2xl">
+                    <img src="${img}" class="w-full h-full object-cover" alt="${p.name}"/>
+                </div>
+                
+                <div class="flex flex-col">
+                    <span class="font-label-caps text-[9px] md:text-[10px] text-primary tracking-[0.3em] uppercase block mb-2 font-bold opacity-70">${p.category}</span>
+                    <h2 class="font-display-xl text-xl md:text-3xl lg:text-4xl leading-tight text-on-surface font-bold mb-4 md:mb-6 uppercase">${p.name}</h2>
+                    
+                    <div class="space-y-3 md:space-y-4 mb-6 md:mb-8">
+                        ${p.specs ? p.specs.slice(0, 5).map(([label, value]) => `
+                            <div class="flex justify-between border-b border-white/5 pb-2">
+                                <span class="text-on-surface-variant text-[10px] md:text-xs uppercase tracking-wider opacity-60">${label}</span>
+                                <span class="text-on-surface text-[10px] md:text-xs font-bold">${value}</span>
+                            </div>
+                        `).join('') : ''}
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <div class="flex flex-col mb-6">
+                            <span class="font-label-caps text-[9px] text-on-surface-variant uppercase tracking-widest mb-2 opacity-50">${p.price_ton ? 'Цена за тонну' : 'Цена за единицу'}</span>
+                            <div class="flex items-center justify-between">
+                                <div class="text-primary text-2xl md:text-4xl font-bold tracking-tight">
+                                    ${p.price_ton ? p.price_ton.toLocaleString('ru-RU') + ' ₽' : (p.price_unit ? p.price_unit.toLocaleString('ru-RU') + ' ₽' : 'Цена по запросу')}
+                                </div>
+                                <div class="flex items-center border border-white/10 rounded-xl overflow-hidden bg-white/5 h-12">
+                                    <button onclick="window.stepModalQty(-1, 1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors">
+                                        <span class="material-symbols-outlined text-sm">remove</span>
+                                    </button>
+                                    <input type="number" id="modalQtyInput" value="${p.price_ton ? '1.00' : '1'}" step="1" class="w-16 bg-transparent border-0 text-center font-bold text-on-surface focus:ring-0 p-0 text-sm outline-none"/>
+                                    <button onclick="window.stepModalQty(1, 1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors">
+                                        <span class="material-symbols-outlined text-sm">add</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="/product?id=${p.id}" class="flex-1 px-6 py-4 border border-primary text-primary font-bold uppercase tracking-widest text-[9px] md:text-[10px] hover:bg-primary/10 transition-all text-center no-underline rounded-full flex items-center justify-center gap-2" onclick="window.closeProductModalGlobal()">
+                                <span class="material-symbols-outlined text-[16px]">info</span> ПОДРОБНЕЕ
+                            </a>
+                            <button onclick="window.addToCartGlobal('${p.id}', parseFloat(document.getElementById('modalQtyInput').value))" class="flex-1 px-6 py-4 bg-primary text-on-primary font-bold uppercase tracking-widest text-[9px] md:text-[10px] hover:brightness-110 transition-all rounded-full flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                                <span class="material-symbols-outlined text-[16px]">shopping_cart</span> В КОРЗИНУ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (e) {
+        console.error('Modal Fetch Error:', e);
+        document.getElementById('productModalPanel').innerHTML = `
+            <button onclick="window.closeProductModalGlobal()" class="absolute top-8 right-8 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">close</button>
+            <div class="text-center p-12">
+                <span class="material-symbols-outlined text-error text-6xl mb-4">error</span>
+                <p class="text-on-surface font-bold uppercase tracking-widest">Товар не найден</p>
+                <p class="text-on-surface-variant text-xs mt-2 opacity-60">Возможно, товар был удален или перемещен</p>
+            </div>
+        `;
+    }
+};
+
+window.closeProductModalGlobal = function() {
+    const overlay = document.getElementById('productModalOverlay');
+    const panel = document.getElementById('productModalPanel');
+    if (!overlay || !panel) return;
+    
+    overlay.classList.add('opacity-0');
+    panel.classList.remove('modal-animate-in');
+    panel.classList.add('modal-animate-out');
+    
+    setTimeout(() => {
+        const modal = document.getElementById('globalProductModal');
+        if (modal) modal.remove();
+        // Only restore scroll if no other high-level modals are open
+        const otherModals = document.querySelectorAll('#globalContactModal, #drawingUploadModal, #cartDrawerGlobal.translate-x-0');
+        if (otherModals.length === 0) {
+            document.body.style.overflow = '';
+        }
+    }, 500);
+};
+
+window.stepModalQty = function(delta, step) {
+    const input = document.getElementById('modalQtyInput');
+    if (!input) return;
+    let val = parseFloat(input.value) || 0;
+    val = Math.max(1, val + (delta * step));
+    input.value = val.toFixed(2);
+};
+
+window.addToCartGlobal = function(id, qty = 1) {
+    fetch(`/api/products/${id}`).then(res => res.json()).then(p => {
+        let cart = JSON.parse(localStorage.getItem('metal_cart') || '[]');
+        
+        let price, unit, finalQty;
+        if (p.price_ton) {
+            price = p.price_ton;
+            unit = 'т.';
+            finalQty = qty;
+        } else {
+            price = p.price_unit;
+            unit = 'т.';
+            finalQty = qty;
+        }
+        
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.qty = (parseFloat(existing.qty) + finalQty).toFixed(2);
+        } else {
+            cart.push({ 
+                id: id, 
+                qty: finalQty.toFixed(2),
+                name: p.name,
+                price: price,
+                unit: unit
+            });
+        }
+        localStorage.setItem('metal_cart', JSON.stringify(cart));
+        
+        // Ensure unit is included in cart if not already
+        const updatedCart = cart.map(item => {
+            if (item.id === id && !item.unit) {
+                return { ...item, unit: unit };
+            }
+            return item;
+        });
+        localStorage.setItem('metal_cart', JSON.stringify(updatedCart));
+        
+        // Refresh UIs
+        if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();
+        if (window.renderCartDrawerItems) window.renderCartDrawerItems();
+        if (typeof updateCartUI === 'function') updateCartUI();
+        
+        // Visual feedback
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-8 right-8 bg-primary text-on-primary px-8 py-4 font-label-caps text-xs shadow-2xl z-[7000] rounded-full animate-bounce';
+        toast.innerHTML = '<div class="flex items-center gap-3"><span class="material-symbols-outlined">done_all</span> ТОВАР ДОБАВЛЕН В КОРЗИНУ</div>';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+        
+        // Close modal after adding
+        window.closeProductModalGlobal();
+    }).catch(e => console.error('Global AddToCart Error:', e));
+};
 // Drawing Upload Modal for Cutting Services
 window.openDrawingUploadModal = function() {
     const existing = document.getElementById('drawingUploadModal');
@@ -2640,3 +3237,319 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 });
+
+window.openGlobalChatDrawerGlobal = async function() {
+    const token = localStorage.getItem('metal_token');
+    const userStr = localStorage.getItem('metal_user');
+    let user = null;
+    try { if (userStr) user = JSON.parse(userStr); } catch(e){}
+
+    const isAdmin = window.location.pathname.includes('/admin') || window.location.pathname.includes('admin.html');
+
+    const modal = document.createElement('div');
+    modal.id = 'globalChatDrawerModal';
+    modal.className = 'fixed inset-0 z-[7000] flex items-center justify-center p-4 pointer-events-none';
+    
+    if (!token || (!isAdmin && !user)) {
+        modal.innerHTML = `
+            <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="this.parentElement.remove(); document.body.style.overflow=''"></div>
+            <div class="relative liquid-glass p-6 md:p-10 max-w-lg w-full rounded-[2.5rem] opacity-0 transition-all duration-500 ease-out pointer-events-auto shadow-2xl border border-white/10" id="globalChatModalPanel">
+                <button onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
+                <header class="mb-6 border-b border-white/5 pb-6 text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/30 mx-auto mb-4 shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined text-3xl">forum</span>
+                    </div>
+                    <h2 class="font-display-xl text-2xl md:text-3xl leading-none text-on-surface font-bold uppercase tracking-tight">Чат поддержки</h2>
+                    <p class="text-on-surface-variant text-xs uppercase tracking-widest mt-2 opacity-60">Онлайн консультация и решение вопросов</p>
+                </header>
+                <div class="space-y-6 text-center py-4">
+                    <p class="text-sm text-on-surface-variant leading-relaxed">Для доступа к истории переписки по вашим заказам и обращениям, пожалуйста, войдите в систему.</p>
+                    <div class="flex flex-col gap-4 pt-4">
+                        <button onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''; toggleAuthModalGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-primary/20">ВОЙТИ В АККАУНТ</button>
+                        <a href="/#contacts" onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''" class="text-xs text-on-surface-variant uppercase tracking-widest hover:text-primary transition-colors">Связаться другим способом</a>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+            const panel = document.getElementById('globalChatModalPanel');
+            if (panel && panel.previousElementSibling) panel.previousElementSibling.classList.remove('opacity-0');
+            if (panel) { panel.classList.remove('opacity-0'); panel.classList.add('modal-animate-in'); }
+        }, 10);
+        return;
+    }
+
+    modal.innerHTML = `
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="window.closeGlobalChatDrawerGlobal()"></div>
+        <div class="relative liquid-glass p-6 md:p-10 max-w-3xl w-full rounded-[2.5rem] opacity-0 transition-all duration-500 ease-out pointer-events-auto max-h-[90vh] flex flex-col shadow-2xl border border-white/10" id="globalChatModalPanel">
+            <button onclick="window.closeGlobalChatDrawerGlobal()" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
+            <header class="mb-6 border-b border-white/5 pb-6 shrink-0">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <span class="font-label-caps text-[10px] text-primary tracking-[0.3em] uppercase font-bold">${isAdmin ? 'ПАНЕЛЬ АДМИНА' : 'ОНЛАЙН ЧАТ'}</span>
+                        <span class="flex items-center gap-1.5 text-[9px] text-primary font-bold tracking-widest uppercase">
+                            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block"></span>online
+                        </span>
+                    </div>
+                    <span class="text-[9px] text-primary bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full uppercase tracking-widest font-bold">Telegram style</span>
+                </div>
+                <h2 class="font-display-xl text-2xl md:text-3xl leading-none text-on-surface font-bold uppercase tracking-tight">${isAdmin ? 'Чат с клиентами' : 'Чат с менеджером'}</h2>
+                <div class="mt-4 flex items-center gap-4">
+                    <label class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold opacity-60 shrink-0">Выбрать диалог:</label>
+                    <select id="globalChatTopicSelect" onchange="window.selectGlobalChatTopicGlobal(this.value)" class="flex-1 bg-surface-container-low border border-white/10 rounded-xl px-4 py-2.5 text-xs text-on-surface outline-none focus:border-primary transition-all font-body-md">
+                        <option value="">Загрузка диалогов...</option>
+                    </select>
+                </div>
+            </header>
+            
+            <div class="flex-1 flex flex-col bg-black/30 border border-white/5 rounded-3xl overflow-hidden shadow-2xl min-h-[380px] max-h-[500px]">
+                <div id="globalChatMessagesContainer" class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-4">
+                    <div class="flex items-center justify-center h-full text-on-surface-variant opacity-50 gap-3">
+                        <span class="material-symbols-outlined animate-spin text-primary">progress_activity</span>
+                        <span class="font-label-caps text-xs uppercase tracking-widest">Загрузка истории...</span>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-white/5 flex gap-3 shrink-0 bg-white/5 items-center">
+                    <input type="text" id="globalChatInput" placeholder="${isAdmin ? 'Написать клиенту...' : 'Написать менеджеру...'}" class="flex-1 bg-black/50 border border-white/10 rounded-2xl px-5 py-3 text-sm outline-none focus:border-primary transition-all text-on-surface placeholder:opacity-40 shadow-inner">
+                    <button id="globalChatSendBtn" onclick="window.sendGlobalChatMessageGlobal()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-primary text-on-primary hover:brightness-110 transition-all shrink-0 shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined text-base">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        const panel = document.getElementById('globalChatModalPanel');
+        if (panel && panel.previousElementSibling) panel.previousElementSibling.classList.remove('opacity-0');
+        if (panel) { panel.classList.remove('opacity-0'); panel.classList.add('modal-animate-in'); }
+    }, 10);
+
+    try {
+        if (isAdmin) {
+            const res = await fetch('/api/admin/chat-topics', { headers: { 'Authorization': 'Bearer ' + token } });
+            if (res.ok) {
+                window.globalChatTopics = await res.json();
+                const select = document.getElementById('globalChatTopicSelect');
+                if (select) {
+                    if (window.globalChatTopics.length > 0) {
+                        select.innerHTML = window.globalChatTopics.map(t => {
+                            const typeStr = t.type === 'order' ? '📦 Заказ' : '✉️ Обращение';
+                            const titleStr = t.title || `${typeStr} #${t.id}`;
+                            const dateStr = new Date(t.created_at).toLocaleDateString('ru-RU');
+                            return `<option value="${t.type}_${t.id}">${titleStr} (${dateStr})</option>`;
+                        }).join('');
+                        window.selectGlobalChatTopicGlobal(window.globalChatTopics[0].type + '_' + window.globalChatTopics[0].id);
+                    } else {
+                        select.innerHTML = `<option value="">Нет активных диалогов</option>`;
+                        const container = document.getElementById('globalChatMessagesContainer');
+                        if (container) container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-on-surface-variant opacity-40 text-center p-6"><span class="material-symbols-outlined text-4xl mb-3 opacity-50">forum</span><span class="text-sm font-bold uppercase tracking-widest font-['Space Grotesk'] text-on-surface">Нет активных диалогов</span><span class="text-xs opacity-70 mt-1 max-w-xs leading-relaxed">Здесь будут отображаться чаты по заказам и обращениям клиентов.</span></div>`;
+                    }
+                }
+            }
+        } else {
+            const [ordersRes, leadsRes] = await Promise.all([
+                fetch('/api/orders/my', { headers: { 'Authorization': 'Bearer ' + token } }),
+                fetch('/api/leads/my', { headers: { 'Authorization': 'Bearer ' + token } })
+            ]);
+            let orders = [];
+            let leads = [];
+            if (ordersRes.ok) orders = await ordersRes.json();
+            if (leadsRes.ok) leads = await leadsRes.json();
+
+            const orderTopics = orders.map(o => ({
+                id: o.id,
+                type: 'order',
+                title: `📦 Заказ #${o.id} — ${Number(o.total || 0).toLocaleString()} ₽`,
+                created_at: o.created_at,
+                messages: o.messages || []
+            }));
+            const leadTopics = leads.map(l => ({
+                id: l.id,
+                type: 'lead',
+                title: `✉️ Обращение #${l.id} — ${l.type || 'Вопрос'}`,
+                created_at: l.created_at,
+                messages: l.messages || []
+            }));
+
+            window.globalChatTopics = [...orderTopics, ...leadTopics].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const select = document.getElementById('globalChatTopicSelect');
+            if (select) {
+                if (window.globalChatTopics.length > 0) {
+                    select.innerHTML = window.globalChatTopics.map(t => `<option value="${t.type}_${t.id}">${t.title} (${new Date(t.created_at).toLocaleDateString('ru-RU')})</option>`).join('');
+                    window.selectGlobalChatTopicGlobal(window.globalChatTopics[0].type + '_' + window.globalChatTopics[0].id);
+                } else {
+                    select.innerHTML = `<option value="">У вас пока нет активных диалогов</option>`;
+                    const container = document.getElementById('globalChatMessagesContainer');
+                    if (container) container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-on-surface-variant opacity-40 text-center p-6"><span class="material-symbols-outlined text-4xl mb-3 opacity-50">forum</span><span class="text-sm font-bold uppercase tracking-widest font-['Space Grotesk'] text-on-surface">Нет активных диалогов</span><span class="text-xs opacity-70 mt-1 max-w-xs leading-relaxed">Создайте обращение или оформите заказ, чтобы начать чат.</span></div>`;
+                }
+            }
+        }
+    } catch(e) { console.warn('Global chat load error:', e); }
+
+    const input = document.getElementById('globalChatInput');
+    if (input) input.onkeydown = (e) => { if (e.key === 'Enter') window.sendGlobalChatMessageGlobal(); };
+};
+
+window.closeGlobalChatDrawerGlobal = function() {
+    if (window.globalChatActiveChannel) {
+        if (window.supabaseClientGlobal) window.supabaseClientGlobal.removeChannel(window.globalChatActiveChannel);
+        window.globalChatActiveChannel = null;
+    }
+    const modal = document.getElementById('globalChatDrawerModal');
+    if (!modal) return;
+    const panel = modal.querySelector('#globalChatModalPanel');
+    const overlay = modal.querySelector('.absolute');
+    if(overlay) overlay.classList.add('opacity-0');
+    if(panel) panel.classList.replace('modal-animate-in', 'modal-animate-out');
+    setTimeout(() => { modal.remove(); document.body.style.overflow = ''; }, 500);
+};
+
+window.selectGlobalChatTopicGlobal = function(val) {
+    if (!val) return;
+    const [type, id] = val.split('_');
+    window.globalChatSelectedTopic = { type, id };
+    const topic = (window.globalChatTopics || []).find(t => t.type === type && String(t.id) === String(id));
+    if (!topic) return;
+
+    let messages = [];
+    try {
+        if (typeof topic.messages === 'string') messages = JSON.parse(topic.messages);
+        else if (Array.isArray(topic.messages)) messages = topic.messages;
+    } catch(e){}
+    window.globalChatActiveMessages = messages;
+
+    window.renderGlobalChatMessagesGlobal();
+
+    if (!window.supabaseClientGlobal) {
+        const SUPABASE_URL = 'https://drbknuvnsyonmeudoleo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyYmtudXZuc3lvbm1ldWRvbGVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTA4MTYsImV4cCI6MjA5NDE4NjgxNn0.gEBVSWAOGZGB7IIVsVIs3MSO2UjZlG6UzTdOEK0grOc';
+        window.supabaseClientGlobal = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { realtime: { params: { eventsPerSecond: 10 } } });
+        const token = localStorage.getItem('metal_token');
+        if (token) window.supabaseClientGlobal.realtime.setAuth(token);
+    }
+
+    if (window.globalChatActiveChannel) {
+        window.supabaseClientGlobal.removeChannel(window.globalChatActiveChannel);
+        window.globalChatActiveChannel = null;
+    }
+
+    const tableName = type === 'order' ? 'orders' : 'leads';
+    const channelName = `global-${type}-chat-${id}`;
+
+    window.globalChatActiveChannel = window.supabaseClientGlobal
+        .channel(channelName)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: tableName, filter: `id=eq.${id}` }, (payload) => {
+            const newMessages = payload.new.messages;
+            if (!newMessages) return;
+            let updated = [];
+            try { updated = typeof newMessages === 'string' ? JSON.parse(newMessages) : newMessages; } catch(e){ return; }
+            if (updated.length > window.globalChatActiveMessages.length) {
+                window.globalChatActiveMessages = updated;
+                const idx = window.globalChatTopics.findIndex(t => t.type === type && String(t.id) === String(id));
+                if (idx !== -1) window.globalChatTopics[idx].messages = updated;
+                window.renderGlobalChatMessagesGlobal();
+            }
+        }).subscribe();
+};
+
+window.renderGlobalChatMessagesGlobal = function() {
+    const chatBox = document.getElementById('globalChatMessagesContainer');
+    if (!chatBox) return;
+    const messages = window.globalChatActiveMessages || [];
+    const isAdmin = window.location.pathname.includes('/admin') || window.location.pathname.includes('admin.html');
+
+    if (!messages.length) {
+        chatBox.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-full text-on-surface-variant opacity-40 text-center p-6 animate-in fade-in duration-300">
+                <span class="material-symbols-outlined text-4xl mb-3 opacity-50">forum</span>
+                <span class="text-sm font-bold uppercase tracking-widest font-['Space Grotesk'] text-on-surface">${isAdmin ? 'Чат с клиентом' : 'Чат с менеджером'}</span>
+                <span class="text-xs opacity-70 mt-1 max-w-xs leading-relaxed">Здесь будет сохраняться вся история переписки. Напишите первое сообщение ниже.</span>
+            </div>
+        `;
+        return;
+    }
+
+    chatBox.innerHTML = messages.map(m => {
+        const isMe = isAdmin ? m.sender === 'admin' : m.sender === 'client';
+        const senderLabel = isMe ? 'Вы' : (isAdmin ? 'Клиент' : 'Менеджер');
+        const timeStr = new Date(m.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = new Date(m.timestamp).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' });
+
+        if (isMe) {
+            return `
+                <div class="flex flex-col items-end mb-4 animate-in fade-in duration-300">
+                    <div class="flex items-end gap-2 max-w-[85%] md:max-w-[75%]">
+                        <div class="px-5 py-3 rounded-3xl text-sm bg-primary text-on-primary rounded-br-none shadow-md font-medium leading-relaxed break-words">
+                            ${m.text}
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-on-surface-variant opacity-50 font-mono mt-1.5 flex items-center gap-1 mr-1">
+                        <span class="material-symbols-outlined text-[12px] text-primary">done_all</span>
+                        ${senderLabel} • ${dateStr} ${timeStr}
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="flex flex-col items-start mb-4 animate-in fade-in duration-300">
+                    <div class="flex items-end gap-2 max-w-[85%] md:max-w-[75%]">
+                        <div class="px-5 py-3 rounded-3xl text-sm bg-surface-container-high border border-outline-variant/30 text-on-surface rounded-bl-none shadow-md leading-relaxed break-words">
+                            ${m.text}
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-primary/80 font-mono mt-1.5 flex items-center gap-1 ml-1">
+                        <span class="material-symbols-outlined text-[12px]">${isAdmin ? 'person' : 'support_agent'}</span>
+                        ${senderLabel} • ${dateStr} ${timeStr}
+                    </div>
+                </div>
+            `;
+        }
+    }).join('');
+    chatBox.scrollTop = chatBox.scrollHeight;
+};
+
+window.sendGlobalChatMessageGlobal = async function() {
+    const input = document.getElementById('globalChatInput');
+    const text = input ? input.value.trim() : '';
+    if (!text || !window.globalChatSelectedTopic) return;
+
+    const isAdmin = window.location.pathname.includes('/admin') || window.location.pathname.includes('admin.html');
+    const sender = isAdmin ? 'admin' : 'client';
+    const newMsg = { sender, text, timestamp: new Date().toISOString() };
+    
+    window.globalChatActiveMessages.push(newMsg);
+    input.value = '';
+    window.renderGlobalChatMessagesGlobal();
+
+    const { type, id } = window.globalChatSelectedTopic;
+    const idx = window.globalChatTopics.findIndex(t => t.type === type && String(t.id) === String(id));
+    if (idx !== -1) window.globalChatTopics[idx].messages = window.globalChatActiveMessages;
+
+    try {
+        const token = localStorage.getItem('metal_token');
+        let endpoint = '';
+        if (isAdmin) {
+            endpoint = type === 'order' ? `/api/admin/orders/${id}` : `/api/admin/leads/${id}`;
+        } else {
+            endpoint = type === 'order' ? `/api/orders/my/${id}` : `/api/leads/my/${id}`;
+        }
+
+        const res = await fetch(endpoint, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: window.globalChatActiveMessages })
+        });
+        if (!res.ok) {
+            window.globalChatActiveMessages.pop();
+            window.renderGlobalChatMessagesGlobal();
+        }
+    } catch(e) {
+        window.globalChatActiveMessages.pop();
+        window.renderGlobalChatMessagesGlobal();
+    }
+};
+

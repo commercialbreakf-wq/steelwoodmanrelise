@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="dark" lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Вес арматуры: Таблица размеров и характеристик ГОСТ | Железный Дровосек</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="/js/shared-ui.js?v=3"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "outline-variant": "#534347",
+                    "surface-container-lowest": "#0f0e0c",
+                    "on-surface-variant": "#d7c1c7",
+                    "surface-tint": "#ffb0cc",
+                    "on-surface": "#e7e2dd",
+                    "surface-container-low": "#1d1b19",
+                    "primary": "#ffb0cc",
+                    "secondary": "#ffb1c0",
+                    "surface": "#151311",
+                    "background": "#151311",
+            },
+            "fontFamily": {
+                    "body": ["Inter", "sans-serif"],
+                    "display": ["Space Grotesk", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+      .glass-card { background: rgba(21, 19, 17, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(231, 226, 221, 0.05); }
+      .pink-slide {
+        position: relative; overflow: hidden; z-index: 1;
+      }
+      .pink-slide::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+        background: #ffb0cc; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1;
+      }
+      .pink-slide:hover::after { transform: translateX(100%); }
+      
+      .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+      .table-container::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+      .table-container::-webkit-scrollbar-thumb { background: #ffb0cc; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-surface">
+    <!-- Shared Header -->
+    <main class="min-h-screen flex flex-col pt-24">
+        
+        <section class="px-6 md:px-16 py-8 md:py-12 max-w-7xl mx-auto w-full">
+            <!-- Breadcrumbs -->
+            <nav class="flex items-center gap-2 text-xs font-display font-bold tracking-widest text-on-surface-variant uppercase mb-8">
+                <a href="/spravka.html" class="hover:text-primary transition-colors">Справочник</a>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                <span class="text-primary">Арматура</span>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                
+                <!-- Content Sidebar -->
+                <div class="lg:col-span-4 space-y-8 order-2 lg:order-1">
+                    <div class="glass-card p-8 rounded-3xl border-primary/20 bg-primary/5">
+                        <h1 class="text-3xl md:text-5xl font-display font-bold uppercase leading-tight mb-6">АРМАТУРА<br/><span class="text-primary">СТАЛЬНАЯ</span></h1>
+                        <p class="text-on-surface-variant text-sm leading-relaxed mb-8">
+                            Справочная таблица теоретического веса арматуры А1 (гладкая) и А3 (рифленая) согласно ГОСТ 5781-82 и ГОСТ 34028-2016.
+                        </p>
+                        
+                        <!-- SVG Profile Drawing -->
+                        <div class="aspect-square bg-surface border border-white/5 rounded-2xl flex items-center justify-center p-8 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
+                            <svg class="w-full h-full text-primary opacity-80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="50" r="35" stroke="currentColor" stroke-width="0.5" stroke-dasharray="4 4"/>
+                                <circle cx="50" cy="50" r="30" stroke="currentColor" stroke-width="2"/>
+                                <path d="M50 20V15" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M50 85V80" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M20 50H15" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M85 50H80" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M28 28L24 24" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M72 72L76 76" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M28 72L24 76" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M72 28L76 24" stroke="currentColor" stroke-width="1.5"/>
+                                <text x="50" y="55" text-anchor="middle" fill="currentColor" font-size="8" font-family="Space Grotesk" font-weight="bold">d</text>
+                            </svg>
+                            <span class="absolute bottom-4 right-4 text-[10px] font-display font-bold tracking-widest text-primary uppercase opacity-40">Профиль А3</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 border-white/5 space-y-4">
+                        <h4 class="font-display font-bold text-xs tracking-widest uppercase text-primary">Полезные ссылки</h4>
+                        <ul class="space-y-2">
+                            <li><a href="/catalog/?pcat=Черный металлопрокат&cat=Арматура" class="text-sm text-on-surface hover:text-primary flex items-center justify-between group">Купить арматуру <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span></a></li>
+                            <li><a href="/calculator/" class="text-sm text-on-surface hover:text-primary flex items-center justify-between group">Калькулятор веса <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">calculate</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Main Data Table -->
+                <div class="lg:col-span-8 order-1 lg:order-2">
+                    <div class="glass-card overflow-hidden rounded-3xl border-white/10">
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-white/5 border-b border-white/10">
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Диаметр (d), мм</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Вес 1 м.п., кг</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Метров в тонне</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Сечение, см²</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    <!-- Rows -->
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">6</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">0.222</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">4504.5</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">0.283</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">8</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">0.395</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">2531.6</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">0.503</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">10</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">0.617</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">1620.7</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">0.785</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">12</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">0.888</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">1126.1</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">1.131</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">14</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">1.210</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">826.4</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">1.540</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">16</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">1.580</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">632.9</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">2.010</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">18</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">2.000</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">500.0</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">2.540</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">20</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">2.470</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">404.9</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">3.140</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">22</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">2.980</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">335.6</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">3.800</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">25</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">3.850</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">259.7</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">4.910</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">28</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">4.830</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">207.0</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">6.160</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">32</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">6.310</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">158.5</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">8.040</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">36</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">7.990</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">125.2</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">10.18</td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group">
+                                        <td class="p-6 font-display font-bold text-xl group-hover:text-primary transition-colors">40</td>
+                                        <td class="p-6 text-on-surface-variant font-mono">9.870</td>
+                                        <td class="p-6 text-on-surface-variant font-mono text-sm">101.3</td>
+                                        <td class="p-6 text-on-surface-variant/50 font-mono text-xs">12.57</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Shared Footer -->
+    <footer id="globalFooter"></footer>
+</body>
+</html>
