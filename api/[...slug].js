@@ -26,6 +26,145 @@ if (!supabaseAnonKey) {
 const supabase = createClient(supabaseUrl || 'http://placeholder', supabaseServiceKey || 'placeholder');
 const supabaseAuth = createClient(supabaseUrl || 'http://placeholder', supabaseAnonKey || 'placeholder');
 
+// --- In-Memory Blazing-Fast Database Engine & Caching ---
+let allProductsInMemory = [];
+let allUsersInMemory = [];
+let allOrdersInMemory = [];
+let allLeadsInMemory = [];
+
+let isProductsWarming = false;
+let isUsersWarming = false;
+let isOrdersWarming = false;
+let isLeadsWarming = false;
+
+async function warmProducts() {
+  if (isProductsWarming) return;
+  isProductsWarming = true;
+  try {
+    const { data, error } = await supabase.from('products').select('*');
+    if (!error && data) {
+      allProductsInMemory = data;
+      console.log(`[CACHE] Successfully warmed ${allProductsInMemory.length} products in memory.`);
+    } else if (error) {
+      console.error('[CACHE] Error loading products into memory:', error.message);
+    }
+  } catch (e) {
+    console.error('[CACHE] Products warming failed:', e.message);
+  } finally {
+    isProductsWarming = false;
+  }
+}
+
+async function invalidateProductCache(productIds) {
+  if (!productIds || productIds.length === 0) return;
+  console.log(`[CACHE] Granularly invalidating ${productIds.length} products...`);
+  try {
+    const { data, error } = await supabase.from('products').select('*').in('id', productIds);
+    if (!error && data) {
+      data.forEach(updatedProduct => {
+        const idx = allProductsInMemory.findIndex(p => String(p.id) === String(updatedProduct.id));
+        if (idx !== -1) {
+          allProductsInMemory[idx] = updatedProduct;
+        } else {
+          allProductsInMemory.unshift(updatedProduct);
+        }
+      });
+      console.log(`[CACHE] Granularly updated ${data.length} products in memory.`);
+    }
+  } catch (e) {
+    console.error('[CACHE] Granular invalidation failed:', e.message);
+  }
+}
+
+async function warmUsers() {
+  if (isUsersWarming) return;
+  isUsersWarming = true;
+  try {
+    const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      allUsersInMemory = data;
+      console.log(`[CACHE] Successfully warmed ${allUsersInMemory.length} users in memory.`);
+    } else if (error) {
+      console.error('[CACHE] Error loading users into memory:', error.message);
+    }
+  } catch (e) {
+    console.error('[CACHE] Users warming failed:', e.message);
+  } finally {
+    isUsersWarming = false;
+  }
+}
+
+async function warmOrders() {
+  if (isOrdersWarming) return;
+  isOrdersWarming = true;
+  try {
+    const { data, error } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
+    if (!error && data) {
+      allOrdersInMemory = data;
+      console.log(`[CACHE] Successfully warmed ${allOrdersInMemory.length} orders in memory.`);
+    } else if (error) {
+      console.error('[CACHE] Error loading orders into memory:', error.message);
+    }
+  } catch (e) {
+    console.error('[CACHE] Orders warming failed:', e.message);
+  } finally {
+    isOrdersWarming = false;
+  }
+}
+
+async function warmLeads() {
+  if (isLeadsWarming) return;
+  isLeadsWarming = true;
+  try {
+    const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      allLeadsInMemory = data;
+      console.log(`[CACHE] Successfully warmed ${allLeadsInMemory.length} leads in memory.`);
+    } else if (error) {
+      console.error('[CACHE] Error loading leads into memory:', error.message);
+    }
+  } catch (e) {
+    console.error('[CACHE] Leads warming failed:', e.message);
+  } finally {
+    isLeadsWarming = false;
+  }
+}
+
+function clearProductsCache() {
+  console.log('[CACHE] Triggering immediate proactive Products refresh...');
+  warmProducts();
+}
+
+function clearUsersCache() {
+  console.log('[CACHE] Triggering immediate proactive Users refresh...');
+  warmUsers();
+}
+
+function clearOrdersCache() {
+  console.log('[CACHE] Triggering immediate proactive Orders refresh...');
+  warmOrders();
+}
+
+function clearLeadsCache() {
+  console.log('[CACHE] Triggering immediate proactive Leads refresh...');
+  warmLeads();
+}
+
+// Proactive warm up on startup
+async function warmupAllCaches() {
+  console.log('[CACHE] Initializing proactive database warming...');
+  await Promise.all([
+    warmProducts(),
+    warmUsers(),
+    warmOrders(),
+    warmLeads()
+  ]);
+  console.log('[CACHE] Proactive warming completed successfully!');
+}
+
+warmupAllCaches().catch(e => console.error('[CACHE] Startup warmup failed:', e.message));
+
+
 const PROFILE_FIELDS = [
   'name', 'phone', 'company_name', 'inn', 'kpp',
   'legal_address', 'actual_address', 'position'
@@ -141,7 +280,8 @@ const authenticateAdmin = async (req, res, next) => {
 };
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use((req, res, next) => {
   console.log(`[REQ] ${req.method} ${req.url}`);
@@ -171,14 +311,18 @@ const router = express.Router();
 
 // Products Management
 router.get('/admin/products', authenticateAdmin, async (req, res) => {
-  const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  if (allProductsInMemory.length === 0) {
+    await warmProducts();
+  }
+  console.log(`[CACHE] Serving ${allProductsInMemory.length} admin products from memory.`);
+  res.json(allProductsInMemory);
 });
 
 router.post('/admin/products', authenticateAdmin, async (req, res) => {
   const { data, error } = await supabase.from('products').insert([req.body]).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  allProductsInMemory.unshift(data);
+  warmProducts();
   res.json(data);
 });
 
@@ -186,6 +330,13 @@ router.put('/admin/products/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { data, error } = await supabase.from('products').update(req.body).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  const idx = allProductsInMemory.findIndex(p => String(p.id) === String(id));
+  if (idx !== -1) {
+    allProductsInMemory[idx] = { ...allProductsInMemory[idx], ...data };
+  } else {
+    allProductsInMemory.unshift(data);
+  }
+  warmProducts();
   res.json(data);
 });
 
@@ -193,28 +344,54 @@ router.delete('/admin/products/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { error } = await supabase.from('products').delete().eq('id', id);
   if (error) return res.status(500).json({ error: error.message });
+  allProductsInMemory = allProductsInMemory.filter(p => String(p.id) !== String(id));
+  warmProducts();
   res.json({ success: true });
 });
 
 // Users Management
 router.get('/admin/users', authenticateAdmin, async (req, res) => {
-  const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  if (allUsersInMemory.length === 0) {
+    await warmUsers();
+  }
+  console.log(`[CACHE] Serving ${allUsersInMemory.length} admin users from memory.`);
+  res.json(allUsersInMemory);
 });
 
 router.put('/admin/users/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { data, error } = await supabase.from('users').update(req.body).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  const idx = allUsersInMemory.findIndex(u => String(u.id) === String(id));
+  if (idx !== -1) {
+    allUsersInMemory[idx] = { ...allUsersInMemory[idx], ...data };
+  }
+  warmUsers();
   res.json(data);
+});
+
+router.delete('/admin/users/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  
+  // Set user_id reference to null in any of their orders to satisfy the foreign key constraint
+  const { error: ordersError } = await supabase.from('orders').update({ user_id: null }).eq('user_id', id);
+  if (ordersError) return res.status(500).json({ error: ordersError.message });
+
+  const { error } = await supabase.from('users').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  
+  allUsersInMemory = allUsersInMemory.filter(u => String(u.id) !== String(id));
+  warmUsers();
+  res.json({ success: true });
 });
 
 // Orders Management
 router.get('/admin/orders', authenticateAdmin, async (req, res) => {
-  const { data, error } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  if (allOrdersInMemory.length === 0) {
+    await warmOrders();
+  }
+  console.log(`[CACHE] Serving ${allOrdersInMemory.length} admin orders from memory.`);
+  res.json(allOrdersInMemory);
 });
 
 router.put('/admin/orders/:id', authenticateAdmin, async (req, res) => {
@@ -222,14 +399,37 @@ router.put('/admin/orders/:id', authenticateAdmin, async (req, res) => {
   const { status } = req.body;
   const { data, error } = await supabase.from('orders').update({ status }).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  const idx = allOrdersInMemory.findIndex(o => String(o.id) === String(id));
+  if (idx !== -1) {
+    allOrdersInMemory[idx] = { ...allOrdersInMemory[idx], ...data };
+  }
+  warmOrders();
   res.json(data);
+});
+
+router.delete('/admin/orders/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  
+  // First delete referencing order_items rows
+  const { error: itemsError } = await supabase.from('order_items').delete().eq('order_id', id);
+  if (itemsError) return res.status(500).json({ error: itemsError.message });
+
+  // Then delete the order itself
+  const { error } = await supabase.from('orders').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+
+  allOrdersInMemory = allOrdersInMemory.filter(o => String(o.id) !== String(id));
+  warmOrders();
+  res.json({ success: true });
 });
 
 // Leads Management
 router.get('/admin/leads', authenticateAdmin, async (req, res) => {
-  const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data);
+  if (allLeadsInMemory.length === 0) {
+    await warmLeads();
+  }
+  console.log(`[CACHE] Serving ${allLeadsInMemory.length} admin leads from memory.`);
+  res.json(allLeadsInMemory);
 });
 
 router.put('/admin/leads/:id', authenticateAdmin, async (req, res) => {
@@ -237,8 +437,23 @@ router.put('/admin/leads/:id', authenticateAdmin, async (req, res) => {
   const { status } = req.body;
   const { data, error } = await supabase.from('leads').update({ status }).eq('id', id).select().single();
   if (error) return res.status(500).json({ error: error.message });
+  const idx = allLeadsInMemory.findIndex(l => String(l.id) === String(id));
+  if (idx !== -1) {
+    allLeadsInMemory[idx] = { ...allLeadsInMemory[idx], ...data };
+  }
+  warmLeads();
   res.json(data);
 });
+
+router.delete('/admin/leads/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { error } = await supabase.from('leads').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  allLeadsInMemory = allLeadsInMemory.filter(l => String(l.id) !== String(id));
+  warmLeads();
+  res.json({ success: true });
+});
+
 
 // --- PUBLIC API ---
 router.get('/health', async (req, res) => {
@@ -264,10 +479,11 @@ router.get('/health', async (req, res) => {
 
 // API: Get filters
 router.get('/filters', async (req, res) => {
-  const { data, error } = await supabase.from('products').select('parent_category, category');
-  if (error) return res.status(500).json({ error: error.message });
-  
-  const counts = data.reduce((acc, r) => {
+  if (allProductsInMemory.length === 0) {
+    await warmProducts();
+  }
+
+  const counts = allProductsInMemory.reduce((acc, r) => {
     const key = `${r.parent_category}|${r.category}`;
     acc[key] = (acc[key] || 0) + 1;
     return acc;
@@ -287,42 +503,75 @@ router.get('/filters', async (req, res) => {
     }, {}),
     totalCount: rows.reduce((sum, r) => sum + r.count, 0)
   };
+
   res.json(filters);
 });
 
-// API: Get products
+// API: Get products (Completely in-memory for sub-millisecond loads!)
 router.get('/products', async (req, res) => {
   const { category, parent_category, search, vid, length, width, page = 1, limit = 12 } = req.query;
-  
-  let query = supabase.from('products').select('*', { count: 'exact' });
 
-  if (category) query = query.in('category', category.split(','));
-  if (parent_category) query = query.in('parent_category', parent_category.split(','));
-  if (vid) query = query.in('vid', vid.split(','));
-  if (length) query = query.in('length', length.split(','));
-  if (width) query = query.in('width', width.split(','));
-  
-  if (search) {
-    query = query.or(`name.ilike.%${search}%,category.ilike.%${search}%,parent_category.ilike.%${search}%`);
+  if (allProductsInMemory.length === 0) {
+    await warmProducts();
   }
 
-  // Pagination logic with robust NaN handling
+  let list = [...allProductsInMemory];
+
+  // Apply filters in-memory
+  if (category) {
+    const cats = category.split(',').map(c => c.trim().toLowerCase());
+    list = list.filter(p => p.category && cats.some(c => p.category.toLowerCase().includes(c)));
+  }
+  if (parent_category) {
+    const parents = parent_category.split(',').map(p => p.trim().toLowerCase());
+    list = list.filter(p => p.parent_category && parents.some(pr => p.parent_category.toLowerCase().includes(pr)));
+  }
+  if (vid) {
+    const vids = vid.split(',').map(v => v.trim().toLowerCase());
+    list = list.filter(p => p.vid && vids.some(v => p.vid.toLowerCase().includes(v)));
+  }
+  if (length) {
+    const lengths = length.split(',').map(l => l.trim().toLowerCase());
+    list = list.filter(p => p.length && lengths.some(l => p.length.toString().toLowerCase().includes(l)));
+  }
+  if (width) {
+    const widths = width.split(',').map(w => w.trim().toLowerCase());
+    list = list.filter(p => p.width && widths.some(w => p.width.toString().toLowerCase().includes(w)));
+  }
+  
+  if (search) {
+    const q = search.toLowerCase().trim();
+    list = list.filter(p => 
+      (p.name && p.name.toLowerCase().includes(q)) ||
+      (p.category && p.category.toLowerCase().includes(q)) ||
+      (p.parent_category && p.parent_category.toLowerCase().includes(q)) ||
+      (p.description && p.description.toLowerCase().includes(q))
+    );
+  }
+
+  // Sort by category ascending, name ascending to match Postgres order
+  list.sort((a, b) => {
+    const catA = (a.category || '').toLowerCase();
+    const catB = (b.category || '').toLowerCase();
+    if (catA < catB) return -1;
+    if (catA > catB) return 1;
+    
+    const nameA = (a.name || '').toLowerCase();
+    const nameB = (b.name || '').toLowerCase();
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
+  });
+
+  const count = list.length;
   const safePage = Math.max(1, parseInt(page) || 1);
   const safeLimit = Math.max(1, Math.min(100, parseInt(limit) || 12));
   const start = (safePage - 1) * safeLimit;
-  const end = start + safeLimit - 1;
+  const end = start + safeLimit;
+  const paginatedList = list.slice(start, end);
 
-  console.log(`[API] Products list fetch. Page: ${safePage}, Limit: ${safeLimit}, Filters:`, { category, parent_category, search });
-  
-  const { data, count, error } = await query
-    .order('category', { ascending: true })
-    .order('name', { ascending: true })
-    .range(start, end);
-
-  if (error) return res.status(500).json({ error: error.message });
-
-  res.json({
-    products: data.map(row => ({
+  const responseData = {
+    products: paginatedList.map(row => ({
       ...row,
       parentCategory: row.parent_category,
       priceTon: row.price_ton ? row.price_ton.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
@@ -338,11 +587,13 @@ router.get('/products', async (req, res) => {
     })),
     pagination: {
       total: count,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(count / parseInt(limit))
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(count / safeLimit)
     }
-  });
+  };
+
+  res.json(responseData);
 });
 
 // API: Single Product
@@ -350,46 +601,50 @@ router.get('/products/:id', async (req, res) => {
   const { id } = req.params;
   console.log(`[API] Fetching product with ID: "${id}"`);
   
-  // Try fetching by ID (integer or UUID string)
-  let query = supabase.from('products').select('*');
-  
-  query = query.or(`id.eq."${id}",name.eq."${id}"`);
-  
-  const { data, error } = await query.single();
+  if (allProductsInMemory.length === 0) {
+    await warmProducts();
+  }
 
-  if (error) {
-    console.error(`[API] Product fetch error for ID ${id}:`, error.message);
+  const idLower = id.toLowerCase();
+  const p = allProductsInMemory.find(x => 
+    x.id.toString() === id || 
+    x.id.toString().toLowerCase() === idLower || 
+    (x.name && x.name.toLowerCase() === idLower)
+  );
+
+  if (!p) {
     return res.status(404).json({ 
       error: 'Product not found', 
-      details: error.message,
       requested_id: id 
     });
   }
 
-  console.log(`[API] Successfully found product: ${data.name}`);
-
   res.json({
-    ...data,
-    specs: typeof data.specs === 'string' ? JSON.parse(data.specs) : (data.specs || [])
+    ...p,
+    specs: typeof p.specs === 'string' ? JSON.parse(p.specs) : (p.specs || [])
   });
 });
 
 // API: Category filters
 router.get('/category-filters', async (req, res) => {
   const { category } = req.query;
-  const { data, error } = await supabase
-    .from('products')
-    .select('vid, length, width, type')
-    .ilike('category', `${category}%`);
+  if (!category) return res.status(400).json({ error: 'Укажите категорию' });
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (allProductsInMemory.length === 0) {
+    await warmProducts();
+  }
 
-  res.json({
-    vids: [...new Set(data.map(r => r.vid))].filter(Boolean).sort(),
-    lengths: [...new Set(data.map(r => r.length))].filter(l => l && l !== 'Немерная').sort(),
-    widths: [...new Set(data.map(r => r.width))].filter(w => w && w !== 'Стандарт').sort(),
-    types: [...new Set(data.map(r => r.type))].filter(Boolean).sort()
-  });
+  const categoryLower = category.toLowerCase();
+  const matched = allProductsInMemory.filter(p => p.category && p.category.toLowerCase().startsWith(categoryLower));
+
+  const result = {
+    vids: [...new Set(matched.map(r => r.vid))].filter(Boolean).sort(),
+    lengths: [...new Set(matched.map(r => r.length))].filter(l => l && l !== 'Немерная').sort(),
+    widths: [...new Set(matched.map(r => r.width))].filter(w => w && w !== 'Стандарт').sort(),
+    types: [...new Set(matched.map(r => r.type))].filter(Boolean).sort()
+  };
+
+  res.json(result);
 });
 
 // API: Auth - Login (Supabase Auth)
@@ -668,6 +923,7 @@ router.post('/orders', async (req, res) => {
     html: `<h2>Заказ #${order.id}</h2><p>Клиент: ${name}</p><ul>${itemsHtml}</ul>`
   }).catch(e => console.error(e));
 
+  clearOrdersCache();
   res.json({ id: order.id, message: 'Order created' });
 });
 
@@ -709,6 +965,7 @@ router.post('/leads', async (req, res) => {
     html: `<p>Имя: ${name}</p><p>Телефон: ${phone}</p><p>Email: ${email}</p><p>Сообщение: ${message}</p>`
   }).catch(e => console.error(e));
 
+  clearLeadsCache();
   res.json({ success: true });
 });
 
