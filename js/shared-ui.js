@@ -2,6 +2,26 @@
  * PREMIUM PRELOADER SYSTEM
  * Injected immediately to ensure early visibility for Iron Woodman High-Tech Site
  */
+
+// --- GLOBAL API REWRITE INTERCEPTOR FOR VERCEL PRODUCTION BACKEND ---
+(function() {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost) {
+        const originalFetch = window.fetch;
+        window.fetch = function(input, init) {
+            if (typeof input === 'string' && input.startsWith('/api/')) {
+                input = 'https://steelwoodman-relise.vercel.app' + input;
+            } else if (input instanceof URL && input.pathname.startsWith('/api/')) {
+                input = new URL(input.pathname, 'https://steelwoodman-relise.vercel.app');
+            } else if (input && typeof input === 'object' && typeof input.url === 'string' && input.url.startsWith('/api/')) {
+                const url = 'https://steelwoodman-relise.vercel.app' + input.url;
+                input = new Request(url, input);
+            }
+            return originalFetch(input, init);
+        };
+    }
+})();
+
 window.maskPhoneGlobal = function(input) {
     let val = input.value.replace(/\D/g, '');
     if (val.startsWith('7')) val = val.substring(1);
@@ -904,7 +924,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <button onclick="switchAuthGlobal('forgot')" class="text-on-surface-variant hover:text-primary text-[10px] font-label-caps uppercase transition-colors tracking-wider">ЗАБЫЛИ ПАРОЛЬ?</button>
                         </div>
                         <div id="loginErrorMsgGlobal" class="text-error text-[11px] font-label-caps mt-[-16px] mb-4 hidden uppercase tracking-wider"></div>
-                        <button onclick="handleLoginGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">ВОЙТИ</button>
+                        <button onclick="handleLoginGlobal(event)" class="w-full py-5 bg-primary text-on-primary font-label-caps text-label-caps tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">ВОЙТИ</button>
                         <div class="text-center">
                             <button onclick="switchAuthGlobal('register')" class="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-[12px] uppercase">НЕТ АККАУНТА? ЗАРЕГИСТРИРОВАТЬСЯ</button>
                         </div>
@@ -1062,9 +1082,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
                             <span class="text-sm text-on-surface-variant leading-relaxed opacity-80">ЛО, промзона Горелово, 6</span>
                         </div>
-                        <div class="flex gap-3">
-                            <span class="material-symbols-outlined text-primary text-[20px]">call</span>
-                            <a href="tel:+79930777717" class="text-sm text-on-surface hover:text-primary transition-colors no-underline">+7 (993) 077-77-17</a>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex gap-3">
+                                <span class="material-symbols-outlined text-primary text-[20px]">call</span>
+                                <div class="flex flex-col">
+                                    <a href="tel:+78129825320" class="text-sm text-on-surface hover:text-primary transition-colors no-underline font-bold">+7 (812) 982-53-20</a>
+                                    <span class="text-[10px] text-on-surface-variant uppercase tracking-widest opacity-60">Отдел продаж</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <span class="material-symbols-outlined text-primary text-[20px]">call</span>
+                                <div class="flex flex-col">
+                                    <a href="tel:+79930777717" class="text-sm text-on-surface hover:text-primary transition-colors no-underline font-bold">+7 (993) 077-77-17</a>
+                                    <span class="text-[10px] text-on-surface-variant uppercase tracking-widest opacity-60">Руководитель</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex gap-3">
                             <span class="material-symbols-outlined text-primary text-[20px]">mail</span>
@@ -1640,7 +1672,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
 
-    window.handleLoginGlobal = async function() {
+    window.handleLoginGlobal = async function(e) {
+        if (e && e.preventDefault) e.preventDefault();
         const email = document.getElementById('loginEmailGlobal').value;
         const password = document.getElementById('loginPassGlobal').value;
         const btn = document.querySelector('#loginFormGlobal button[onclick^="handleLoginGlobal"]');
