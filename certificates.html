@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="ru"><head>
+<html lang="ru"><head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
@@ -11,7 +17,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="/js/shared-ui.js?v=8"></script>
+<script src="/js/shared-ui.js?v=8" defer></script>
 <script src="/js/theme.js?v=1"></script>
 <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
@@ -39,7 +45,7 @@
     <!-- SCREEN 1: Hero & Stats -->
     <section id="hero" class="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden metal-grid-overlay scroll-mt-20">
         <div class="absolute inset-0 z-0">
-            <img alt="" class="w-full h-full object-cover opacity-40 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGB2aEMNQ9XYvV0hQ520-g95z1i0Jt2fIJEptfFnxt0OBIY35x8zH8ghK5xwqcvqFsFI44gO6-W4UrZ4e90lo2ZU9LnyBcsEIAG73q6EMm-MhF_r-EZLFzc_6OhtKeSSWS5Nn4E12Z9bNo016pqgTTG3m_yHlrvLjyZBbmpgq0GaX-WrQ3FXdomiXJwgzCizjh1RWiRUrXMXpra5PXKOCGZaNs0Czh7beBJ2Z-jDEvj5HZL9vxq5THX8VZUiV1A7iQAXMJO_mULL0"/>
+            <img fetchpriority="high" alt="" class="w-full h-full object-cover opacity-40 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGB2aEMNQ9XYvV0hQ520-g95z1i0Jt2fIJEptfFnxt0OBIY35x8zH8ghK5xwqcvqFsFI44gO6-W4UrZ4e90lo2ZU9LnyBcsEIAG73q6EMm-MhF_r-EZLFzc_6OhtKeSSWS5Nn4E12Z9bNo016pqgTTG3m_yHlrvLjyZBbmpgq0GaX-WrQ3FXdomiXJwgzCizjh1RWiRUrXMXpra5PXKOCGZaNs0Czh7beBJ2Z-jDEvj5HZL9vxq5THX8VZUiV1A7iQAXMJO_mULL0"/>
             <div class="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background"></div>
         </div>
         

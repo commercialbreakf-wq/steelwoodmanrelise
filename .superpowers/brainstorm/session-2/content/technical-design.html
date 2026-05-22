@@ -1,0 +1,76 @@
+<h2>Техническая архитектура и Потоки данных</h2>
+<p class="subtitle">Обеспечение "бесшовности" и надежности при массовых операциях</p>
+
+<div class="mockup">
+  <div class="mockup-header">Схема взаимодействия компонентов</div>
+  <div class="mockup-body" style="padding: 20px; background: #f8fafc;">
+    <div style="display: flex; justify-content: space-around; align-items: center; gap: 20px;">
+      
+      <!-- Client Side -->
+      <div style="flex: 1; border: 2px solid #2563eb; background: #fff; padding: 15px; border-radius: 8px; text-align: center;">
+        <div style="font-weight: bold; color: #2563eb; margin-bottom: 10px;">Frontend (Admin Panel)</div>
+        <div style="font-size: 12px; text-align: left; background: #eff6ff; padding: 10px; border-radius: 4px;">
+          ● <b>Local State:</b> Мгновенное обновление UI до ответа сервера<br>
+          ● <b>Bulk Dispatcher:</b> Пакетная отправка изменений<br>
+          ● <b>Side Drawer:</b> Изолированный редактор сущности
+        </div>
+      </div>
+
+      <div style="font-size: 24px; color: #94a3b8;">⇆</div>
+
+      <!-- Server Side -->
+      <div style="flex: 1; border: 2px solid #10b981; background: #fff; padding: 15px; border-radius: 8px; text-align: center;">
+        <div style="font-weight: bold; color: #10b981; margin-bottom: 10px;">Backend (Express + Supabase)</div>
+        <div style="font-size: 12px; text-align: left; background: #ecfdf5; padding: 10px; border-radius: 4px;">
+          ● <b>Atomic Updates:</b> Транзакционное изменение групп товаров<br>
+          ● <b>Cache Invalidation:</b> Точечное обновление In-Memory кэша<br>
+          ● <b>Import Engine:</b> Парсинг MD/Excel в фоновом режиме
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>Принято: реализуем полный набор инструментов</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Что это даст администратору:</h4>
+      <ul>
+        <li><b>Мгновенность:</b> Цена изменилась в таблице? Она уже в базе и в кэше.</li>
+        <li><b>Безопасность:</b> Отмена действий (Undo) для массовых правок.</li>
+        <li><b>Автоматизация:</b> Загрузили новый прайс — система подсветила изменения перед сохранением.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 20px;">
+  <h3>Вопрос №3: Как должна работать синхронизация из прайс-листа (Markdown/Excel)?</h3>
+  <p class="subtitle">Выберите наиболее подходящий сценарий "бесшовности"</p>
+  
+  <div class="options">
+    <div class="option" data-choice="semi-auto" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Полуавтомат (Рекомендуется)</h3>
+        <p>Вы загружаете файл, система показывает список: "10 цен изменилось, 2 новых товара". Вы нажимаете "Применить".</p>
+      </div>
+    </div>
+    <div class="option" data-choice="auto" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>Полный автомат</h3>
+        <p>Загрузили — база обновилась мгновенно. Максимальная скорость, но меньше контроля над ошибками в файле.</p>
+      </div>
+    </div>
+    <div class="option" data-choice="merge" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content">
+        <h3>Интеллектуальное слияние</h3>
+        <p>Система обновляет только цены и наличие, не трогая вручную отредактированные описания и фото в админке.</p>
+      </div>
+    </div>
+  </div>
+</div>

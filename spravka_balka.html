@@ -1,41 +1,25 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
+<link rel="apple-touch-icon" href="/images/favicon.svg?v=4">
+<link rel="mask-icon" href="/images/favicon.svg?v=4" color="#ffb0cc">
     <title>Вес балки (двутавра): Таблица ГОСТ | Железный Дровосек</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <script src="/js/shared-ui.js?v=3"></script>
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "error": "#ffb4ab",
-                    "outline-variant": "#534347",
-                    "surface-container-lowest": "#0f0e0c",
-                    "on-surface-variant": "#d7c1c7",
-                    "surface-tint": "#ffb0cc",
-                    "on-surface": "#e7e2dd",
-                    "surface-container-low": "#1d1b19",
-                    "primary": "#ffb0cc",
-                    "secondary": "#ffb1c0",
-                    "surface": "#151311",
-                    "background": "#151311",
-            },
-            "fontFamily": {
-                    "body": ["Inter", "sans-serif"],
-                    "display": ["Space Grotesk", "sans-serif"]
-            }
-          }
-        }
-      }
-    </script>
+    <script src="/js/shared-ui.js?v=8" defer></script>
+    <script src="/js/theme.js?v=1"></script>
     <style>
       .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
       .glass-card { background: rgba(21, 19, 17, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(231, 226, 221, 0.05); }
@@ -55,7 +39,7 @@
     <main class="min-h-screen flex flex-col pt-24">
         <section class="px-6 md:px-16 py-8 md:py-12 max-w-7xl mx-auto w-full">
             <nav class="flex items-center gap-2 text-xs font-display font-bold tracking-widest text-on-surface-variant uppercase mb-8">
-                <a href="/spravka.html" class="hover:text-primary transition-colors">Справочник</a>
+                <a href="/spravka" class="hover:text-primary transition-colors">Справочник</a>
                 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
                 <span class="text-primary">Балка</span>
             </nav>
@@ -75,6 +59,14 @@
                             </svg>
                         </div>
                     </div>
+
+                    <div class="glass-card p-6 border-white/5 space-y-4">
+                        <h4 class="font-display font-bold text-xs tracking-widest uppercase text-primary">Полезные ссылки</h4>
+                        <ul class="space-y-2">
+                            <li><a href="/catalog/?pcat=Черный металлопрокат&cat=Балка" class="text-sm text-on-surface hover:text-primary flex items-center justify-between group">Купить балку <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span></a></li>
+                            <li><a href="/calculator/" class="text-sm text-on-surface hover:text-primary flex items-center justify-between group">Калькулятор веса <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">calculate</span></a></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="lg:col-span-8 order-1 lg:order-2">
@@ -89,43 +81,38 @@
                                         <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Метров в тонне</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-white/5 font-mono">
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">10Б1</td>
-                                        <td class="p-6 text-on-surface-variant">100</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">9.46</td>
-                                        <td class="p-6 text-on-surface-variant">105.7</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">12Б1</td>
-                                        <td class="p-6 text-on-surface-variant">120</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">11.50</td>
-                                        <td class="p-6 text-on-surface-variant">86.9</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">14Б1</td>
-                                        <td class="p-6 text-on-surface-variant">140</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">13.70</td>
-                                        <td class="p-6 text-on-surface-variant">73.0</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">16Б1</td>
-                                        <td class="p-6 text-on-surface-variant">160</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">15.80</td>
-                                        <td class="p-6 text-on-surface-variant">63.3</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">18Б1</td>
-                                        <td class="p-6 text-on-surface-variant">180</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">18.80</td>
-                                        <td class="p-6 text-on-surface-variant">53.2</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-lg group-hover:text-primary transition-colors">20Б1</td>
-                                        <td class="p-6 text-on-surface-variant">200</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">21.30</td>
-                                        <td class="p-6 text-on-surface-variant">46.9</td>
-                                    </tr>
+                                <tbody class="divide-y divide-white/5 font-mono text-sm">
+                                    <!-- Б - Нормальные -->
+                                    <tr class="bg-white/5"><td colspan="4" class="p-4 font-display font-bold text-xs tracking-widest uppercase text-primary">Нормальные двутавры (Б)</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">10Б1</td><td class="p-4">100</td><td class="p-4 text-primary font-bold">9.46</td><td class="p-4">105.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">12Б1</td><td class="p-4">120</td><td class="p-4 text-primary font-bold">11.5</td><td class="p-4">87.0</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">14Б1</td><td class="p-4">140</td><td class="p-4 text-primary font-bold">13.7</td><td class="p-4">73.0</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">16Б1</td><td class="p-4">160</td><td class="p-4 text-primary font-bold">15.8</td><td class="p-4">63.3</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">18Б1</td><td class="p-4">180</td><td class="p-4 text-primary font-bold">18.8</td><td class="p-4">53.2</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">20Б1</td><td class="p-4">200</td><td class="p-4 text-primary font-bold">21.3</td><td class="p-4">46.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">25Б1</td><td class="p-4">248</td><td class="p-4 text-primary font-bold">25.7</td><td class="p-4">38.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">30Б1</td><td class="p-4">296</td><td class="p-4 text-primary font-bold">32.9</td><td class="p-4">30.4</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">35Б1</td><td class="p-4">346</td><td class="p-4 text-primary font-bold">38.9</td><td class="p-4">25.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">40Б1</td><td class="p-4">396</td><td class="p-4 text-primary font-bold">48.1</td><td class="p-4">20.8</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">45Б1</td><td class="p-4">446</td><td class="p-4 text-primary font-bold">54.3</td><td class="p-4">18.4</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">50Б1</td><td class="p-4">496</td><td class="p-4 text-primary font-bold">61.5</td><td class="p-4">16.3</td></tr>
+
+                                    <!-- Ш - Широкополочные -->
+                                    <tr class="bg-white/5"><td colspan="4" class="p-4 font-display font-bold text-xs tracking-widest uppercase text-primary">Широкополочные двутавры (Ш)</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">20Ш1</td><td class="p-4">194</td><td class="p-4 text-primary font-bold">30.6</td><td class="p-4">32.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">25Ш1</td><td class="p-4">244</td><td class="p-4 text-primary font-bold">44.1</td><td class="p-4">22.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">30Ш1</td><td class="p-4">294</td><td class="p-4 text-primary font-bold">53.6</td><td class="p-4">18.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">35Ш1</td><td class="p-4">338</td><td class="p-4 text-primary font-bold">61.2</td><td class="p-4">16.3</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">40Ш1</td><td class="p-4">388</td><td class="p-4 text-primary font-bold">75.2</td><td class="p-4">13.3</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">50Ш1</td><td class="p-4">484</td><td class="p-4 text-primary font-bold">96.3</td><td class="p-4">10.4</td></tr>
+
+                                    <!-- К - Колонные -->
+                                    <tr class="bg-white/5"><td colspan="4" class="p-4 font-display font-bold text-xs tracking-widest uppercase text-primary">Колонные двутавры (К)</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">20К1</td><td class="p-4">196</td><td class="p-4 text-primary font-bold">41.4</td><td class="p-4">24.2</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">25К1</td><td class="p-4">246</td><td class="p-4 text-primary font-bold">62.0</td><td class="p-4">16.1</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">30К1</td><td class="p-4">296</td><td class="p-4 text-primary font-bold">87.0</td><td class="p-4">11.5</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">35К1</td><td class="p-4">343</td><td class="p-4 text-primary font-bold">109.0</td><td class="p-4">9.17</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">40К1</td><td class="p-4">393</td><td class="p-4 text-primary font-bold">147.0</td><td class="p-4">6.80</td></tr>
                                 </tbody>
                             </table>
                         </div>

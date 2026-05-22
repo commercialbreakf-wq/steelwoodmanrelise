@@ -1,4 +1,4 @@
-﻿// js/theme.js
+// js/theme.js
 (function() {
     const style = document.createElement('style');
     style.id = 'premium-theme-vars';
@@ -112,115 +112,103 @@
             color: var(--color-on-primary);
         }
 
+        /* Theme Transition Class */
+        .theme-transitioning, 
+        .theme-transitioning * {
+            transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
         /* --- LIQUID GLASS & LIGHT THEME MAGIC --- */
         html:not(.dark) .bg-surface,
         html:not(.dark) .bg-surface-container,
         html:not(.dark) .bg-surface-container-lowest,
         html:not(.dark) .glass-panel,
         html:not(.dark) .price-block {
-            background-color: rgba(255, 255, 255, 0.65) !important;
-            backdrop-filter: blur(25px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.8) !important;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.5) !important;
+            background-color: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         /* Hero Stats Liquid Glass & Divider Overrides */
-        html:not(.dark) #hero .bg-surface\/50,
-        html:not(.dark) #hero .bg-surface-container-low\/50,
+        html:not(.dark) #hero .bg-surface/50,
+        html:not(.dark) #hero .bg-surface-container-low/50,
         html:not(.dark) #hero .liquid-glass,
         html:not(.dark) #hero [class*="bg-surface"],
-        html:not(.dark) #hero [class*="bg-surface-container-low"],
-        html.light #hero .bg-surface\/50,
-        html.light #hero .bg-surface-container-low\/50,
-        html.light #hero .liquid-glass,
-        html.light #hero [class*="bg-surface"],
-        html.light #hero [class*="bg-surface-container-low"] {
-            background-color: rgba(255, 255, 255, 0.65) !important;
-            backdrop-filter: blur(25px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-            border-color: rgba(255, 255, 255, 0.8) !important;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.5) !important;
+        html:not(.dark) #hero [class*="bg-surface-container-low"] {
+            background-color: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
-        html:not(.dark) #hero .border-primary\/30,
-        html:not(.dark) #hero .border-l,
-        html.light #hero .border-primary\/30,
-        html.light #hero .border-l {
-            border-color: rgba(150, 69, 81, 0.25) !important;
+        html:not(.dark) #hero .border-primary/30,
+        html:not(.dark) #hero .border-l {
+            border-color: rgba(150, 69, 81, 0.25);
         }
 
         /* Light Theme Header (Liquid Glass 70%) */
         html:not(.dark) #globalHeader {
-            background-color: rgba(255, 255, 255, 0.7) !important;
-            backdrop-filter: blur(20px) saturate(190%) !important;
-            -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03) !important;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
-        /* Complete reset for Hero section in Light Mode - No blur, no effects, transparent background, clear image */
-        html.light #hero,
-        html.light section#hero,
-        html.light section:first-of-type,
+        /* Complete reset for Hero section in Light Mode */
         html:not(.dark) #hero,
         html:not(.dark) section#hero,
         html:not(.dark) section:first-of-type {
-            background-color: transparent !important;
-            background-image: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            filter: none !important;
+            background-color: transparent;
+            background-image: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            filter: none;
         }
 
-        html.light #hero .absolute.inset-0.z-0,
         html:not(.dark) #hero .absolute.inset-0.z-0 {
-            background-color: transparent !important;
-            background-image: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            filter: none !important;
+            background-color: transparent;
+            background-image: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            filter: none;
         }
 
-        /* The gradient overlay div inside the hero has the lightened gradient matching dark mode boundaries */
-        html.light #hero .bg-gradient-to-r,
-        html.light section:first-of-type .bg-gradient-to-r,
         html:not(.dark) #hero .bg-gradient-to-r,
         html:not(.dark) section:first-of-type .bg-gradient-to-r {
-            display: block !important;
-            opacity: 1 !important;
-            background: transparent !important;
-            background-image: linear-gradient(to right, #FAFAFA 0%, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%) !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            display: block;
+            opacity: 1;
+            background: transparent;
+            background-image: linear-gradient(to right, #FAFAFA 0%, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
 
-        html.light #hero .bg-gradient-to-b,
-        html.light section:first-of-type .bg-gradient-to-b,
         html:not(.dark) #hero .bg-gradient-to-b,
         html:not(.dark) section:first-of-type .bg-gradient-to-b {
-            display: block !important;
-            opacity: 1 !important;
-            background: transparent !important;
-            background-image: linear-gradient(to bottom, #FAFAFA 0%, rgba(250, 250, 250, 0.6) 60%, #FAFAFA 100%) !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            display: block;
+            opacity: 1;
+            background: transparent;
+            background-image: linear-gradient(to bottom, #FAFAFA 0%, rgba(250, 250, 250, 0.6) 60%, #FAFAFA 100%);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
 
-        /* The image itself is shown with 100% opacity, 6px blur, normal mix blend mode */
-        html.light #hero img,
-        html.light section#hero img,
-        html.light section:first-of-type img,
-        html.light .hero-bg img,
         html:not(.dark) #hero img,
         html:not(.dark) section#hero img,
         html:not(.dark) section:first-of-type img,
         html:not(.dark) .hero-bg img {
-            opacity: 1 !important;
-            filter: blur(3px) brightness(0.85) !important;
-            mix-blend-mode: normal !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            opacity: 1;
+            filter: blur(3px) brightness(0.85);
+            mix-blend-mode: normal;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
 
         /* Glow effects for buttons in light mode */
@@ -229,7 +217,7 @@
         }
         html:not(.dark) .pink-glow:hover,
         html:not(.dark) .group:hover .pink-glow {
-            box-shadow: 0 12px 35px -10px var(--color-primary) !important;
+            box-shadow: 0 12px 35px -10px var(--color-primary);
         }
         
         /* Interactive element effects */
@@ -241,18 +229,18 @@
         html:not(.dark) .group:hover.bg-surface,
         html:not(.dark) .group:hover.bg-surface-container,
         html:not(.dark) .card-enter:hover {
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), inset 0 0 20px rgba(255,255,255,1) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), inset 0 0 20px rgba(255,255,255,1);
             transform: translateY(-4px);
-            border-color: rgba(150, 69, 81, 0.2) !important; /* Muted primary border */
+            border-color: rgba(150, 69, 81, 0.2);
         }
 
         /* Hero text colors & contrast shadows */
         html:not(.dark) h1 {
-            color: var(--color-on-bg) !important;
+            color: var(--color-on-bg);
         }
         html:not(.dark) h1 .text-primary, html:not(.dark) h2 .text-primary {
-            color: var(--color-primary) !important;
-            text-shadow: 0 4px 20px rgba(150, 69, 81, 0.2) !important;
+            color: var(--color-primary);
+            text-shadow: 0 4px 20px rgba(150, 69, 81, 0.2);
         }
 
         /* Dark Theme: Remove all bright/white section & panel borders/frames */
@@ -264,11 +252,11 @@
         .dark [class*="border-"],
         .dark .divide-y > *,
         .dark .divide-x > * {
-            border-color: rgba(255, 255, 255, 0.04) !important;
+            border-color: rgba(255, 255, 255, 0.04);
         }
         .dark .border-primary,
         .dark [class*="border-primary"] {
-            border-color: var(--color-primary) !important;
+            border-color: var(--color-primary);
         }
 
         /* Premium Header Button Animations (Hover & Click) */
@@ -276,92 +264,130 @@
         #authBtnGlobal, 
         nav button[onclick="toggleCartDrawerGlobal()"],
         #mobileMenuBtnGlobal {
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         #globalSearchBtn:hover, 
         #authBtnGlobal:hover, 
         nav button[onclick="toggleCartDrawerGlobal()"]:hover,
         #mobileMenuBtnGlobal:hover {
-            transform: scale(1.12) !important;
-            background-color: var(--color-primary-container) !important;
-            color: var(--color-primary) !important;
-            box-shadow: 0 4px 12px rgba(150, 69, 81, 0.15) !important;
+            transform: scale(1.12);
+            background-color: var(--color-primary-container);
+            color: var(--color-primary);
+            box-shadow: 0 4px 12px rgba(150, 69, 81, 0.15);
         }
         #globalSearchBtn:active, 
         #authBtnGlobal:active, 
         nav button[onclick="toggleCartDrawerGlobal()"]:active,
         #mobileMenuBtnGlobal:active {
-            transform: scale(0.92) !important;
-            background-color: var(--color-primary) !important;
-            color: var(--color-on-primary) !important;
-            transition: all 0.1s ease !important;
+            transform: scale(0.92);
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+            transition: all 0.1s ease;
         }
         
         .apple-toggle-container {
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .apple-toggle-container:hover {
-            transform: scale(1.08) !important;
-            box-shadow: 0 4px 12px rgba(150, 69, 81, 0.12) !important;
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(150, 69, 81, 0.12);
         }
         .apple-toggle-container:active {
-            transform: scale(0.95) !important;
-            transition: all 0.1s ease !important;
-        }
-
-        /* Smooth transitions for theme switching */
-        html.theme-switching, html.theme-switching * {
-            transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease !important;
+            transform: scale(0.95);
+            transition: all 0.1s ease;
         }
 
         /* === PREMIUM PINK #d6336c OVERRIDES FOR LIGHT MODE === */
-        html.light .pink-slide::after,
         html:not(.dark) .pink-slide::after {
-            background-color: #d6336c !important;
-            background: #d6336c !important;
+            background-color: #d6336c;
         }
-        html.light .mega-cat-link:hover,
-        html.light .mega-cat-item.is-active .mega-cat-link,
         html:not(.dark) .mega-cat-link:hover,
         html:not(.dark) .mega-cat-item.is-active .mega-cat-link {
-            background-color: #d6336c !important;
-            background: #d6336c !important;
-            color: #ffffff !important;
+            background-color: #d6336c;
+            color: #ffffff;
         }
-        html.light .mega-cat-item.is-active .mega-cat-link::before,
         html:not(.dark) .mega-cat-item.is-active .mega-cat-link::before {
-            background-color: #ffffff !important;
-            background: #ffffff !important;
+            background-color: #ffffff;
         }
-        html.light .tab-btn.active,
-        html.light .tab-active,
         html:not(.dark) .tab-btn.active,
         html:not(.dark) .tab-active {
-            background-color: #d6336c !important;
-            background: #d6336c !important;
-            color: #ffffff !important;
-            border-color: #d6336c !important;
+            background-color: rgba(150, 69, 81, 0.15);
+            color: #964551;
+            border-color: #964551;
         }
-        html.light .active-shape-card,
         html:not(.dark) .active-shape-card {
-            border-color: #d6336c !important;
-            background-color: rgba(150, 69, 81, 0.08) !important;
-            box-shadow: 0 0 20px rgba(150, 69, 81, 0.15) !important;
+            border-color: #d6336c;
+            background-color: rgba(150, 69, 81, 0.08);
+            box-shadow: 0 0 20px rgba(150, 69, 81, 0.15);
         }
-        html.light input:focus,
-        html.light select:focus,
-        html.light textarea:focus,
         html:not(.dark) input:focus,
         html:not(.dark) select:focus,
         html:not(.dark) textarea:focus {
-            border-bottom-color: #d6336c !important;
-            border-color: #d6336c !important;
+            border-bottom-color: #d6336c;
+            border-color: #d6336c;
         }
-        html.light .industrial-glow:hover,
         html:not(.dark) .industrial-glow:hover {
-            border-color: #d6336c !important;
-            box-shadow: inset 0 0 25px rgba(150, 69, 81, 0.1) !important;
+            border-color: #d6336c;
+            box-shadow: inset 0 0 25px rgba(150, 69, 81, 0.1);
         }
+
+        /* Premium hover animation for catalog cards in light theme */
+        html:not(.dark) .card-enter:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(214, 51, 108, 0.25), inset 0 0 20px rgba(255, 255, 255, 0.6);
+            border-color: rgba(214, 51, 108, 0.4);
+        }
+
+        /* Harmonized quantity selector backgrounds and text in light theme */
+        html:not(.dark) .qty-selector-container,
+        html:not(.dark) .calc-input-container {
+            background-color: #F5F5F7;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+        html:not(.dark) .qty-selector-container *,
+        html:not(.dark) .calc-input-container * {
+            color: #1A1817;
+        }
+        html:not(.dark) .qty-selector-container .border-l,
+        html:not(.dark) .qty-selector-container .border-b,
+        html:not(.dark) .calc-input-container .border-l,
+        html:not(.dark) .calc-input-container .border-t {
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        html:not(.dark) .qty-selector-container .bg-white/5,
+        html:not(.dark) .calc-input-container .bg-white/[0.03] {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Shopping cart button styling in catalog card in light theme */
+        html:not(.dark) .catalog-cart-btn {
+            background-color: #EAEAEB;
+            color: #1A1817;
+        }
+        html:not(.dark) .catalog-cart-btn * {
+            color: #1A1817;
+        }
+        html:not(.dark) .catalog-cart-btn:hover {
+            background-color: #D9D9DA;
+        }
+
+        /* Calculator low container border and background overrides */
+        html:not(.dark) .bg-surface-container-low {
+            background-color: #F5F5F7;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+        html:not(.dark) .bg-surface-container-low .border-white/10,
+        html:not(.dark) .bg-surface-container-low .border-r,
+        html:not(.dark) .bg-surface-container-low .border-b {
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Restore opacity settings for light mode */
+        html:not(.dark) .opacity-40 { opacity: 0.4; }
+        html:not(.dark) .opacity-50 { opacity: 0.5; }
+        html:not(.dark) .opacity-60 { opacity: 0.6; }
+        html:not(.dark) .opacity-70 { opacity: 0.7; }
+        html:not(.dark) .opacity-80 { opacity: 0.8; }
     `;
     document.head.appendChild(style);
 

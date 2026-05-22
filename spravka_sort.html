@@ -1,41 +1,25 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
+<link rel="apple-touch-icon" href="/images/favicon.svg?v=4">
+<link rel="mask-icon" href="/images/favicon.svg?v=4" color="#ffb0cc">
     <title>Вес стального круга, квадрата, полосы: Таблица ГОСТ | Железный Дровосек</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <script src="/js/shared-ui.js?v=3"></script>
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "error": "#ffb4ab",
-                    "outline-variant": "#534347",
-                    "surface-container-lowest": "#0f0e0c",
-                    "on-surface-variant": "#d7c1c7",
-                    "surface-tint": "#ffb0cc",
-                    "on-surface": "#e7e2dd",
-                    "surface-container-low": "#1d1b19",
-                    "primary": "#ffb0cc",
-                    "secondary": "#ffb1c0",
-                    "surface": "#151311",
-                    "background": "#151311",
-            },
-            "fontFamily": {
-                    "body": ["Inter", "sans-serif"],
-                    "display": ["Space Grotesk", "sans-serif"]
-            }
-          }
-        }
-      }
-    </script>
+    <script src="/js/shared-ui.js?v=8" defer></script>
+    <script src="/js/theme.js?v=1"></script>
     <style>
       .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
       .glass-card { background: rgba(21, 19, 17, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(231, 226, 221, 0.05); }
@@ -53,7 +37,7 @@
     <main class="min-h-screen flex flex-col pt-24">
         <section class="px-6 md:px-16 py-8 md:py-12 max-w-7xl mx-auto w-full">
             <nav class="flex items-center gap-2 text-xs font-display font-bold tracking-widest text-on-surface-variant uppercase mb-8">
-                <a href="/spravka.html" class="hover:text-primary transition-colors">Справочник</a>
+                <a href="/spravka" class="hover:text-primary transition-colors">Справочник</a>
                 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
                 <span class="text-primary">Сортовой прокат</span>
             </nav>
@@ -77,10 +61,17 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="glass-card p-6 border-white/5 space-y-4">
+                        <h4 class="font-display font-bold text-xs tracking-widest uppercase text-primary">Полезные ссылки</h4>
+                        <ul class="space-y-2">
+                            <li><a href="/catalog/?pcat=Сортовой металлопрокат" class="text-sm text-on-surface hover:text-primary flex items-center justify-between group">Купить сортовой прокат <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span></a></li>
+                            <li><a href="/calculator/" class="text-sm text-on-surface hover:text-primary flex items-center justify-between group">Калькулятор веса <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">calculate</span></a></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="lg:col-span-8 order-1 lg:order-2 space-y-12">
-                    
                     <!-- Table: Round -->
                     <div class="space-y-4">
                         <h3 class="font-display font-bold text-xl uppercase text-primary px-2">Круг стальной</h3>
@@ -94,26 +85,19 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/5 font-mono text-sm">
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">10</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">0.617</td>
-                                        <td class="p-6 text-on-surface-variant">1620.7</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">12</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">0.888</td>
-                                        <td class="p-6 text-on-surface-variant">1126.1</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">16</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">1.580</td>
-                                        <td class="p-6 text-on-surface-variant">632.9</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">20</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">2.470</td>
-                                        <td class="p-6 text-on-surface-variant">404.9</td>
-                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">6</td><td class="p-4 text-primary font-bold">0.222</td><td class="p-4">4504.5</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">8</td><td class="p-4 text-primary font-bold">0.395</td><td class="p-4">2531.6</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">10</td><td class="p-4 text-primary font-bold">0.617</td><td class="p-4">1620.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">12</td><td class="p-4 text-primary font-bold">0.888</td><td class="p-4">1126.1</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">14</td><td class="p-4 text-primary font-bold">1.210</td><td class="p-4">826.4</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">16</td><td class="p-4 text-primary font-bold">1.580</td><td class="p-4">632.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">18</td><td class="p-4 text-primary font-bold">2.000</td><td class="p-4">500.0</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">20</td><td class="p-4 text-primary font-bold">2.470</td><td class="p-4">404.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">22</td><td class="p-4 text-primary font-bold">2.980</td><td class="p-4">335.6</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">25</td><td class="p-4 text-primary font-bold">3.850</td><td class="p-4">259.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">30</td><td class="p-4 text-primary font-bold">5.550</td><td class="p-4">180.2</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">40</td><td class="p-4 text-primary font-bold">9.870</td><td class="p-4">101.3</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">50</td><td class="p-4 text-primary font-bold">15.41</td><td class="p-4">64.9</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -132,31 +116,45 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/5 font-mono text-sm">
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">10</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">0.785</td>
-                                        <td class="p-6 text-on-surface-variant">1273.9</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">12</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">1.130</td>
-                                        <td class="p-6 text-on-surface-variant">885.0</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">16</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">2.010</td>
-                                        <td class="p-6 text-on-surface-variant">497.5</td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors group">
-                                        <td class="p-6 font-display font-bold text-base group-hover:text-primary transition-colors">20</td>
-                                        <td class="p-6 text-on-surface-variant font-bold text-primary/80">3.140</td>
-                                        <td class="p-6 text-on-surface-variant">318.5</td>
-                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">10</td><td class="p-4 text-primary font-bold">0.785</td><td class="p-4">1273.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">12</td><td class="p-4 text-primary font-bold">1.130</td><td class="p-4">885.0</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">14</td><td class="p-4 text-primary font-bold">1.540</td><td class="p-4">649.4</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">16</td><td class="p-4 text-primary font-bold">2.010</td><td class="p-4">497.5</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">20</td><td class="p-4 text-primary font-bold">3.140</td><td class="p-4">318.5</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">25</td><td class="p-4 text-primary font-bold">4.910</td><td class="p-4">203.7</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">30</td><td class="p-4 text-primary font-bold">7.070</td><td class="p-4">141.4</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">40</td><td class="p-4 text-primary font-bold">12.56</td><td class="p-4">79.6</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">50</td><td class="p-4 text-primary font-bold">19.63</td><td class="p-4">50.9</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
+                    <!-- Table: Strip -->
+                    <div class="space-y-4">
+                        <h3 class="font-display font-bold text-xl uppercase text-primary px-2">Полоса стальная</h3>
+                        <div class="glass-card overflow-hidden rounded-3xl border-white/10">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-white/5 border-b border-white/10">
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Размер (AxB), мм</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Вес 1 м.п., кг</th>
+                                        <th class="p-6 font-display text-[10px] font-bold tracking-widest uppercase text-primary">Метров в тонне</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5 font-mono text-sm">
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">20 х 4</td><td class="p-4 text-primary font-bold">0.628</td><td class="p-4">1592.4</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">25 х 4</td><td class="p-4 text-primary font-bold">0.785</td><td class="p-4">1273.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">30 х 4</td><td class="p-4 text-primary font-bold">0.942</td><td class="p-4">1061.6</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">40 х 4</td><td class="p-4 text-primary font-bold">1.256</td><td class="p-4">796.2</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">40 х 5</td><td class="p-4 text-primary font-bold">1.570</td><td class="p-4">636.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">50 x 5</td><td class="p-4 text-primary font-bold">1.963</td><td class="p-4">509.4</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">60 x 6</td><td class="p-4 text-primary font-bold">2.826</td><td class="p-4">353.9</td></tr>
+                                    <tr class="hover:bg-primary/5 transition-colors group"><td class="p-4 font-bold">100 x 10</td><td class="p-4 text-primary font-bold">7.850</td><td class="p-4">127.4</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

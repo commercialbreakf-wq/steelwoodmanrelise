@@ -1,88 +1,24 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
+<link rel="apple-touch-icon" href="/images/favicon.svg?v=4">
+<link rel="mask-icon" href="/images/favicon.svg?v=4" color="#ffb0cc">
+
     <title>404 — Страница не найдена | ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script src="/js/shared-ui.js"></script>
-    <script id="tailwind-config">
-          tailwind.config = {
-            darkMode: "class",
-            theme: {
-              extend: {
-                "colors": {
-                        "error": "#ffb4ab",
-                        "outline-variant": "#534347",
-                        "surface-container-lowest": "#0f0e0c",
-                        "on-tertiary-container": "#282a2a",
-                        "surface-container-highest": "#373431",
-                        "primary-container": "#cf7498",
-                        "surface-container-high": "#2c2a27",
-                        "on-secondary": "#660029",
-                        "on-surface-variant": "#d7c1c7",
-                        "surface-tint": "#ffb0cc",
-                        "on-surface": "#e7e2dd",
-                        "on-primary-container": "#520d2f",
-                        "inverse-primary": "#944365",
-                        "inverse-on-surface": "#32302d",
-                        "surface-container-low": "#1d1b19",
-                        "tertiary": "#c6c6c7",
-                        "on-primary": "#5a1536",
-                        "surface-variant": "#373431",
-                        "on-secondary-fixed-variant": "#8e093d",
-                        "surface-container": "#211f1d",
-                        "primary-fixed": "#ffd9e4",
-                        "primary": "#ffb0cc",
-                        "on-secondary-fixed": "#3f0017",
-                        "on-tertiary-fixed-variant": "#454747",
-                        "secondary-container": "#8e093d",
-                        "surface": "#151311",
-                        "on-background": "#e7e2dd",
-                        "tertiary-fixed": "#e2e2e2",
-                        "surface-dim": "#151311",
-                        "on-error": "#690005",
-                        "tertiary-fixed-dim": "#c6c6c7",
-                        "on-secondary-container": "#ff96ad",
-                        "error-container": "#93000a",
-                        "on-tertiary-fixed": "#1a1c1c",
-                        "on-error-container": "#ffdad6",
-                        "secondary": "#ffb1c0",
-                        "inverse-surface": "#e7e2dd",
-                        "primary-fixed-dim": "#ffb0cc",
-                        "outline": "#a08c91",
-                        "surface-bright": "#3b3936",
-                        "on-primary-fixed": "#3e0020",
-                        "secondary-fixed-dim": "#ffb1c0",
-                        "background": "#151311",
-                        "on-tertiary": "#2f3131",
-                        "tertiary-container": "#909191",
-                        "on-primary-fixed-variant": "#772c4d",
-                        "secondary-fixed": "#ffd9df"
-                },
-                "spacing": {
-                        "margin-edge": "64px",
-                        "margin-edge-mobile": "20px",
-                        "section-gap": "160px",
-                        "section-gap-mobile": "80px",
-                        "gutter": "24px",
-                        "unit": "8px",
-                        "container-max": "1440px"
-                },
-                "fontFamily": {
-                        "body-md": ["Inter", "sans-serif"],
-                        "label-caps": ["Space Grotesk", "sans-serif"],
-                        "headline-lg": ["Space Grotesk", "sans-serif"],
-                        "display-xl": ["Space Grotesk", "sans-serif"],
-                        "body-lg": ["Inter", "sans-serif"],
-                        "headline-md": ["Space Grotesk", "sans-serif"]
-                }
-              }
-            }
-          }
-    </script>
+    <script src="/js/shared-ui.js?v=8" defer></script>
+    <script src="/js/theme.js?v=1"></script>
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;

@@ -1,6 +1,12 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
@@ -11,7 +17,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script src="/js/shared-ui.js?v=8"></script>
+    <script src="/js/shared-ui.js?v=10" defer></script>
     <script src="/js/theme.js?v=1"></script>
     <style>
 
@@ -53,7 +59,7 @@
 
 
         /* Smooth scroll enhancement */
-        .is-visible {
+        section.is-visible {
             animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         @keyframes fadeIn {
@@ -97,7 +103,7 @@
                     Мы не просто доставляем металл — мы берем на себя всю заботу о логистике. Наш собственный парк техники гарантирует, что ваш заказ приедет вовремя и в идеальном состоянии в любую точку России.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button class="px-10 py-5 bg-primary text-on-primary font-label-caps font-bold tracking-widest hover:brightness-110 transition-all duration-300 group flex items-center justify-center gap-3 rounded-full text-[12px] shadow-[0_0_20px_rgba(255,176,204,0.3)]">
+                    <button onclick="window.scrollToSectionGlobal('#fleet-hero-target')" class="px-10 py-5 bg-primary text-on-primary font-label-caps font-bold tracking-widest hover:brightness-110 transition-all duration-300 group flex items-center justify-center gap-3 rounded-full text-[12px] shadow-[0_0_20px_rgba(255,176,204,0.3)]">
                         ПОСМОТРЕТЬ ТЕХНИКУ
                         <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
                     </button>
@@ -300,7 +306,7 @@
                     </ul>
                 </div>
                 <div class="lg:col-span-7 relative">
-                    <div class="aspect-square md:aspect-video machined-border rounded-[2.5rem] overflow-hidden grayscale opacity-40 hover:opacity-100 hover:grayscale-0 transition-all duration-1000">
+                    <div class="aspect-square md:aspect-video machined-border rounded-[2.5rem] overflow-hidden map-container-wrapper">
                         <iframe src="https://yandex.ru/map-widget/v1/?ll=37.617635%2C55.755814&z=5&mode=search&ol=geo&ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg1MzAwMDAwMBIY0KDQvtGB0YHQuNGPLCDQnNC-0YHQutCy0LAiCg2S5hhCFYFpX0I%2C&l=map" width="100%" height="100%" frameborder="0"></iframe>
                     </div>
                     <div class="absolute -top-6 -right-6 p-8 liquid-glass rounded-2xl hidden md:block">

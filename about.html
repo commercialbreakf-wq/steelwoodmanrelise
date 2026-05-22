@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
@@ -12,7 +18,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="/js/shared-ui.js?v=8"></script>
+<script src="/js/shared-ui.js?v=10" defer></script>
 <script src="/js/theme.js?v=1"></script>
 <style>
 
@@ -208,10 +214,10 @@
         </div>
         
         <!-- Map Small -->
-        <div class="w-full h-[200px] md:h-[250px] overflow-hidden rounded-3xl mt-12 grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all duration-1000 shadow-2xl border border-white/5 relative group">
+        <div class="w-full h-[200px] md:h-[250px] overflow-hidden rounded-3xl mt-12 shadow-2xl border border-white/5 relative group">
             <div class="absolute -inset-1 bg-gradient-to-r from-primary/40 to-primary/20 rounded-2xl blur opacity-10 group-hover:opacity-40 transition duration-1000"></div>
-            <div class="relative w-full h-full">
-                <iframe allowfullscreen="true" frameborder="0" height="100%" src="https://yandex.ru/map-widget/v1/?ll=30.177896%2C59.787936&amp;mode=whatshere&amp;utm_source=share&amp;whatshere%5Bpoint%5D=30.177896%2C59.787936&amp;whatshere%5Bzoom%5D=17&amp;z=17" style="position:relative; filter: contrast(1.1) saturate(1.1);" width="100%"></iframe>
+            <div class="relative w-full h-full map-container-wrapper">
+                <iframe allowfullscreen="true" frameborder="0" height="100%" src="https://yandex.ru/map-widget/v1/?ll=30.177896%2C59.787936&amp;mode=whatshere&amp;utm_source=share&amp;whatshere%5Bpoint%5D=30.177896%2C59.787936&amp;whatshere%5Bzoom%5D=17&amp;z=17" style="position:relative;" width="100%"></iframe>
             </div>
         </div>
     </div>

@@ -1,8 +1,18 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
+<link rel="apple-touch-icon" href="/images/favicon.svg?v=4">
+<link rel="mask-icon" href="/images/favicon.svg?v=4" color="#ffb0cc">
+    
     <title>ЖЕЛЕЗНЫЙ ДРОВОСЕК — Навигация по страницам</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -202,7 +212,7 @@
 </head>
 <body>
     <div class="logo-container">
-        <img src="/images/logo_icon.png" alt="Logo" class="logo-img">
+        <img src="/images/logo_premium.png" alt="Logo" class="logo-img">
         <div class="logo">ЖЕЛЕЗНЫЙ<br/><span>ДРОВОСЕК</span></div>
     </div>
     <div class="subtitle">Карта страниц сайта</div>
@@ -313,6 +323,18 @@
                 <div class="card-number">08</div>
                 <div class="card-title">Контакты</div>
                 <div class="card-desc">Адреса, телефоны, карта проезда и форма обратной связи</div>
+                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+            </div>
+        </a>
+        <a class="card" href="/spravka.html">
+            <div class="card-img-wrap">
+                <img class="card-img" src="/images/tubes.png" alt="Справочник"/>
+                <div class="card-badge">Справочник</div>
+            </div>
+            <div class="card-body">
+                <div class="card-number">09</div>
+                <div class="card-title">Инженерный справочник</div>
+                <div class="card-desc">Теоретический вес и размеры металлопроката по ГОСТ</div>
                 <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>

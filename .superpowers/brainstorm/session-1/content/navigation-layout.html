@@ -1,0 +1,62 @@
+<h2>Navigation: Products, Categories, Subcategories</h2>
+<p class="subtitle">How should we organize the 3 different management tables?</p>
+
+<div class="options">
+  <div class="option" data-choice="tabs" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Separate Tabs</h3>
+      <p>Switch between "Products", "Categories", and "Subcategories" tables using a tab bar. Clean and focused.</p>
+      <div class="mock-nav" style="margin-top: 1rem;">
+        <span style="border-bottom: 2px solid var(--primary); padding-bottom: 4px;">Товары</span> | Категории | Подкатегории
+      </div>
+    </div>
+  </div>
+  
+  <div class="option" data-choice="nested" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Unified Nested View</h3>
+      <p>A hierarchical view where you can expand categories to see subcategories and products. Good for seeing relationships.</p>
+      <div class="mock-content" style="margin-top: 1rem; opacity: 0.7;">
+        <div>▼ Черный металлопрокат (Категория)</div>
+        <div style="margin-left: 1.5rem;">▼ Арматура (Подкатегория)</div>
+        <div style="margin-left: 3rem;">• Арматура А500С (Товар)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 3rem;">
+  <h3>Inline Price Editing</h3>
+  <p class="subtitle">Mockup of how inline price editing looks compared to a popup.</p>
+  <div class="mockup">
+    <div class="mockup-body">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <th style="text-align: left; padding: 1rem;">Товар</th>
+          <th style="text-align: left; padding: 1rem;">Цена (Тонна)</th>
+          <th style="text-align: right; padding: 1rem;">Действия</th>
+        </tr>
+        <tr class="selected" style="background: rgba(var(--primary-rgb), 0.1);">
+          <td style="padding: 1rem;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span>
+              <div>
+                <div style="font-weight: bold; font-size: 0.8rem;">АРМАТУРА А500С 10ММ</div>
+                <div style="font-size: 0.6rem; opacity: 0.5;">ARM-10-A500C</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 1rem;">
+            <input type="text" value="65 000" class="mock-input" style="width: 80px; padding: 4px 8px; font-size: 0.8rem;"> ₽
+          </td>
+          <td style="padding: 1rem; text-align: right;">
+            <button class="mock-button" style="padding: 4px 12px; font-size: 0.7rem;">OK</button>
+            <button class="mock-button" style="padding: 4px 12px; font-size: 0.7rem; background: transparent; border: 1px solid rgba(255,255,255,0.2);">Отмена</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

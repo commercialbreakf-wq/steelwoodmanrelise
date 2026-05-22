@@ -1,33 +1,22 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
+<link rel="apple-touch-icon" href="/images/favicon.svg?v=4">
+<link rel="mask-icon" href="/images/favicon.svg?v=4" color="#ffb0cc">
     <title>ГОСТ 380-2005 | Марки углеродистой стали | ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#ffb0cc",
-                        "background": "#151311",
-                        "surface": "#1d1b19",
-                        "on-surface": "#e8e1dd",
-                        "on-surface-variant": "#d7c1c7",
-                        "outline-variant": "#534347",
-                    },
-                    fontFamily: {
-                        "headline": ["Space Grotesk"],
-                        "body": ["Inter"],
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="/js/theme.js?v=1"></script>
     <style>
         .metal-grid-overlay { background-image: radial-gradient(circle at 2px 2px, #32302E 1px, transparent 0); background-size: 24px 24px; }
         .machined-border { border: 1px solid #32302E; }
@@ -122,6 +111,6 @@
 
     <div id="globalFooter"></div>
 
-    <script src="/js/shared-ui.js"></script>
+    <script src="/js/shared-ui.js?v=8" defer></script>
 </body>
 </html>

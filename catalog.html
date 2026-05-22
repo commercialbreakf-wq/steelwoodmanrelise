@@ -1,6 +1,12 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Каталог металлопроката — ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
@@ -8,45 +14,235 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="/js/shared-ui.js"></script>
-<script>
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "error":"#ffb4ab","outline-variant":"#534347","surface-container-lowest":"#0f0e0c",
-        "surface-container-highest":"#373431","primary-container":"#cf7498",
-        "surface-container-high":"#2c2a27","on-surface-variant":"#d7c1c7",
-        "surface-tint":"#ffb0cc","on-surface":"#e7e2dd","surface-container-low":"#1d1b19",
-        "surface-container":"#211f1d","primary":"#ffb0cc","surface":"#151311",
-        "on-background":"#e7e2dd","on-primary":"#5a1536","background":"#151311",
-        "outline":"#a08c91","surface-bright":"#3b3936"
-      },
-      spacing: {
-        "margin-edge":"64px",
-        "margin-edge-mobile":"20px",
-        "section-gap":"160px",
-        "section-gap-mobile":"80px",
-        "gutter":"24px",
-        "container-max":"1440px"
-      },
-      fontFamily: {"body-md":["Inter", "sans-serif"],"label-caps":["Space Grotesk", "sans-serif"],"headline-md":["Space Grotesk", "sans-serif"]},
-      fontSize: {
-        "body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],
-        "label-caps":["14px",{"lineHeight":"20px","letterSpacing":"0.1em","fontWeight":"600"}],
-        "body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}]
-      }
-
-    }
-  }
-}
-</script>
+<script src="/js/shared-ui.js?v=8" defer></script>
+<script src="/js/theme.js?v=1"></script>
 <style>
+.liquid-glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
 .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
-.pink-glow:hover{box-shadow:0 0 20px rgba(255,176,204,0.15)}
+.pink-glow:hover{box-shadow:0 0 20px rgba(150,69,81,0.25)}
 .card-enter{animation:cardIn .5s cubic-bezier(.16,1,.3,1) both}
 @keyframes cardIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* Sidebar Filter Custom Styles (Borderless, Premium highlights) */
+.filter-parent-category {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+    background-color: #151311 !important;
+    color: #e7e2dd !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+.filter-parent-category:hover {
+    background-color: #964551 !important;
+    color: #c7c5c5 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+.filter-parent-category.is-active {
+    background-color: #964551 !important;
+    color: #e7e2dd !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(150, 69, 81, 0.2) !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+.filter-parent-category.is-active span,
+.filter-parent-category.is-active .material-symbols-outlined {
+    color: #e7e2dd !important;
+}
+.filter-parent-category:hover span,
+.filter-parent-category:hover .material-symbols-outlined {
+    color: #c7c5c5 !important;
+}
+
+.filter-subcategory {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    margin: 4px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+    color: #e7e2dd !important;
+}
+.filter-subcategory:hover {
+    background-color: rgba(150, 69, 81, 0.08) !important;
+    color: #964551 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+.filter-subcategory.is-active {
+    background-color: rgba(150, 69, 81, 0.15) !important;
+    color: #e7e2dd !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+.filter-subcategory-name {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    margin-right: 8px;
+}
+.filter-subcategory-count {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    opacity: 0.6;
+    font-family: 'Space Grotesk', sans-serif;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Size/Vid nested filter styling */
+.nested-filter-container {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    padding: 8px;
+    margin: 4px 0 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+html.light .nested-filter-container {
+    background-color: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.filter-size-header {
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #e7e2dd;
+    margin-bottom: 6px;
+    opacity: 0.5;
+}
+html.light .filter-size-header {
+    color: #151311;
+}
+.compact-select {
+    font-size: 10px !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    height: auto !important;
+    background-color: #1a1816 !important;
+}
+html.light .compact-select {
+    background-color: #ffffff !important;
+}
+
+/* Ensure active subcategory text uses light gray, and hover uses dark text on dark theme */
+.filter-subcategory.is-active .filter-subcategory-name,
+.filter-subcategory.is-active .filter-subcategory-count {
+    color: #e7e2dd !important;
+    opacity: 1 !important;
+}
+.filter-subcategory:hover .filter-subcategory-name,
+.filter-subcategory:hover .filter-subcategory-count {
+    color: #964551 !important;
+    opacity: 1 !important;
+}
+
+/* Light Theme Overrides for Sidebar Filters */
+html.light .filter-parent-category {
+    background-color: #C7C5C5 !important;
+    color: #3b3b3b !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+html.light .filter-parent-category:hover {
+    background-color: rgba(150, 69, 81, 0.08) !important;
+    color: #964551 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+html.light .filter-parent-category:hover span,
+html.light .filter-parent-category:hover .material-symbols-outlined {
+    color: #964551 !important;
+}
+html.light .filter-parent-category.is-active {
+    background-color: #964551 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(150, 69, 81, 0.25) !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+html.light .filter-parent-category.is-active span,
+html.light .filter-parent-category.is-active .material-symbols-outlined {
+    color: #ffffff !important;
+}
+html.light .filter-subcategory {
+    background-color: transparent !important;
+    color: #151311 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+html.light .filter-subcategory:hover {
+    background-color: rgba(150, 69, 81, 0.05) !important;
+    color: #964551 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    outline: none !important;
+}
+html.light .filter-subcategory.is-active {
+    background-color: rgba(150, 69, 81, 0.12) !important;
+    color: #964551 !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-radius: 8px !important;
+    outline: none !important;
+}
+html.light .filter-subcategory.is-active .filter-subcategory-name,
+html.light .filter-subcategory.is-active .filter-subcategory-count,
+html.light .filter-subcategory:hover .filter-subcategory-name,
+html.light .filter-subcategory:hover .filter-subcategory-count {
+    color: #964551 !important;
+    opacity: 1 !important;
+}
 </style>
 </head>
 <body class="bg-background text-on-background font-body-md selection:bg-primary selection:text-on-primary">
@@ -63,45 +259,87 @@ tailwind.config = {
 <span class="cursor-pointer hover:text-primary transition-colors" onclick="resetFilters()">КАТАЛОГ</span>
 </nav>
 <div class="relative w-full md:w-96">
-<input id="searchInput" class="w-full bg-transparent border-b border-outline-variant/30 focus:border-primary outline-none py-2 px-0 font-label-caps text-label-caps transition-all text-on-surface" placeholder="ПОИСК ПО КАТАЛОГУ..." type="text"/>
-<span class="material-symbols-outlined absolute right-0 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input id="searchInput" class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary outline-none py-3 px-4 rounded-xl font-label-caps text-xs md:text-label-caps transition-all text-on-surface" placeholder="ПОИСК ПО КАТАЛОГУ..." type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
 </div>
 </div>
 
 
-<div class="md:hidden mb-6">
-    <button id="filterToggleBtn" onclick="toggleFilters()" class="w-full py-4 bg-primary text-on-primary font-label-caps text-label-caps flex items-center justify-center gap-2 rounded-xl shadow-lg shadow-primary/20">
-        <span class="material-symbols-outlined">filter_list</span>
-        ПОКАЗАТЬ ФИЛЬТРЫ
+<div class="md:hidden mb-6 sticky top-[72px] z-20">
+    <button id="filterToggleBtn" onclick="toggleFilters()" class="w-full py-4 bg-primary text-on-primary font-bold uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 rounded-2xl shadow-[0_12px_40px_rgba(255,176,204,0.3)] backdrop-blur-md active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-lg">filter_list</span>
+        ФИЛЬТРЫ КАТАЛОГА
     </button>
 </div>
 
-<div class="flex flex-col md:flex-row gap-gutter">
-<!-- Sidebar Filters -->
-<aside id="catalogSidebar" class="hidden md:block w-full md:w-64 flex-shrink-0 space-y-8 md:space-y-10">
-<section>
-<h3 class="font-label-caps text-label-caps text-on-surface mb-6 border-l-2 border-primary pl-4 tracking-widest uppercase">Категории</h3>
-<div id="categoryFilters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-3 font-body-md text-on-surface-variant"></div>
-</section>
-<div class="flex flex-col gap-4">
-<button onclick="resetFilters()" class="w-full py-4 border border-outline-variant/30 text-on-surface-variant font-label-caps text-label-caps hover:border-primary hover:text-primary transition-all duration-300">
-СБРОСИТЬ ФИЛЬТРЫ
-</button>
-<div class="border border-outline-variant/10 p-6 bg-surface-container-lowest">
-<p class="font-label-caps text-[10px] text-on-surface-variant mb-2 tracking-widest">ТОВАРОВ В КАТАЛОГЕ</p>
-<p id="productCount" class="text-primary text-3xl font-bold">0</p>
-</div>
-</div>
+<!-- Main Content Grid -->
+<div class="flex flex-col md:flex-row gap-gutter relative">
+<!-- Sidebar Filters (Drawer on mobile, Sidebar on desktop) -->
+<div id="filterDrawerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[6000] opacity-0 pointer-events-none transition-opacity duration-500 md:hidden" onclick="toggleFilters()"></div>
+<aside id="catalogSidebar" class="fixed md:static inset-y-0 left-0 w-[85%] max-w-[340px] md:w-64 bg-[#0f0e0c] md:bg-transparent z-[6001] md:z-auto translate-x-[-100%] md:translate-x-0 transition-transform duration-500 ease-apple md:block flex flex-col shadow-2xl md:shadow-none border-r border-white/5 md:border-0 overflow-hidden h-full">
+    <div class="flex items-center justify-between p-5 md:hidden border-b border-outline-variant/10 bg-surface-container shrink-0">
+        <div>
+            <h3 class="font-display-xl text-lg uppercase tracking-tight">Фильтры</h3>
+            <p class="text-[9px] text-primary font-bold uppercase tracking-widest mt-0.5">Настройка выдачи</p>
+        </div>
+        <button onclick="toggleFilters()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-on-surface-variant hover:text-white">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto px-4 pt-[10px] pb-6 md:p-0 flex flex-col gap-0 md:gap-2 custom-scrollbar">
+        <div class="w-full">
+            <h3 class="font-label-caps text-label-caps text-on-surface mb-3 border-l-2 border-primary pl-4 tracking-widest uppercase hidden md:block">Категории</h3>
+            <div id="categoryFilters" class="grid grid-cols-1 gap-1 font-body-md text-on-surface-variant"></div>
+        </div>
+        
+        <div class="flex flex-col gap-2 pb-6 md:pb-0 mt-0 md:mt-4">
+            <button onclick="window.innerWidth < 768 ? toggleFilters() : resetFilters()" class="w-full py-3.5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 hover:shadow-[0_8px_24px_rgba(255,176,204,0.15)] transition-all duration-300 rounded-xl uppercase font-bold border-none active:scale-95">
+                <span class="md:hidden">ПОКАЗАТЬ</span>
+                <span class="hidden md:inline">ПОКАЗАТЬ ВСЕ ТОВАРЫ</span>
+            </button>
+            <button onclick="resetFilters()" class="w-full py-3.5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-300 rounded-xl uppercase font-bold bg-white/[0.02]">
+                СБРОСИТЬ ФИЛЬТРЫ
+            </button>
+            <div class="border border-outline-variant/10 p-4 bg-surface-container-lowest rounded-2xl flex items-center justify-between md:block">
+                <p class="font-label-caps text-[9px] text-on-surface-variant tracking-widest opacity-60 uppercase">Товаров:</p>
+                <p id="productCount" class="text-primary text-xl md:text-2xl font-bold">0</p>
+            </div>
+        </div>
+    </div>
 </aside>
 
 
-<!-- Product List -->
-<div class="flex-1">
-<div id="productGrid" class="flex flex-col gap-4"></div>
-<p id="noResults" class="hidden text-center text-on-surface-variant py-20 text-lg">Товары не найдены. Попробуйте изменить фильтры.</p>
+<!-- Product List Container -->
+<div class="flex-1 min-w-0">
+    <!-- Toolbar: Sorting & Desktop count -->
+    <div class="mb-6 md:mb-8 bg-[#1d1b19] md:bg-transparent p-1 md:p-0 rounded-2xl border border-white/5 md:border-0">
+        <div class="flex flex-col md:flex-row md:items-center justify-between">
+             <div class="w-full md:w-auto">
+                 <div class="relative group w-full md:w-72">
+                     <select id="sortSelect" onchange="applySort(this.value)" class="w-full bg-surface-container border-none outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer appearance-none transition-all">
+                         <option value="default" class="bg-[#1d1b19] text-[#e7e2dd]">СОРТИРОВКА: ПО УМОЛЧАНИЮ</option>
+                         <option value="price_asc" class="bg-[#1d1b19] text-[#e7e2dd]">СНАЧАЛА ДЕШЕВЛЕ</option>
+                         <option value="price_desc" class="bg-[#1d1b19] text-[#e7e2dd]">СНАЧАЛА ДОРОЖЕ</option>
+                         <option value="name_asc" class="bg-[#1d1b19] text-[#e7e2dd]">ПО НАЗВАНИЮ (А-Я)</option>
+                         <option value="name_desc" class="bg-[#1d1b19] text-[#e7e2dd]">ПО НАЗВАНИЮ (Я-А)</option>
+                     </select>
+                 </div>
+             </div>
+             <div class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest hidden md:block">
+                Страница <span id="currentPageDisplay" class="text-primary">1</span>
+             </div>
+        </div>
+    </div>
 
-<!-- Pagination -->
-<div id="pagination" class="mt-12 flex justify-center items-center gap-3"></div>
+    <div id="productGrid" class="flex flex-col gap-4"></div>
+    <p id="noResults" class="hidden text-center text-on-surface-variant py-20 text-lg font-display-xl uppercase tracking-widest opacity-50">
+        <span class="material-symbols-outlined text-6xl block mb-4">search_off</span>
+        Товары не найдены
+    </p>
+
+    <!-- Pagination -->
+    <div id="pagination" class="mt-12 flex justify-center items-center gap-3"></div>
 </div>
 </div>
 </main>
@@ -111,18 +349,36 @@ tailwind.config = {
 <script>
 function toggleFilters() {
     const sidebar = document.getElementById('catalogSidebar');
-    const btn = document.getElementById('filterToggleBtn');
-    sidebar.classList.toggle('hidden');
+    const overlay = document.getElementById('filterDrawerOverlay');
+    const isMobile = window.innerWidth < 768;
     
-    if (sidebar.classList.contains('hidden')) {
-        btn.innerHTML = '<span class="material-symbols-outlined">filter_list</span> ПОКАЗАТЬ ФИЛЬТРЫ';
+    if (isMobile) {
+        const isOpen = sidebar.classList.contains('translate-x-0');
+        if (isOpen) {
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('translate-x-[-100%]');
+            overlay.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('pointer-events-none');
+                window.unlockScrollGlobal();
+            }, 500);
+        } else {
+            overlay.classList.remove('pointer-events-none');
+            // Force reflow
+            overlay.offsetHeight;
+            sidebar.classList.remove('translate-x-[-100%]');
+            sidebar.classList.add('translate-x-0');
+            overlay.classList.replace('opacity-0', 'opacity-100');
+            window.lockScrollGlobal();
+        }
     } else {
-        btn.innerHTML = '<span class="material-symbols-outlined">close</span> СКРЫТЬ ФИЛЬТРЫ';
+        sidebar.classList.toggle('hidden');
     }
 }
 
 let currentPage = 1;
 const itemsPerPage = 20;
+let currentSort = 'default';
 let activeFilters = {
     parentCategory: [],
     category: [],
@@ -188,6 +444,7 @@ async function fetchProducts() {
     if (activeFilters.length) params.append('length', activeFilters.length);
     if (activeFilters.width) params.append('width', activeFilters.width);
     if (searchQuery) params.append('search', searchQuery);
+    if (currentSort !== 'default') params.append('sort', currentSort);
 
     try {
         const res = await fetch(`/api/products?${params.toString()}`);
@@ -218,6 +475,8 @@ async function fetchProducts() {
         renderPagination(data.pagination);
         
         document.getElementById('productCount').textContent = data.pagination.total;
+        const pageDisp = document.getElementById('currentPageDisplay');
+        if (pageDisp) pageDisp.textContent = currentPage;
         
         if (data.products.length === 0) {
             noResults.classList.remove('hidden');
@@ -262,7 +521,7 @@ function updateBreadcrumbs() {
 function renderFilters() {
     updateBreadcrumbs();
     const container = document.getElementById('categoryFilters');
-    
+
     let filtersHtml = filterData.parentCategories.map(p => {
         const icons = {
           'Черный металлопрокат': 'construction',
@@ -274,32 +533,31 @@ function renderFilters() {
         const isExpanded = openSections.has(p);
         const categories = filterData.categories[p] || [];
         const isActiveParent = activeFilters.parentCategory.includes(p);
-        
+
         return `
-          <div class="mb-2">
-            <div onclick="toggleSection('${p}')" class="flex justify-between items-center py-4 px-5 border ${isActiveParent ? 'border-primary bg-primary/5 text-primary' : 'border-outline-variant/10 text-on-surface-variant hover:border-primary/40 hover:bg-primary/5'} cursor-pointer transition-all group bg-surface-container-low/30 rounded-xl">
-              <div class="flex items-center gap-4">
-                <span class="material-symbols-outlined ${isActiveParent ? 'text-primary' : 'text-primary/60'} group-hover:text-primary transition-colors">${icon}</span>
-                <span class="group-hover:text-primary transition-colors font-bold text-sm uppercase tracking-tight">${p}</span>
+          <div class="mb-1.5">
+            <div onclick="toggleSection('${p}')" class="filter-parent-category ${isActiveParent ? 'is-active' : ''}">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[18px] transition-colors">${icon}</span>
+                <span class="font-bold text-xs uppercase tracking-tight transition-colors">${p}</span>
               </div>
-              <span class="material-symbols-outlined text-[18px] transition-transform duration-300 ${isExpanded ? 'rotate-180 text-primary' : 'text-on-surface-variant/40 group-hover:text-primary'}">expand_more</span>
+              <span class="material-symbols-outlined text-[14px] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}">expand_more</span>
             </div>
-            
-            <div class="overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[2000px] mt-2 opacity-1' : 'max-h-0 opacity-0'}">
-              <div class="pl-4 space-y-1">
+
+            <div class="overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[2000px] mt-1 opacity-1' : 'max-h-0 opacity-0'}">
+              <div class="pl-2 space-y-0.5">
                 ${categories.map(cat => {
                   const isActiveCat = activeFilters.category.includes(cat.name);
                   let catHtml = `
-                    <div onclick="setFilter('category', '${cat.name}')" class="flex justify-between items-center py-2.5 px-4 rounded-lg border ${isActiveCat ? 'border-primary/50 bg-primary/10 text-primary' : 'border-transparent text-on-surface-variant hover:bg-primary/5 hover:text-primary'} cursor-pointer transition-all group">
-                      <span class="font-medium text-sm">${cat.name}</span>
-                      <span class="text-[10px] opacity-40">${cat.count}</span>
+                    <div onclick="setFilter('category', '${cat.name}')" class="filter-subcategory ${isActiveCat ? 'is-active' : ''}">
+                      <span class="filter-subcategory-name">${cat.name}</span>
+                      <span class="filter-subcategory-count">${cat.count}</span>
                     </div>
                   `;
-                  
+
                   if (isActiveCat && categoryFiltersCache[cat.name]) {
                     const cf = categoryFiltersCache[cat.name];
-                    let subFilters = `<div class="py-4 px-2 space-y-4 animate-fadeIn">`;
-                    
+                    let subFilters = `<div class="nested-filter-container animate-fadeIn">`;                    
                     const getUniqueFilters = (arr) => {
                         const groups = {};
                         arr.forEach(item => {
@@ -317,8 +575,8 @@ function renderFilters() {
 
                     if (allSizes.length > 0) {
                       subFilters += `<div>
-                        <h4 class="text-[9px] uppercase tracking-widest text-on-surface-variant mb-2">РАЗМЕРЫ / ВИД</h4>
-                        <select onchange="setFilterSize(this.value, '${cat.name}')" class="w-full bg-surface-container border border-outline-variant/20 text-on-surface text-xs focus:ring-primary focus:border-primary py-2.5 px-3 outline-none rounded-md cursor-pointer hover:border-primary/40 transition-all">
+                        <h4 class="filter-size-header">РАЗМЕРЫ / ВИД</h4>
+                        <select onchange="setFilterSize(this.value, '${cat.name}')" class="w-full compact-select border-none outline-none focus:ring-0 shadow-sm text-on-surface py-2 px-3 rounded-md cursor-pointer transition-all">
                           <option value="">Все размеры</option>
                           ${allSizes.map(s => {
                             const cleanLabel = s.toString().replace(/Швеллер|Балка|Арматура|Лист|Труба|Профнастил|сетка|окрашенный|оцинкованный|полиэстер|односторонний|двусторонний/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').trim();
@@ -330,9 +588,9 @@ function renderFilters() {
 
                     if (cf.lengths.length > 0 && p !== 'Кровля и фасад') {
                       const uniqueLengths = getUniqueFilters(cf.lengths).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-                      subFilters += `<div>
-                        <h4 class="text-[9px] uppercase tracking-widest text-on-surface-variant mb-2">ДЛИНА</h4>
-                        <select onchange="setFilter('length', this.value)" class="w-full bg-surface-container border border-outline-variant/20 text-on-surface text-xs focus:ring-primary focus:border-primary py-2.5 px-3 outline-none rounded-md cursor-pointer hover:border-primary/40 transition-all">
+                      subFilters += `<div class="mt-2">
+                        <h4 class="filter-size-header">ДЛИНА</h4>
+                        <select onchange="setFilter('length', this.value)" class="w-full compact-select border-none outline-none focus:ring-0 shadow-sm text-on-surface py-2 px-3 rounded-md cursor-pointer transition-all">
                           <option value="">Любая длина</option>
                           ${uniqueLengths.map(l => `<option value="${l}" ${activeFilters.length === l ? 'selected' : ''}>${l}</option>`).join('')}
                         </select>
@@ -352,6 +610,11 @@ function renderFilters() {
     }).join('');
 
     container.innerHTML = filtersHtml;
+    
+    // Initialize custom selects for sorting and filters
+    if (window.initCustomSelects) {
+        setTimeout(() => window.initCustomSelects(), 10);
+    }
 }
 
 function toggleSection(section) {
@@ -369,22 +632,15 @@ function toggleSection(section) {
     } else {
         activeFilters.parentCategory.push(section);
         openSections.add(section);
-        // Add all its subcategories
-        categories.forEach(cat => {
-            if (!activeFilters.category.includes(cat.name)) {
-                activeFilters.category.push(cat.name);
-                loadCategoryFilters(cat.name);
-            }
-        });
     }
     renderFilters();
-    applyFilters();
+    applyFilters(false); // Don't scroll top if in drawer
 }
 
-function applyFilters() {
+function applyFilters(shouldScroll = true) {
     currentPage = 1;
     fetchProducts();
-    window.scrollToTopGlobal();
+    if (shouldScroll) window.scrollToTopGlobal();
 }
 
 function setFilterSize(value, catName) {
@@ -401,7 +657,7 @@ function setFilterSize(value, catName) {
         }
     }
     renderFilters();
-    applyFilters();
+    applyFilters(false);
 }
 
 function setFilter(key, value) {
@@ -417,23 +673,33 @@ function setFilter(key, value) {
         activeFilters.length = null;
         activeFilters.width = null;
         renderFilters();
-        applyFilters();
+        applyFilters(false);
     } else {
         activeFilters[key] = value || null;
         renderFilters();
-        applyFilters();
+        applyFilters(false);
     }
 }
 
 function resetFilters() {
   activeFilters = { parentCategory: [], category: [], vid: null, length: null, width: null };
   searchQuery = '';
-  currentPage = 1;
   document.getElementById('searchInput').value = '';
+  currentSort = 'default';
+  const sortSelect = document.getElementById('sortSelect');
+  if (sortSelect) sortSelect.value = 'default';
+  
+  currentPage = 1;
   openSections.clear();
   categoryFiltersCache = {};
   renderFilters();
   fetchProducts();
+
+  // Close mobile filter drawer if open
+  const sidebar = document.getElementById('catalogSidebar');
+  if (sidebar && sidebar.classList.contains('translate-x-0') && window.innerWidth < 768) {
+      toggleFilters();
+  }
 }
 
 function renderProducts(products) {
@@ -449,32 +715,32 @@ function renderProducts(products) {
         </div>
         <h4 class="font-headline-md text-lg md:text-xl font-semibold text-on-surface group-hover:text-primary transition-colors truncate">${p.name}</h4>
         <div class="flex flex-wrap gap-4 mt-2">
-            <p class="text-on-surface-variant text-xs flex items-center gap-1.5">
+            <p class="text-on-surface-variant text-xs flex items-center gap-1.5 whitespace-nowrap">
                 <span class="material-symbols-outlined text-[16px] opacity-40">verified</span> ${p.steel || 'Ст3'}
             </p>
-            <p class="text-on-surface-variant text-xs flex items-center gap-1.5">
+            <p class="text-on-surface-variant text-xs flex items-center gap-1.5 whitespace-nowrap">
                 <span class="material-symbols-outlined text-[16px] opacity-40">straighten</span> ${p.length || 'Немерная'}
             </p>
-            <p class="text-on-surface-variant text-xs flex items-center gap-1.5">
+            <p class="text-on-surface-variant text-xs flex items-center gap-1.5 whitespace-nowrap">
                 <span class="material-symbols-outlined text-[16px] opacity-40">inventory_2</span> ${p.standard || 'ГОСТ'}
             </p>
         </div>
       </div>
 
       <div class="w-full md:w-auto flex flex-row md:flex-col items-end justify-between md:justify-center gap-4 md:text-right z-10 pointer-events-none">
-        <div>
+        <div class="whitespace-nowrap">
             <p class="font-label-caps text-[9px] text-on-surface-variant mb-0.5 uppercase tracking-widest">${p.price_ton ? 'ЦЕНА ЗА ТОННУ' : 'ЦЕНА'}</p>
             <p class="text-primary text-xl md:text-2xl font-bold tracking-tight leading-none">${p.priceTon} ₽</p>
         </div>
-        <div class="md:border-t md:border-outline-variant/10 md:pt-2">
+        <div class="md:border-t md:border-outline-variant/10 md:pt-2 whitespace-nowrap">
             <p class="font-label-caps text-[9px] text-on-surface-variant mb-0.5 uppercase tracking-widest">${p.unitLabel}</p>
             <p class="text-on-surface font-semibold text-sm leading-none">${p.priceUnit} ₽</p>
         </div>
       </div>
 
       <div class="w-full md:w-72 flex items-center gap-2 z-10">
-        <div class="flex-1 flex items-center bg-surface-container border border-outline-variant/10 overflow-hidden h-11">
-            <input type="text" id="qty-${p.id}" value="1.00" inputmode="decimal" class="w-16 bg-transparent border-none text-left pl-3 font-bold text-on-surface outline-none text-sm h-full"/>
+        <div class="qty-selector-container flex-1 flex items-center bg-surface-container border border-outline-variant/10 overflow-hidden h-11">
+            <input type="text" id="qty-${p.id}" value="1.00" inputmode="decimal" onblur="window.validateCatalogQtyInput(this, ${!!p.price_ton})" onchange="window.validateCatalogQtyInput(this, ${!!p.price_ton})" class="w-16 bg-transparent border-none text-left pl-3 font-bold text-on-surface outline-none text-sm h-full"/>
             <span class="text-[9px] font-label-caps text-on-surface-variant uppercase tracking-widest flex-1 opacity-60">${p.price_ton ? 'Т' : 'ЕД.'}</span>
             <div class="flex flex-col h-full w-10 border-l border-white/5 bg-white/5">
                 <button onclick="event.stopPropagation(); changeQty('${p.id}', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors border-b border-white/5 group">
@@ -485,7 +751,7 @@ function renderProducts(products) {
                 </button>
             </div>
         </div>
-        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="w-12 h-11 bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow">
+        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="catalog-cart-btn w-12 h-11 bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow">
             <span class="material-symbols-outlined">shopping_cart</span>
         </button>
       </div>
@@ -527,6 +793,16 @@ function changePage(p) {
     window.scrollToTopGlobal();
     fetchProducts();
 }
+
+window.validateCatalogQtyInput = function(input, isTon) {
+    let val = parseFloat(input.value.replace(',', '.')) || 0;
+    if (isTon && val > 1000) {
+        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+        val = 1000;
+    }
+    if (val < 0) val = 0;
+    input.value = val.toFixed(2);
+};
 
 window.changeQty = function(id, delta) {
     const input = document.getElementById('qty-' + id);
@@ -587,12 +863,18 @@ function addToCart(id) {
   fetch(`/api/products/${id}`).then(res => res.json()).then(p => {
     let cart = JSON.parse(localStorage.getItem('metal_cart') || '[]');
     const qtyInput = document.getElementById('qty-' + id);
-    const qty = qtyInput ? parseFloat(qtyInput.value) : 1;
+    let qty = qtyInput ? parseFloat(qtyInput.value.replace(',', '.')) : 1;
+    if (isNaN(qty) || qty <= 0) qty = 1;
     
     let price, unit, finalQty;
     if (p.price_ton) {
         price = p.price_ton;
         unit = 'т';
+        if (qty > 1000) {
+            alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+            qty = 1000;
+            if (qtyInput) qtyInput.value = "1000.00";
+        }
         finalQty = qty;
     } else {
         price = p.price_unit;
@@ -602,7 +884,12 @@ function addToCart(id) {
     
     const existing = cart.find(item => item.id === id);
     if (existing) {
-      existing.qty = (parseFloat(existing.qty) + finalQty).toFixed(2);
+      let newQty = parseFloat(existing.qty) + finalQty;
+      if (unit === 'т' && newQty > 1000) {
+          alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+          newQty = 1000;
+      }
+      existing.qty = newQty.toFixed(2);
     } else {
       cart.push({ 
         id: id, 

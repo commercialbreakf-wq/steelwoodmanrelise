@@ -1,0 +1,45 @@
+<h2>Техническая реализация переключателя</h2>
+<p class="subtitle">Как мы внедрим светлую тему без изменения текущего UI</p>
+
+<div class="mockup">
+  <div class="mockup-header">Предложение по архитектуре</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+      <div style="flex: 1; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
+        <h4 style="margin-top:0;">1. Глобальный конфиг</h4>
+        <p style="font-size: 14px;">Добавим в Tailwind конфигурацию светлые аналоги всех цветов (light-surface, light-on-surface и т.д.).</p>
+      </div>
+      <div style="flex: 1; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;">
+        <h4 style="margin-top:0;">2. Переключатель (Toggle)</h4>
+        <p style="font-size: 14px;">Добавим премиальный ползунок в шапку сайта (Shared Header). Он будет менять класс 'dark' на 'light' у тега &lt;html&gt;.</p>
+      </div>
+    </div>
+    
+    <h3>Дизайн кнопки-переключателя</h3>
+    <div class="options" data-multiselect="false">
+      <div class="option" data-choice="minimal" onclick="toggleSelect(this)">
+        <div class="content">
+          <h4>Минималистичный Икон-переключатель</h4>
+          <p>Простая иконка Луна/Солнце рядом с личным кабинетом. Не перегружает интерфейс.</p>
+        </div>
+      </div>
+      <div class="option" data-choice="premium-toggle" onclick="toggleSelect(this)">
+        <div class="content">
+          <h4>Индустриальный Слайдер</h4>
+          <p>Горизонтальный ползунок с текстовыми метками "DARK / LIGHT". Выглядит как элемент управления оборудованием.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Плюсы выбранного подхода</h4>
+    <ul>
+      <li>Не ломает текущую верстку</li>
+      <li>Легко масштабируется на все страницы через shared-ui.js</li>
+      <li>Запоминает выбор пользователя через localStorage</li>
+    </ul>
+  </div>
+</div>

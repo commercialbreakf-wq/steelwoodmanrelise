@@ -1,9 +1,19 @@
-﻿<!DOCTYPE html>
-<html class="dark" lang="ru">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>ЖЕЛЕЗНЫЙ ДРОВОСЕК — Навигация по страницам</title>
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
+<link rel="apple-touch-icon" href="/images/favicon.svg?v=4">
+<link rel="mask-icon" href="/images/favicon.svg?v=4" color="#ffb0cc">
+
+    <title>�������� �������� � ��������� �� ���������</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
@@ -202,118 +212,118 @@
 </head>
 <body>
     <div class="logo-container">
-        <img src="/images/logo_icon.png" alt="Logo" class="logo-img">
-        <div class="logo">ЖЕЛЕЗНЫЙ<br/><span>ДРОВОСЕК</span></div>
+        <img src="/images/logo_premium.png" alt="Logo" class="logo-img">
+        <div class="logo">��������<br/><span>��������</span></div>
     </div>
-    <div class="subtitle">Карта страниц сайта</div>
+    <div class="subtitle">����� ������� �����</div>
 
     <div class="main-link">
         <a href="/hi_tech_style/code.html">
-            <span>Открыть главную страницу</span>
+            <span>������� ������� ��������</span>
             <span class="material-symbols-outlined" style="font-size:18px; position:relative; z-index:1;">arrow_forward</span>
         </a>
     </div>
 
-    <div class="section-label">Разделы сайта</div>
+    <div class="section-label">������� �����</div>
     <div class="grid">
         <a class="card" href="/hi_tech_style/code">
             <div class="card-img-wrap">
-                <img class="card-img" src="/hi_tech_style/screen.png" alt="Главная"/>
-                <div class="card-badge">Главная</div>
+                <img class="card-img" src="/hi_tech_style/screen.png" alt="�������"/>
+                <div class="card-badge">�������</div>
             </div>
             <div class="card-body">
                 <div class="card-number">00</div>
-                <div class="card-title">Главная страница</div>
-                <div class="card-desc">Hero-секция, популярные категории, преимущества, новости и формы обратной связи</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">������� ��������</div>
+                <div class="card-desc">Hero-������, ���������� ���������, ������������, ������� � ����� �������� �����</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/catalog/">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_5/screen.png" alt="Каталог"/>
+                <img class="card-img" src="/_5/screen.png" alt="�������"/>
             </div>
             <div class="card-body">
                 <div class="card-number">01</div>
-                <div class="card-title">Каталог металлопроката</div>
-                <div class="card-desc">Список товаров с фильтрами по категориям, размерам и маркам стали</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">������� ��������������</div>
+                <div class="card-desc">������ ������� � ��������� �� ����������, �������� � ������ �����</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/product?id=balka-20b1">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_3/screen.png" alt="Карточка товара"/>
+                <img class="card-img" src="/_3/screen.png" alt="�������� ������"/>
             </div>
             <div class="card-body">
                 <div class="card-number">02</div>
-                <div class="card-title">Карточка товара</div>
-                <div class="card-desc">Балка 20Б1 — характеристики, галерея, калькулятор стоимости</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">�������� ������</div>
+                <div class="card-desc">����� 20�1 � ��������������, �������, ����������� ���������</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/calculator/">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_1/screen.png" alt="Калькулятор"/>
+                <img class="card-img" src="/_1/screen.png" alt="�����������"/>
             </div>
             <div class="card-body">
                 <div class="card-number">03</div>
-                <div class="card-title">Калькулятор веса металла</div>
-                <div class="card-desc">Выбор материала, формы и размеров для мгновенного расчёта веса и стоимости</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">����������� ���� �������</div>
+                <div class="card-desc">����� ���������, ����� � �������� ��� ����������� ������� ���� � ���������</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/services/">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_6/screen.png" alt="Услуги резки"/>
+                <img class="card-img" src="/_6/screen.png" alt="������ �����"/>
             </div>
             <div class="card-body">
                 <div class="card-number">04</div>
-                <div class="card-title">Услуги резки</div>
-                <div class="card-desc">Лазерная и плазменная резка металла, точность и промышленный сервис</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">������ �����</div>
+                <div class="card-desc">�������� � ���������� ����� �������, �������� � ������������ ������</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/certificates/">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_2/screen.png" alt="Сертификаты"/>
+                <img class="card-img" src="/_2/screen.png" alt="�����������"/>
             </div>
             <div class="card-body">
                 <div class="card-number">05</div>
-                <div class="card-title">Сертификаты качества</div>
-                <div class="card-desc">Документы и сертификаты соответствия ГОСТ на продукцию</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">����������� ��������</div>
+                <div class="card-desc">��������� � ����������� ������������ ���� �� ���������</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/fleet/">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_4/screen.png" alt="Логистика"/>
+                <img class="card-img" src="/_4/screen.png" alt="���������"/>
             </div>
             <div class="card-body">
                 <div class="card-number">06</div>
-                <div class="card-title">Автопарк и логистика</div>
-                <div class="card-desc">Собственный автопарк, маршруты доставки и условия</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">�������� � ���������</div>
+                <div class="card-desc">����������� ��������, �������� �������� � �������</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/about/">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_7/screen.png" alt="О компании"/>
+                <img class="card-img" src="/_7/screen.png" alt="� ��������"/>
             </div>
             <div class="card-body">
                 <div class="card-number">07</div>
-                <div class="card-title">О компании</div>
-                <div class="card-desc">История, производственный цикл, контактная форма и карта</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">� ��������</div>
+                <div class="card-desc">�������, ���������������� ����, ���������� ����� � �����</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
         <a class="card" href="/contacts/">
             <div class="card-img-wrap">
-                <img class="card-img" src="/_8/screen.png" alt="Контакты"/>
+                <img class="card-img" src="/_8/screen.png" alt="��������"/>
             </div>
             <div class="card-body">
                 <div class="card-number">08</div>
-                <div class="card-title">Контакты</div>
-                <div class="card-desc">Адреса, телефоны, карта проезда и форма обратной связи</div>
-                <div class="card-arrow">Открыть <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
+                <div class="card-title">��������</div>
+                <div class="card-desc">������, ��������, ����� ������� � ����� �������� �����</div>
+                <div class="card-arrow">������� <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></div>
             </div>
         </a>
     </div>

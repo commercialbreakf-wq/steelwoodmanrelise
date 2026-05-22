@@ -13,14 +13,15 @@
     document.documentElement.classList.add(savedTheme);
     
     window.toggleThemeGlobal = function() {
-        const currentTheme = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+        const doc = document.documentElement;
+        const currentTheme = doc.classList.contains('light') ? 'light' : 'dark';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
         // Add temporary switching class for smooth transition
-        document.documentElement.classList.add('theme-switching');
+        doc.classList.add('theme-transitioning');
         
-        document.documentElement.classList.remove('dark', 'light');
-        document.documentElement.classList.add(newTheme);
+        doc.classList.remove('dark', 'light');
+        doc.classList.add(newTheme);
         localStorage.setItem('theme', newTheme);
         
         // Dispatch event for components that might need to react
@@ -29,10 +30,10 @@
         // Update any toggle buttons on page
         updateToggleVisuals(newTheme);
         
-        // Remove switching class after transition
+        // Remove switching class after transition (matching CSS 0.25s)
         setTimeout(() => {
-            document.documentElement.classList.remove('theme-switching');
-        }, 600);
+            doc.classList.remove('theme-transitioning');
+        }, 250);
     };
 
     function updateToggleVisuals(theme) {
@@ -47,7 +48,7 @@
         
         activeIcons.forEach(icon => {
             icon.textContent = theme === 'light' ? 'light_mode' : 'dark_mode';
-            icon.style.color = theme === 'light' ? '#FF9500' : '#FFD60A';
+            icon.style.color = theme === 'light' ? '#c7c5c5' : '#FFD60A';
         });
     }
     
@@ -617,7 +618,11 @@ window.syncAuthStorageAndCookiesGlobal = function() {
     const preloaderStyles = `
         #globalPreloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #151311; z-index: 999999; 
+            background: rgba(21, 19, 17, 0.8) !important;
+            backdrop-filter: blur(25px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.02), inset 0 0 40px rgba(255, 176, 204, 0.02) !important;
+            z-index: 999999; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
             pointer-events: auto;
@@ -694,6 +699,41 @@ window.syncAuthStorageAndCookiesGlobal = function() {
             50% { opacity: 0.8; }
         }
         body.preloader-active { overflow: hidden !important; height: 100vh !important; }
+ 
+        /* Light Theme Preloader (Liquid Glass & Contrast Overrides) */
+        html.light #globalPreloader, html:not(.dark) #globalPreloader {
+            background: rgba(250, 250, 250, 0.8) !important;
+            backdrop-filter: blur(25px) saturate(200%) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.5), inset 0 0 40px rgba(214, 51, 108, 0.03) !important;
+        }
+        html.light .loader-ring, html:not(.dark) .loader-ring {
+            border-color: rgba(214, 51, 108, 0.08) !important;
+        }
+        html.light .loader-ring::after, html:not(.dark) .loader-ring::after {
+            border-top-color: #d6336c !important;
+        }
+        html.light .loader-hex, html:not(.dark) .loader-hex {
+            background: rgba(214, 51, 108, 0.03) !important;
+            border-color: rgba(214, 51, 108, 0.2) !important;
+        }
+        html.light .loader-hex::before, html:not(.dark) .loader-hex::before {
+            background: linear-gradient(to bottom, transparent, rgba(214, 51, 108, 0.3), transparent) !important;
+        }
+        html.light .loader-logo, html:not(.dark) .loader-logo {
+            filter: drop-shadow(0 0 15px rgba(214, 51, 108, 0.3)) !important;
+        }
+        html.light .loader-text, html:not(.dark) .loader-text {
+            color: #3B3B3B !important;
+            opacity: 0.8 !important;
+        }
+        html.light .loader-progress-track, html:not(.dark) .loader-progress-track {
+            background: rgba(214, 51, 108, 0.1) !important;
+        }
+        html.light .loader-progress-bar, html:not(.dark) .loader-progress-bar {
+            background: #d6336c !important;
+            box-shadow: 0 0 10px rgba(214, 51, 108, 0.5) !important;
+        }
     `;
 
     const inject = () => {
@@ -1123,12 +1163,14 @@ document.addEventListener('DOMContentLoaded', function() {
             #scrollTopBtnGlobal {
                 opacity: 0;
                 visibility: hidden;
+                pointer-events: none;
                 transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 transform: translateY(20px);
             }
             #scrollTopBtnGlobal.visible {
                 opacity: 1;
                 visibility: visible;
+                pointer-events: auto;
                 transform: translateY(0);
             }
             /* --- PREMIUM PINK SCROLLBAR --- */
@@ -1163,14 +1205,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="flex justify-between items-center h-20 px-4 md:px-margin-edge w-full max-w-container-max mx-auto">
             <div class="flex items-center gap-4 group">
                 <button id="mobileMenuBtnGlobal" onclick="toggleMobileMenuGlobal()" class="md:hidden material-symbols-outlined text-on-surface hover:text-primary transition-colors">menu</button>
-                <a class="flex items-center gap-4 hover:opacity-80 transition-opacity whitespace-nowrap no-underline" href="/">
-                    <div class="relative group/logo">
-                        <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 group-hover/logo:opacity-100 transition-opacity"></div>
-                        <img src="/images/logo_icon.png" alt="Железный Дровосек" class="w-14 h-14 md:w-16 md:h-16 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.4)]">
+                <a class="logo-link-hover-effect flex items-center gap-4 whitespace-nowrap no-underline" href="/">
+                    <div class="relative logo-img-container">
+                        <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 logo-bg-glow transition-opacity duration-500"></div>
+                        <img src="/images/logo_icon.png" alt="Железный Дровосек" class="logo-img w-14 h-14 md:w-16 md:h-16 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.4)]">
                     </div>
                     <div class="flex flex-col items-start leading-none">
-                        <span class="font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
-                        <span class="font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
+                        <span class="logo-text-part-1 font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
+                        <span class="logo-text-part-2 font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
                     </div>
                 </a>
             </div>
@@ -1213,11 +1255,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="mobileMenuOverlayGlobal" class="absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 transition-opacity duration-500 pointer-events-none" onclick="toggleMobileMenuGlobal()"></div>
         <div id="mobileMenuPanelGlobal" class="absolute top-0 left-0 w-[85%] max-w-sm h-full bg-surface/90 backdrop-blur-[40px] border-r border-white/10 -translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.33,1,0.68,1)] pointer-events-auto p-8 flex flex-col">
             <header class="flex justify-between items-center mb-10">
-                <a href="/" class="flex items-center gap-4 leading-none no-underline">
-                    <img src="/images/logo_icon.png" alt="Logo" class="w-14 h-14 object-cover rounded-full border-2 border-primary/30 shadow-[0_0_15px_rgba(255,176,204,0.3)]">
+                <a href="/" class="logo-link-hover-effect flex items-center gap-4 leading-none no-underline">
+                    <div class="relative logo-img-container">
+                        <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 logo-bg-glow transition-opacity duration-500"></div>
+                        <img src="/images/logo_icon.png" alt="Logo" class="logo-img w-14 h-14 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_15px_rgba(255,176,204,0.3)]">
+                    </div>
                     <div class="flex flex-col items-start leading-none">
-                        <span class="font-display-xl text-[20px] text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
-                        <span class="font-display-xl text-[20px] text-primary font-semibold uppercase">ДРОВОСЕК</span>
+                        <span class="logo-text-part-1 font-display-xl text-[20px] text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
+                        <span class="logo-text-part-2 font-display-xl text-[20px] text-primary font-semibold uppercase">ДРОВОСЕК</span>
                     </div>
                 </a>
                 <button onclick="toggleMobileMenuGlobal()" class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-white/5">close</button>
@@ -1600,7 +1645,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="floatingChatBadgeGlobal" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden border-2 border-background"></span>
     </button>
 
-    <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-4 left-4 md:bottom-10 md:right-10 md:left-auto z-[5000] w-12 h-12 md:w-16 md:h-16 bg-surface-container-high/80 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-primary hover:text-surface transition-all duration-500 shadow-2xl opacity-0 pointer-events-none translate-y-10 group rounded-2xl md:rounded-[1.5rem]">
+    <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-4 left-4 md:bottom-10 md:right-10 md:left-auto z-[5000] w-12 h-12 md:w-16 md:h-16 bg-surface-container-high/80 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-primary hover:text-surface transition-all duration-500 shadow-2xl group rounded-2xl md:rounded-[1.5rem]">
         <span class="material-symbols-outlined text-[24px] md:text-[32px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
     </button>
     `;
@@ -1626,7 +1671,7 @@ document.addEventListener('DOMContentLoaded', function() {
         /* Admin/Telegram Chat Style */
         .chat-bubble { border-radius: 1.5rem; padding: 1rem 1.25rem; font-size: 0.9375rem; line-height: 1.5; position: relative; max-width: 85%; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .chat-bubble-bot { background: #211f1d; color: #e7e2dd; border-bottom-left-radius: 0.25rem; border: 1px solid rgba(255,255,255,0.05); }
-        .chat-bubble-user { background: #964551; color: #0f0e0c; align-self: flex-end; border-bottom-right-radius: 0.25rem; font-weight: 500; }
+        .chat-bubble-user { background: #964551; color: #c7c5c5; align-self: flex-end; border-bottom-right-radius: 0.25rem; font-weight: 500; }
         .chat-time { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; opacity: 0.3; margin-top: 0.4rem; }
         .ease-apple { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-animate-in { animation: modalIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -1642,11 +1687,14 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-gutter mb-20">
                 <!-- Branding Column -->
                 <div class="md:col-span-4 space-y-8">
-                    <a class="flex items-center gap-4 hover:opacity-80 transition-opacity no-underline" href="/">
-                        <img src="/images/logo_icon.png" alt="Железный Дровосек" class="w-16 h-16 object-cover rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.3)]">
+                    <a class="logo-link-hover-effect flex items-center gap-4 no-underline" href="/">
+                        <div class="relative logo-img-container">
+                            <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 logo-bg-glow transition-opacity duration-500"></div>
+                            <img src="/images/logo_icon.png" alt="Железный Дровосек" class="logo-img w-16 h-16 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.3)]">
+                        </div>
                         <div class="flex flex-col items-start leading-none">
-                            <span class="font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
-                            <span class="font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
+                            <span class="logo-text-part-1 font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
+                            <span class="logo-text-part-2 font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
                         </div>
                     </a>
                     <p class="text-on-surface-variant text-sm leading-relaxed max-w-sm opacity-80">
@@ -1749,6 +1797,67 @@ document.addEventListener('DOMContentLoaded', function() {
             transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease !important;
         }
 
+        /* --- PREMIUM LOGO HOVER EFFECT --- */
+        .logo-link-hover-effect {
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .logo-link-hover-effect:hover {
+            opacity: 1 !important;
+        }
+        .logo-link-hover-effect .logo-img {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        border-color 0.4s ease;
+        }
+        .logo-link-hover-effect:hover .logo-img {
+            transform: scale(1.08) rotate(15deg);
+            border-color: #ca7093 !important;
+            box-shadow: 0 0 25px rgba(255, 176, 204, 0.7) !important;
+        }
+        .logo-link-hover-effect .logo-bg-glow {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .logo-link-hover-effect:hover .logo-bg-glow {
+            opacity: 1 !important;
+            transform: scale(1.2);
+        }
+        .logo-link-hover-effect .logo-text-part-1,
+        .logo-link-hover-effect .logo-text-part-2 {
+            display: inline-block;
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                        color 0.3s ease,
+                        text-shadow 0.4s ease,
+                        letter-spacing 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .logo-link-hover-effect:hover .logo-text-part-1 {
+            transform: translateX(4px);
+            letter-spacing: 0.03em;
+            color: #ffffff !important;
+        }
+        .logo-link-hover-effect:hover .logo-text-part-2 {
+            transform: translateX(6px);
+            letter-spacing: 0.05em;
+            color: #ca7093 !important;
+            text-shadow: 0 0 15px rgba(255, 176, 204, 0.6);
+        }
+
+        /* Light mode adjustments */
+        html.light .logo-link-hover-effect:hover .logo-img,
+        html:not(.dark) .logo-link-hover-effect:hover .logo-img {
+            border-color: #d6336c !important;
+            box-shadow: 0 0 20px rgba(214, 51, 108, 0.5) !important;
+        }
+        html.light .logo-link-hover-effect:hover .logo-text-part-1,
+        html:not(.dark) .logo-link-hover-effect:hover .logo-text-part-1 {
+            color: #000000 !important;
+        }
+        html.light .logo-link-hover-effect:hover .logo-text-part-2,
+        html:not(.dark) .logo-link-hover-effect:hover .logo-text-part-2 {
+            text-shadow: 0 0 12px rgba(214, 51, 108, 0.5) !important;
+            color: #d6336c !important;
+        }
+
         #globalHeader { z-index: 1000; }
         .nav-link { position: relative; }
         .nav-link::after {
@@ -1807,6 +1916,16 @@ document.addEventListener('DOMContentLoaded', function() {
             will-change: transform, opacity;
             backface-visibility: hidden;
         }
+        
+        /* LIQUID GLASS EFFECT FOR DARK THEME */
+        html.dark #cartPanelGlobal, 
+        html.dark #authPanelGlobal {
+            background: rgba(21, 19, 17, 0.4) !important;
+            backdrop-filter: blur(40px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+            border-left: 1px solid rgba(255, 176, 204, 0.1) !important;
+            box-shadow: -20px 0 80px rgba(0, 0, 0, 0.6), inset 1px 0 0 rgba(255, 255, 255, 0.05) !important;
+        }
         #mobileMenuPanelGlobal { box-shadow: 20px 0 60px rgba(0,0,0,0.5); }
         
         .mega-default-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; gap: 16px; }
@@ -1814,7 +1933,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .mega-default-title { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600; color: #e7e2dd; }
         .mega-default-desc { font-size: 14px; color: rgba(215, 193, 199, 0.5); max-width: 280px; }
         .mega-default-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 12px 28px; border: 1px solid #964551; color: #c7c5c5; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-decoration: none; transition: all 0.3s ease; }
-        .mega-default-btn:hover { background: #964551; color: #151311; }
+        .mega-default-btn:hover { background: #964551; color: #c7c5c5; }
 
         /* Compact About Menu */
         .about-compact-menu { width: auto; }
@@ -1836,12 +1955,14 @@ document.addEventListener('DOMContentLoaded', function() {
         #scrollTopBtnGlobal, #floatingChatBtnGlobal {
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateY(20px);
         }
         #scrollTopBtnGlobal.visible, #floatingChatBtnGlobal.visible {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
             transform: translateY(0);
         }
 
@@ -4025,6 +4146,12 @@ html.light .text-primary * {
     color: #964551 !important;
 }
 
+html.light a[href="/"] .text-primary,
+html:not(.dark) a[href="/"] .text-primary {
+    color: #d6336c !important;
+}
+
+
 /* 5. Header Fix */
 html.light #globalHeader {
     background-color: rgba(199, 197, 197, 0.8) !important;
@@ -4107,10 +4234,10 @@ html.light .tab-btn.active,
 html.light .tab-active,
 html:not(.dark) .tab-btn.active,
 html:not(.dark) .tab-active {
-    background-color: #d6336c !important;
-    background: #d6336c !important;
-    color: #ffffff !important;
-    border-color: #d6336c !important;
+    background-color: rgba(150, 69, 81, 0.15) !important;
+    background: rgba(150, 69, 81, 0.15) !important;
+    color: #964551 !important;
+    border-color: #964551 !important;
 }
 html.light .active-shape-card,
 html:not(.dark) .active-shape-card {
@@ -4131,6 +4258,179 @@ html.light .industrial-glow:hover,
 html:not(.dark) .industrial-glow:hover {
     border-color: #d6336c !important;
     box-shadow: inset 0 0 25px rgba(214, 51, 108, 0.1) !important;
+}
+html.light input,
+html.light textarea,
+html.light select,
+html:not(.dark) input,
+html:not(.dark) textarea,
+html:not(.dark) select {
+    color: #3B3B3B !important;
+}
+html.light input::placeholder,
+html.light textarea::placeholder,
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light input::-webkit-input-placeholder,
+html:not(.dark) input::-webkit-input-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light textarea::-webkit-input-placeholder,
+html:not(.dark) textarea::-webkit-input-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light select::-webkit-input-placeholder,
+html:not(.dark) select::-webkit-input-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light input::-moz-placeholder,
+html:not(.dark) input::-moz-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light textarea::-moz-placeholder,
+html:not(.dark) textarea::-moz-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light select::-moz-placeholder,
+html:not(.dark) select::-moz-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light input:-ms-input-placeholder,
+html:not(.dark) input:-ms-input-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light textarea:-ms-input-placeholder,
+html:not(.dark) textarea:-ms-input-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light select:-ms-input-placeholder,
+html:not(.dark) select:-ms-input-placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light input::placeholder,
+html:not(.dark) input::placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light textarea::placeholder,
+html:not(.dark) textarea::placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+html.light select::placeholder,
+html:not(.dark) select::placeholder {
+    color: rgba(59, 59, 59, 0.6) !important;
+}
+
+html.light .cta-urgent-box .cta-title,
+html:not(.dark) .cta-urgent-box .cta-title {
+    color: #964551 !important;
+}
+html.light .cta-urgent-box .cta-btn,
+html:not(.dark) .cta-urgent-box .cta-btn {
+    background-color: #964551 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+html.light .cta-urgent-box .cta-btn:hover,
+html:not(.dark) .cta-urgent-box .cta-btn:hover {
+    background-color: #7a3541 !important;
+    color: #ffffff !important;
+}
+html.light .cta-urgent-box .cta-btn .material-symbols-outlined,
+html:not(.dark) .cta-urgent-box .cta-btn .material-symbols-outlined {
+    color: #ffffff !important;
+}
+
+html.light .mega-default-title,
+html:not(.dark) .mega-default-title {
+    color: #3B3B3B !important;
+}
+html.light .mega-default-desc,
+html:not(.dark) .mega-default-desc {
+    color: #3B3B3B !important;
+    opacity: 0.85 !important;
+}
+
+/* Fix text and icon colors on wine-red (#964551) background elements to be light gray (#c7c5c5) */
+html.light .bg-primary,
+html.light button.bg-primary,
+html.light [type="submit"],
+html.light .addToCartBtn,
+html.light [onclick*="addToCart"],
+html.light .mega-default-btn,
+html.light #floatingChatBtnGlobal {
+    color: #c7c5c5 !important;
+}
+
+html.light .bg-primary *,
+html.light button.bg-primary *,
+html.light [type="submit"] *,
+html.light .addToCartBtn *,
+html.light [onclick*="addToCart"] *,
+html.light .mega-default-btn *,
+html.light #floatingChatBtnGlobal * {
+    color: #c7c5c5 !important;
+}
+
+/* Hover state for floating chat button (turns background white, so text/icon should be dark gray) */
+html.light #floatingChatBtnGlobal:hover,
+html.light #floatingChatBtnGlobal:hover * {
+    color: #3B3B3B !important;
+}
+
+/* Hover state for scroll to top button (turns background wine-red, so text/icon should be light gray) */
+html.light #scrollTopBtnGlobal:hover,
+html.light #scrollTopBtnGlobal:hover * {
+    color: #c7c5c5 !important;
+}
+
+/* Ensure buttons inside bg-primary with their own light/dark background retain correct text/icon contrast */
+html.light .bg-primary button:not(.bg-primary),
+html.light .bg-primary button:not(.bg-primary) * {
+    color: #3B3B3B !important;
+}
+html.light .bg-primary button:not(.bg-primary):hover,
+html.light .bg-primary button:not(.bg-primary):hover * {
+    color: #EBE8E6 !important;
+}
+
+
+/* === POPULAR CATEGORIES LIGHT THEME ALIGNMENT === */
+html.light #popular-categories a,
+html.light #popular-categories [class*="bg-surface"] {
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.light #popular-categories [class*="bg-gradient-to-t"] {
+    background-image: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%) !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+@media (min-width: 768px) {
+    html.light #popular-categories a p {
+        opacity: 0 !important;
+        transition: opacity 0.5s ease, transform 0.5s ease !important;
+    }
+    html.light #popular-categories a:hover p {
+        opacity: 1 !important;
+    }
+}
+
+/* Custom contrast improvements for switcher and cart badge in light theme */
+html.light .apple-toggle-thumb {
+    background-color: #3B3B3B !important;
+}
+html.light .apple-toggle-thumb .theme-icon-active {
+    color: #c7c5c5 !important;
+}
+html.light #cartBadgeGlobal {
+    background-color: #3B3B3B !important;
+    color: #c7c5c5 !important;
 }
 `;
     const style = document.createElement('style');

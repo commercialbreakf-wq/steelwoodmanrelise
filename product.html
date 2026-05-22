@@ -1,174 +1,149 @@
 <!DOCTYPE html>
-<html class="dark" lang="ru">
+<html lang="ru">
 <head>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.add(theme);
+    })();
+  </script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=4">
+<link rel="apple-touch-icon" href="/images/favicon.svg?v=4">
+<link rel="mask-icon" href="/images/favicon.svg?v=4" color="#ffb0cc">
+
 <title>Карточка товара — ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script>
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "outline-variant":"#534347","surface-container-lowest":"#0f0e0c",
-        "surface-container-highest":"#373431","primary-container":"#cf7498",
-        "surface-container-high":"#2c2a27","on-surface-variant":"#d7c1c7",
-        "on-surface":"#e7e2dd","surface-container-low":"#1d1b19",
-        "surface-container":"#211f1d","primary":"#ffb0cc","surface":"#151311",
-        "on-background":"#e7e2dd","on-primary":"#5a1536","background":"#151311",
-        "outline":"#a08c91"
-      },
-      spacing: {
-        "margin-edge":"64px",
-        "margin-edge-mobile":"20px",
-        "section-gap":"160px",
-        "section-gap-mobile":"80px",
-        "gutter":"24px",
-        "container-max":"1440px"
-      },
-      fontFamily: {"body-md":["Inter", "sans-serif"],"label-caps":["Space Grotesk", "sans-serif"],"headline-md":["Space Grotesk", "sans-serif"],"display-xl":["Space Grotesk", "sans-serif"]},
-
-      fontSize: {
-        "body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],
-        "label-caps":["14px",{"lineHeight":"20px","letterSpacing":"0.1em","fontWeight":"600"}],
-        "body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],
-        "headline-md":["48px",{"lineHeight":"56px","fontWeight":"500"}],
-        "display-xl":["80px",{"lineHeight":"80px","letterSpacing":"-0.04em","fontWeight":"700"}]
-      }
-    }
-  }
-}
-</script>
-<script src="/js/shared-ui.js"></script>
+<script src="/js/theme.js?v=1"></script>
+<script src="/js/shared-ui.js?v=8" defer></script>
 <script src="/js/product-images.js"></script>
+<style>
+</style>
 </head>
 <body class="font-body-md bg-background text-on-background selection:bg-primary selection:text-on-primary">
 
 <!-- Shared Header -->
 
-<main class="pt-24 md:pt-32 pb-16 md:pb-24 max-w-container-max mx-auto px-margin-edge-mobile md:px-margin-edge">
+<main class="pt-28 md:pt-32 pb-12 md:pb-24 max-w-container-max mx-auto px-margin-edge-mobile md:px-margin-edge">
 
-<div class="grid grid-cols-12 gap-gutter">
-<!-- Breadcrumbs -->
-<nav id="breadcrumbs" class="col-span-12 mb-8 flex items-center gap-2 font-label-caps text-label-caps text-on-surface-variant fade-in"></nav>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-4 lg:gap-y-10 items-start">
 
-<!-- Product Image -->
-<div class="col-span-12 lg:col-span-7 flex flex-col fade-in" style="animation-delay:.1s">
-<div class="aspect-[4/3] w-full overflow-hidden border border-outline-variant/10 group relative mb-6 bg-surface-container">
-<img id="productImg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="" alt=""/>
-<div id="productBadge" class="absolute top-6 left-6 bg-surface/40 backdrop-blur-md px-4 py-2 border border-outline-variant/20">
-<span class="font-label-caps text-label-caps text-primary">ГОСТ / ТУ</span>
-</div>
-</div>
-<section class="space-y-6 mt-6">
-<h2 class="font-label-caps text-label-caps text-primary uppercase">ОПИСАНИЕ ПРОДУКТА</h2>
-<p id="productDesc" class="text-on-surface-variant"></p>
-</section>
-</div>
-
-<!-- Product Details -->
-<div class="col-span-12 lg:col-span-5 space-y-8 md:space-y-10 lg:pl-12 fade-in" style="animation-delay:.2s">
-<header>
-<p id="productCategory" class="font-label-caps text-[12px] md:text-label-caps text-on-surface-variant mb-2"></p>
-<h1 id="productName" class="text-[28px] md:text-[36px] lg:text-[44px] font-display-xl uppercase leading-tight mb-6"></h1>
-<p id="productSubtitle" class="font-body-lg text-body-lg text-on-surface-variant max-w-md opacity-80"></p>
-</header>
-
-
-<!-- Specs -->
-<section class="space-y-4">
-<h3 class="font-label-caps text-label-caps text-primary">ТЕХНИЧЕСКИЕ ХАРАКТЕРИСТИКИ</h3>
-<div id="specsTable" class="border-t border-outline-variant/20"></div>
-</section>
-
-<!-- Calculator -->
-<section class="glass-panel p-6 md:p-8 space-y-6 bg-surface-container/50 border border-outline-variant/10">
-<h3 class="font-label-caps text-label-caps text-primary">КАЛЬКУЛЯТОР СТОИМОСТИ</h3>
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <!-- Weight -->
-    <div>
-        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-2 uppercase tracking-widest opacity-60">ВЕС (Т)</label>
-        <div class="flex items-center bg-surface-container border border-outline-variant/10 h-16 group hover:border-primary/30 transition-all">
-            <input id="calcWeight" class="w-full bg-transparent border-none text-left pl-4 font-bold text-on-surface outline-none text-xl" type="text" value="1.00" inputmode="decimal"/>
-            <div class="flex flex-col h-full w-12 border-l border-white/5">
-                <button onclick="stepInput('weight', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
-                    <span class="material-symbols-outlined text-primary text-xl">expand_less</span>
-                </button>
-                <button onclick="stepInput('weight', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
-                    <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
-                </button>
-            </div>
+<!-- 1. Left Column: Image -->
+<div class="col-span-1 lg:col-span-7 order-1 fade-in flex flex-col gap-4 md:gap-8" style="animation-delay:.1s">
+    <!-- Navigation Group -->
+    <div class="flex flex-col gap-2 md:gap-3">
+        <!-- Catalog Link -->
+        <div class="flex">
+            <a href="/catalog/" class="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-primary transition-all duration-300 font-label-caps text-[11px] md:text-[12px] tracking-widest group">
+                <span class="material-symbols-outlined text-[16px] md:text-[18px] transition-transform group-hover:-translate-x-1">west</span> 
+                ВЕРНУТЬСЯ В КАТАЛОГ
+            </a>
         </div>
+
+        <!-- Breadcrumbs -->
+        <nav id="breadcrumbs" class="flex items-center gap-2 font-label-caps text-[10px] md:text-[12px] tracking-wider text-on-surface-variant/60 overflow-x-auto whitespace-nowrap pb-1 scroll-hide"></nav>
     </div>
-    <!-- Quantity -->
-    <div>
-        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-2 uppercase tracking-widest opacity-60">КОЛ-ВО (ШТ)</label>
-        <div class="flex items-center bg-surface-container border border-outline-variant/10 h-16 group hover:border-primary/30 transition-all">
-            <input id="calcQty" class="w-full bg-transparent border-none text-left pl-4 font-bold text-on-surface outline-none text-xl" type="text" value="1" inputmode="numeric"/>
-            <div class="flex flex-col h-full w-12 border-l border-white/5">
-                <button onclick="stepInput('qty', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
-                    <span class="material-symbols-outlined text-primary text-xl">expand_less</span>
-                </button>
-                <button onclick="stepInput('qty', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
-                    <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
-                </button>
-            </div>
-        </div>
-    </div>
-    <!-- Length -->
-    <div>
-        <label class="font-label-caps text-[10px] text-on-surface-variant block mb-2 uppercase tracking-widest opacity-60">ДЛИНА (ММ)</label>
-        <div class="flex items-center bg-surface-container border border-outline-variant/10 h-16 group hover:border-primary/30 transition-all">
-            <input id="calcLen" class="w-full bg-transparent border-none text-left pl-4 font-bold text-on-surface outline-none text-xl" type="text" value="6000" inputmode="numeric"/>
-            <div class="flex flex-col h-full w-12 border-l border-white/5">
-                <button onclick="stepInput('len', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
-                    <span class="material-symbols-outlined text-primary text-xl">expand_less</span>
-                </button>
-                <button onclick="stepInput('len', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20">
-                    <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
-                </button>
-            </div>
+
+    <div class="aspect-[21/9] lg:aspect-[16/10] w-full overflow-hidden border border-outline-variant/10 group relative bg-surface-container shadow-2xl rounded-2xl">
+        <img id="productImg" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="" alt=""/>
+        <div id="productBadge" class="absolute top-4 left-4 md:top-6 md:left-6 bg-surface/60 backdrop-blur-xl px-3 py-1.5 md:px-4 md:py-2 border border-outline-variant/20 rounded-lg">
+            <span class="font-label-caps text-[10px] md:text-[12px] text-primary tracking-[0.2em]">ГОСТ / ТУ</span>
         </div>
     </div>
 </div>
 
-<div class="grid grid-cols-2 gap-4">
-<div class="bg-surface-container p-4">
-<span class="font-label-caps text-[10px] text-on-surface-variant block uppercase" id="priceLabel1">Цена за тонну</span>
-<span class="font-headline-md text-[20px] md:text-[24px] text-on-surface" id="priceValue1"></span>
-</div>
-<div class="bg-surface-container p-4">
-<span class="font-label-caps text-[10px] text-on-surface-variant block uppercase" id="priceLabel2">За метр</span>
-<span class="font-headline-md text-[20px] md:text-[24px] text-on-surface" id="priceValue2"></span>
-</div>
-</div>
-<div class="pt-4">
-<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-<span class="font-label-caps text-label-caps text-on-surface-variant whitespace-nowrap">ИТОГО К ОПЛАТЕ</span>
-<span class="text-[32px] md:text-[40px] lg:text-[48px] font-display-xl text-primary leading-none whitespace-nowrap" id="totalPrice"></span>
+<!-- 2. Right Column: Container for Title, Price, Calc -->
+<div class="col-span-1 lg:col-span-5 order-2 flex flex-col gap-3 lg:gap-8 fade-in" style="animation-delay:.2s">
+    <header>
+        <p id="productCategory" class="font-label-caps text-[10px] md:text-[11px] tracking-[0.3em] text-primary mb-0.5 md:mb-3 uppercase opacity-60"></p>
+        <h1 id="productName" class="text-[22px] sm:text-[36px] md:text-[42px] lg:text-[52px] font-display-xl uppercase leading-[1.1] tracking-tight mb-0"></h1>
+    </header>
+
+    <!-- Price Display -->
+    <div class="price-block bg-[#0f0e0c] py-2 px-4 md:p-8 border-l-4 border-primary rounded-r-2xl shadow-[inset_0_0_40px_rgba(0,0,0,0.6)] border border-white/5 border-l-primary transition-all duration-300">
+        <div class="flex flex-row lg:flex-col items-center lg:items-start justify-between lg:gap-0.5">
+            <span class="font-label-caps text-[9px] md:text-[11px] tracking-[0.2em] text-on-surface-variant/50 uppercase font-bold">Итого к оплате</span>
+            <div class="flex items-baseline gap-1.5 md:gap-2">
+                <span class="text-[22px] sm:text-[44px] md:text-[56px] font-display-xl text-primary leading-none" id="totalPrice"></span>
+                <span class="text-[10px] md:text-sm text-on-surface-variant/40 font-bold uppercase tracking-widest">/ т.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calculator Card -->
+    <section class="glass-panel no-full-height p-6 md:p-8 space-y-5 md:space-y-8 bg-[#1a1816]/60 backdrop-blur-xl border border-white/5 relative overflow-hidden rounded-3xl md:rounded-[2.5rem]">
+        <div class="absolute top-0 right-0 w-40 h-40 bg-primary/5 blur-[100px] rounded-full -mr-20 -mt-20"></div>
+        
+        <div class="flex items-center justify-between">
+            <h3 id="calcTitle" class="font-label-caps text-[9px] md:text-[12px] tracking-[0.2em] text-on-surface-variant uppercase font-bold">Параметры заказа</h3>
+            <span class="material-symbols-outlined text-primary/40 text-xs md:text-lg">calculate</span>
+        </div>
+
+        <div class="space-y-4 md:space-y-6">
+            <!-- Weight Input -->
+            <div class="space-y-1.5 md:space-y-3">
+                <div class="flex justify-between items-end px-1">
+                    <label id="weightLabel" for="calcWeight" class="font-label-caps text-[9px] md:text-[11px] text-on-surface-variant/80 uppercase tracking-widest font-bold">ВЕС (Тонны)</label>
+                    <span class="text-[9px] md:text-[11px] text-primary font-bold font-mono" id="priceValue1_mini"></span>
+                </div>
+                <div class="calc-input-container flex items-center bg-[#0a0908] border border-white/10 h-14 md:h-20 group focus-within:border-primary/50 transition-all duration-500 rounded-xl md:rounded-2xl overflow-hidden shadow-inner">
+                    <input id="calcWeight" class="w-full bg-transparent border-none text-left pl-4 md:pl-6 font-display-xl text-xl md:text-3xl text-on-surface outline-none qty-input" type="text" value="1.00" inputmode="decimal"/>
+                    <div class="flex flex-col h-full w-12 md:w-16 border-l border-white/5 bg-white/[0.03]">
+                        <button onclick="stepInput('weight', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 text-primary transition-colors">
+                            <span class="material-symbols-outlined text-lg md:text-2xl">add</span>
+                        </button>
+                        <button onclick="stepInput('weight', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-t border-white/5">
+                            <span class="material-symbols-outlined text-lg md:text-2xl">remove</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden inputs -->
+            <input id="calcQty" type="hidden" value="1"/>
+            <input id="calcLen" type="hidden" value="6000"/>
+
+            <div class="pt-1">
+                <button onclick="addToCart()" id="addToCartBtn" class="w-full h-14 md:h-20 bg-primary text-on-primary font-label-caps text-[12px] md:text-[14px] tracking-[0.2em] flex items-center justify-center gap-2 group relative overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] shadow-[0_15px_30px_-10px_rgba(255,176,204,0.3)] rounded-full">
+                    <span class="material-symbols-outlined text-lg md:text-xl">shopping_cart</span>
+                    <span class="relative z-10 font-bold uppercase">В КОРЗИНУ</span>
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+
 </div>
 
-<button id="addToCartBtn" class="w-full h-16 bg-transparent border border-primary text-primary font-label-caps text-label-caps tracking-widest relative overflow-hidden group pink-glow transition-all duration-500">
-<span class="relative z-10 transition-colors duration-500 group-hover:text-on-primary">В КОРЗИНУ</span>
-<div class="absolute top-0 left-0 w-0 h-full bg-primary transition-all duration-500 group-hover:w-full -z-0"></div>
-</button>
-</div>
-</section>
+<!-- 3. Bottom Row: Specs & Description -->
+<div class="col-span-1 lg:col-span-12 order-3 space-y-6 md:space-y-12 fade-in mt-4 md:mt-12 pt-4 md:pt-12 border-t border-outline-variant/10" style="animation-delay:.3s">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+        <section class="no-full-height space-y-3 md:space-y-6">
+            <h2 class="font-label-caps text-[12px] md:text-label-caps text-primary uppercase flex items-center gap-3">
+                <span class="w-6 md:w-8 h-[1px] bg-primary/30"></span>
+                Описание
+            </h2>
+            <p id="productDesc" class="text-on-surface-variant leading-relaxed text-xs md:text-sm opacity-80"></p>
+        </section>
 
-<!-- Back to catalog -->
-<a href="/catalog/" class="flex items-center gap-3 text-on-surface-variant hover:text-primary transition-colors font-label-caps text-label-caps">
-<span class="material-symbols-outlined">arrow_back</span> НАЗАД В КАТАЛОГ
-</a>
+        <section class="no-full-height space-y-3 md:space-y-6">
+            <h2 class="font-label-caps text-[12px] md:text-label-caps text-primary uppercase flex items-center gap-3">
+                <span class="w-6 md:w-8 h-[1px] bg-primary/30"></span>
+                Характеристики
+            </h2>
+            <div id="specsTable" class="border-t border-outline-variant/10"></div>
+        </section>
+    </div>
 </div>
 </div>
 
 <!-- Related Products -->
-<section class="mt-24 fade-in" style="animation-delay:.3s">
-<h2 class="font-label-caps text-label-caps text-primary mb-8 border-l-2 border-primary pl-4">ПОХОЖИЕ ТОВАРЫ</h2>
+<section class="no-full-height mt-8 md:mt-32 fade-in" style="animation-delay:.4s">
+<h2 class="font-label-caps text-label-caps text-primary mb-6 md:mb-8 border-l-2 border-primary pl-4">ПОХОЖИЕ ТОВАРЫ</h2>
 <div id="relatedGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter"></div>
 </section>
 </main>
@@ -220,110 +195,160 @@ function showNotFound(status, error, details) {
 let currentProduct = null;
 
 function renderProduct(product) {
+  // Normalize properties to support both snake_case and camelCase API responses safely
+  product.name = product.name || '';
+  product.category = product.category || '';
+  product.description = product.description || product.desc || '';
+  product.desc = product.desc || product.description || '';
+  product.specs = product.specs || [];
+  product.unitLabel = product.unitLabel || product.unit_label || '';
+  product.priceUnit = product.priceUnit || product.price_unit || 0;
+  product.priceTonNum = product.priceTonNum || product.price_ton || 0;
+  product.image = product.image || product.img || '';
+  product.img = product.img || product.image || '';
+
   currentProduct = product;
   document.title = product.name + ' — ЖЕЛЕЗНЫЙ ДРОВОСЕК';
 
-  document.getElementById('breadcrumbs').innerHTML = `
-    <a class="hover:text-primary" href="/catalog/">КАТАЛОГ</a>
-    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-    <a class="hover:text-primary" href="/catalog/">${product.category.toUpperCase()}</a>
-    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-    <span class="text-primary">${product.name.toUpperCase()}</span>`;
-
-  document.getElementById('productImg').src = window.getProductImage ? window.getProductImage(product.category) : product.image;
-  document.getElementById('productImg').alt = product.name;
-  document.getElementById('productBadge').querySelector('span').textContent = 'ГОСТ / ТУ';
-  document.getElementById('productCategory').textContent = product.category.toUpperCase();
-  document.getElementById('productName').textContent = product.name;
-  document.getElementById('productSubtitle').textContent = (product.type || 'Ст3') + (product.length ? ', длина ' + product.length : '');
-  document.getElementById('productDesc').textContent = product.description;
-
-  // Specs
-  const specsHtml = product.specs.map(([label, value]) => `
-    <div class="flex justify-between py-4 border-b border-outline-variant/10">
-      <span class="text-on-surface-variant">${label}</span>
-      <span class="font-semibold ${label === 'Марка стали' || label === 'Класс' || label === 'Покрытие' ? 'text-primary' : ''}">${value}</span>
-    </div>`).join('');
-  document.getElementById('specsTable').innerHTML = specsHtml;
-
-  // Calculator Logic
-  const hasTonPrice = product.price_ton > 0;
-  const calcWeight = document.getElementById('calcWeight');
-  const calcQty = document.getElementById('calcQty');
-  const calcLen = document.getElementById('calcLen');
-  
-  if (hasTonPrice) {
-    document.getElementById('priceLabel1').textContent = 'Цена за тонну';
-    document.getElementById('priceValue1').textContent = product.price_ton.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' ₽';
-    document.getElementById('priceLabel2').textContent = product.unit_label || 'Цена за метр';
-    document.getElementById('priceValue2').textContent = product.price_unit.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' ₽';
-    calcWeight.value = "1.00";
-    calcQty.value = Math.round(product.price_ton / (product.price_unit || 1));
-    calcLen.value = (parseFloat(product.length) || 6) * 1000;
-  } else {
-    // If no ton price, hide irrelevant fields
-    calcWeight.parentElement.parentElement.classList.add('opacity-30', 'pointer-events-none');
-    document.getElementById('priceLabel1').textContent = product.unit_label || 'Цена за ед.';
-    document.getElementById('priceValue1').textContent = product.price_unit.toLocaleString('ru-RU', {minimumFractionDigits: 2}) + ' ₽';
-    document.getElementById('priceLabel2').textContent = '';
-    document.getElementById('priceValue2').textContent = '';
-    calcQty.value = "1";
-    calcLen.value = "1000";
+  const breadcrumbsEl = document.getElementById('breadcrumbs');
+  if (breadcrumbsEl) {
+    breadcrumbsEl.innerHTML = `
+      <a class="hover:text-primary" href="/catalog/">КАТАЛОГ</a>
+      <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+      <a class="hover:text-primary" href="/catalog/">${product.category.toUpperCase()}</a>
+      <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+      <span class="text-primary">${product.name.toUpperCase()}</span>`;
   }
 
-  function updateTotal(source) {
-    const p_ton = product.price_ton || 0;
-    const p_unit = product.price_unit || 0;
-    const weight_per_unit = p_ton > 0 ? (p_unit / p_ton) : 0;
+  const productImgEl = document.getElementById('productImg');
+  if (productImgEl) {
+    productImgEl.src = window.getProductImage ? window.getProductImage(product.category) : product.image;
+    productImgEl.alt = product.name;
+  }
+  
+  // Dynamic Badges
+  const badgeContainer = document.getElementById('productBadge');
+  if (badgeContainer) {
+    const isGost = product.desc && product.desc.toLowerCase().includes('гост');
+    const steelGrade = product.specs.find(s => s[0].toLowerCase().includes('стали') || s[0].toLowerCase().includes('марка'))?.[1];
     
-    let weight = parseFloat(calcWeight.value.replace(',', '.')) || 0;
-    let qty = parseInt(calcQty.value) || 0;
-    let len = parseInt(calcLen.value) || 0; // in mm
+    let badgesHtml = '';
+    if (isGost) badgesHtml += `<span class="font-label-caps text-[12px] text-primary tracking-[0.2em] border-r border-outline-variant/30 pr-4 mr-4">ГОСТ</span>`;
+    if (steelGrade) badgesHtml += `<span class="font-label-caps text-[12px] text-on-surface tracking-[0.2em]">${steelGrade}</span>`;
+    
+    if (badgesHtml) {
+      badgeContainer.innerHTML = badgesHtml;
+      badgeContainer.classList.remove('hidden');
+    } else {
+      badgeContainer.classList.add('hidden');
+    }
+  }
 
-    if (source === 'weight') {
-        if (weight_per_unit > 0) {
-            qty = Math.round(weight / (weight_per_unit * (len / 1000)));
-            calcQty.value = qty;
-        }
-    } else if (source === 'qty' || source === 'len') {
-        if (weight_per_unit > 0) {
-            weight = qty * weight_per_unit * (len / 1000);
-            calcWeight.value = weight.toFixed(3);
-        }
+  const categoryEl = document.getElementById('productCategory');
+  if (categoryEl) categoryEl.textContent = product.category.toUpperCase();
+
+  const nameEl = document.getElementById('productName');
+  if (nameEl) nameEl.textContent = product.name;
+
+  const descEl = document.getElementById('productDesc');
+  if (descEl) descEl.textContent = product.description || product.desc;
+
+  // Specs
+  const specsTableEl = document.getElementById('specsTable');
+  if (specsTableEl) {
+    const specsHtml = product.specs.map(([label, value]) => `
+      <div class="flex justify-between py-4 border-b border-outline-variant/5">
+        <span class="text-on-surface-variant text-sm">${label}</span>
+        <span class="font-medium text-sm ${label === 'Марка стали' || label === 'Класс' || label === 'Покрытие' ? 'text-primary' : ''}">${value}</span>
+      </div>`).join('');
+    specsTableEl.innerHTML = specsHtml;
+  }
+
+  // Calculator Logic: Measured vs Bulk
+  const isMeasured = product.unitLabel && (product.unitLabel.toLowerCase().includes('метр') || product.unitLabel.toLowerCase().includes('шт'));
+  const calcWeight = document.getElementById('calcWeight');
+  const weightLabel = document.getElementById('weightLabel') || document.querySelector('label[for="calcWeight"]') || document.querySelector('.space-y-2.5 label') || document.querySelector('.space-y-3 label') || { textContent: '' };
+  const priceMini = document.getElementById('priceValue1_mini') || { textContent: '' };
+  const calcTitle = document.getElementById('calcTitle') || document.querySelector('h3.font-label-caps.text-on-surface-variant') || { textContent: '' };
+
+  if (isMeasured) {
+    calcTitle.textContent = 'РАСЧЕТ ПО КОЛИЧЕСТВУ';
+    weightLabel.textContent = product.unitLabel.toUpperCase().replace('ЗА ', '');
+    priceMini.textContent = product.priceUnit.toLocaleString('ru-RU') + ' ₽ / ' + product.unitLabel.toLowerCase().replace('за ', '');
+    if (calcWeight) calcWeight.value = "1";
+    window.currentStep = 1;
+  } else {
+    calcTitle.textContent = 'РАСЧЕТ ПО ВЕСУ';
+    weightLabel.textContent = 'ВЕС (ТОННЫ)';
+    priceMini.textContent = (product.priceTonNum || product.price_ton || 0).toLocaleString('ru-RU') + ' ₽ / т.';
+    if (calcWeight) calcWeight.value = "1.00";
+    window.currentStep = 1;
+  }
+
+  function updateTotal() {
+    if (!calcWeight) return;
+    const p_ton = product.priceTonNum || product.price_ton || 0;
+    const p_unit = parseFloat(product.priceUnit?.toString().replace(/\s/g, '').replace(',', '.')) || 0;
+    
+    let val = parseFloat(calcWeight.value.replace(',', '.')) || 0;
+
+    if (!isMeasured && val > 1000) {
+        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+        val = 1000;
+        calcWeight.value = "1000.00";
     }
 
     let total;
-    if (hasTonPrice) {
-      total = weight * p_ton;
+    if (isMeasured) {
+      total = val * p_unit;
     } else {
-      total = qty * p_unit;
+      total = val * p_ton;
     }
     
     const priceEl = document.getElementById('totalPrice');
-    const priceStr = total.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
-    priceEl.textContent = priceStr;
+    if (priceEl) {
+      const priceStr = Math.round(total).toLocaleString('ru-RU') + ' ₽';
+      priceEl.textContent = priceStr;
+    }
   }
   
   window.stepInput = function(type, delta) {
-    if (type === 'weight') {
-        let val = parseFloat(calcWeight.value.replace(',', '.')) || 0;
-        calcWeight.value = Math.max(0, val + (delta * 0.1)).toFixed(2);
-        updateTotal('weight');
-    } else if (type === 'qty') {
-        let val = parseInt(calcQty.value) || 0;
-        calcQty.value = Math.max(0, val + delta);
-        updateTotal('qty');
-    } else if (type === 'len') {
-        let val = parseInt(calcLen.value) || 0;
-        calcLen.value = Math.max(0, val + (delta * 100));
-        updateTotal('len');
+    if (!calcWeight) return;
+    let val = parseFloat(calcWeight.value.replace(',', '.')) || 0;
+    let step = window.currentStep || 1;
+    
+    if (!isMeasured && delta > 0 && val >= 1000) {
+        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+        return;
     }
+
+    let newVal = val + (delta * step);
+    if (!isMeasured && newVal > 1000) {
+        newVal = 1000;
+    }
+    calcWeight.value = Math.max(1, newVal).toFixed(isMeasured ? 0 : 2);
+    updateTotal();
   };
 
-  calcWeight.addEventListener('input', () => updateTotal('weight'));
-  calcQty.addEventListener('input', () => updateTotal('qty'));
-  calcLen.addEventListener('input', () => updateTotal('len'));
-  
+  if (calcWeight) {
+    calcWeight.addEventListener('input', () => {
+        let val = parseFloat(calcWeight.value.replace(',', '.')) || 0;
+        if (!isMeasured && val > 1000) {
+            alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+            calcWeight.value = "1000";
+        }
+        updateTotal();
+    });
+    calcWeight.addEventListener('blur', () => {
+        let val = parseFloat(calcWeight.value.replace(',', '.')) || 0;
+        if (!isMeasured && val > 1000) {
+            val = 1000;
+        }
+        if (val < 1) val = 1;
+        calcWeight.value = val.toFixed(isMeasured ? 0 : 2);
+        updateTotal();
+    });
+  }
   updateTotal();
   
   const buyBtn = document.getElementById('addToCartBtn');
@@ -345,7 +370,7 @@ async function loadRelated(category, currentId) {
                 </div>
                 <h4 class="font-headline-md text-sm font-semibold text-on-surface mb-1 line-clamp-1">${p.name}</h4>
                 <p class="text-on-surface-variant text-xs mb-3">${p.type || 'Ст3'}</p>
-                <p class="text-primary font-bold mt-auto">${p.price_ton ? p.price_ton.toLocaleString() + ' ₽/т' : p.price_unit.toLocaleString() + ' ₽'}</p>
+                <p class="text-primary font-bold mt-auto">${p.price_ton ? p.price_ton.toLocaleString() + ' ₽/т.' : p.price_unit.toLocaleString() + ' ₽'}</p>
             </a>`).join('');
     } catch (e) { console.error('Failed to load related', e); }
 }
@@ -361,18 +386,27 @@ window.addToCart = function() {
     let price, unit, finalQty;
     if (currentProduct.price_ton > 0) {
         price = currentProduct.price_ton;
-        unit = 'т';
+        unit = 'т.';
         finalQty = weight;
     } else {
         price = currentProduct.price_unit;
-        unit = currentProduct.unit_label || 'шт';
+        unit = 'т.';
         finalQty = qty;
     }
     
     const existing = cart.find(item => item.id === currentProduct.id && item.length === len);
     if (existing) {
-      existing.qty = (parseFloat(existing.qty) + finalQty).toFixed(3);
+      let newQty = parseFloat(existing.qty) + finalQty;
+      if (unit.startsWith('т') && newQty > 1000) {
+          alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+          newQty = 1000;
+      }
+      existing.qty = newQty.toFixed(3);
     } else {
+      if (unit.startsWith('т') && finalQty > 1000) {
+          alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+          finalQty = 1000;
+      }
       cart.push({ 
         id: currentProduct.id, 
         qty: finalQty.toFixed(3), 
