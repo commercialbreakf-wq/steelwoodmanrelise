@@ -130,16 +130,16 @@
 
         /* Dark Theme Header (Dark Liquid Glass) */
         .dark #globalHeader {
-            background-color: rgba(21, 19, 17, 0.7);
+            background-color: rgba(21, 19, 17, 0.75);
             backdrop-filter: blur(25px) saturate(210%);
             -webkit-backdrop-filter: blur(25px) saturate(210%);
-            border-bottom: 1px solid rgba(150, 69, 81, 0.15);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(150, 69, 81, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
         /* Light Theme Header (Premium Glass) */
         html:not(.dark) #globalHeader {
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: rgba(255, 255, 255, 0.45);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -159,17 +159,33 @@
         html:not(.dark) #mobileMenuPanelGlobal,
         html:not(.dark) #mobileCatalogPanelGlobal,
         html:not(.dark) #searchContainerGlobal {
-            background-color: rgba(255, 255, 255, 0.75) !important;
-            backdrop-filter: blur(30px) saturate(210%) !important;
-            -webkit-backdrop-filter: blur(30px) saturate(210%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.9) !important;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05), inset 0 0 20px rgba(255, 255, 255, 0.6) !important;
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(35px) saturate(210%) !important;
+            -webkit-backdrop-filter: blur(35px) saturate(210%) !important;
+            border: 1px solid rgba(255, 255, 255, 1) !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), inset 0 0 30px rgba(255, 255, 255, 0.8) !important;
             color: var(--color-on-bg) !important;
+        }
+
+        /* Forms & Inputs in Light Mode */
+        html:not(.dark) input,
+        html:not(.dark) select,
+        html:not(.dark) textarea {
+            background-color: rgba(0, 0, 0, 0.03) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            color: var(--color-on-bg) !important;
+        }
+        html:not(.dark) input:focus,
+        html:not(.dark) select:focus,
+        html:not(.dark) textarea:focus {
+            background-color: rgba(255, 255, 255, 1) !important;
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 0 0 4px rgba(150, 69, 81, 0.1) !important;
         }
 
         /* Mega Menu Overrides */
         html:not(.dark) .mega-menu-left {
-            background-color: rgba(0, 0, 0, 0.02) !important;
+            background-color: rgba(0, 0, 0, 0.03) !important;
             border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
         }
         html:not(.dark) .mega-cat-link {
@@ -178,8 +194,26 @@
         html:not(.dark) .mega-sub-link {
             color: var(--color-on-surface-variant) !important;
         }
-        html:not(.dark) .mega-sub-link:hover {
-            color: var(--color-primary) !important;
+
+        /* Card Highlights Restoration */
+        .card-enter, .pink-glow {
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) !important;
+        }
+        html:not(.dark) .card-enter:hover,
+        html:not(.dark) .pink-glow:hover {
+            background-color: #FFFFFF !important;
+            border-color: var(--color-primary) !important;
+            box-shadow: 0 15px 45px rgba(150, 69, 81, 0.12), 0 0 0 1px var(--color-primary) !important;
+            transform: translateY(-5px) scale(1.01) !important;
+        }
+
+        /* 404 Page Theme Sync */
+        html:not(.dark) .bg-industrial {
+            background-image: linear-gradient(rgba(250, 250, 250, 0.85), rgba(250, 250, 250, 0.85)), url('/industrial_404_bg_1778612131862.png') !important;
+        }
+        html:not(.dark) .glitch-text {
+            color: var(--color-on-bg);
+            opacity: 0.6;
         }
 
         /* Hero Stats Liquid Glass & Divider Overrides */
