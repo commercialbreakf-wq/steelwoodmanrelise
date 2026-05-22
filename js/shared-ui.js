@@ -6,6 +6,56 @@
 // --- GLOBAL API REWRITE INTERCEPTOR FOR VERCEL PRODUCTION BACKEND ---
 (function() {
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    // --- THEME INITIALIZATION ---
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.classList.remove('dark', 'light');
+    document.documentElement.classList.add(savedTheme);
+    
+    window.toggleThemeGlobal = function() {
+        const currentTheme = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        // Add temporary switching class for smooth transition
+        document.documentElement.classList.add('theme-switching');
+        
+        document.documentElement.classList.remove('dark', 'light');
+        document.documentElement.classList.add(newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        // Dispatch event for components that might need to react
+        window.dispatchEvent(new CustomEvent('themechanged', { detail: { theme: newTheme } }));
+        
+        // Update any toggle buttons on page
+        updateToggleVisuals(newTheme);
+        
+        // Remove switching class after transition
+        setTimeout(() => {
+            document.documentElement.classList.remove('theme-switching');
+        }, 600);
+    };
+
+    function updateToggleVisuals(theme) {
+        const toggleThumbs = document.querySelectorAll('.apple-toggle-thumb');
+        const activeIcons = document.querySelectorAll('.theme-icon-active');
+        
+        toggleThumbs.forEach(thumb => {
+            if (theme === 'light') {
+                // thumb movement handled by CSS class on html.light
+            }
+        });
+        
+        activeIcons.forEach(icon => {
+            icon.textContent = theme === 'light' ? 'light_mode' : 'dark_mode';
+            icon.style.color = theme === 'light' ? '#FF9500' : '#FFD60A';
+        });
+    }
+    
+    // Initial visual update after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        updateToggleVisuals(localStorage.getItem('theme') || 'dark');
+    });
+
     if (!isLocalhost) {
         const originalFetch = window.fetch;
         window.fetch = function(input, init) {
@@ -24,6 +74,7 @@
 
 // --- PREMIUM IRON WOODMAN GLOBAL MODAL OVERRIDES FOR ALERT & CONFIRM ---
 window.confirm = function(message) {
+    window.lockScrollGlobal();
     return new Promise((resolve) => {
         const modalWrapper = document.createElement('div');
         modalWrapper.className = 'fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
@@ -32,10 +83,10 @@ window.confirm = function(message) {
         const title = isDestructive ? 'Подтверждение удаления' : 'Системный запрос';
         const icon = isDestructive ? 'delete_forever' : 'help_center';
         
-        const iconColorClass = isDestructive ? 'text-[#ff4a7a]' : 'text-[#ffb0cc]';
-        const iconBgClass = isDestructive ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
-        const topGlowStyle = isDestructive ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #ffb0cc, transparent);';
-        const btnClass = isDestructive ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#ffb0cc] hover:bg-white text-[#0f0e0c] shadow-lg shadow-[#ffb0cc]/10';
+        const iconColorClass = isDestructive ? 'text-[#ff4a7a]' : 'text-[#c7c5c5]';
+        const iconBgClass = isDestructive ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#964551]/10 border-[#964551]/20';
+        const topGlowStyle = isDestructive ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #964551, transparent);';
+        const btnClass = isDestructive ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#964551] hover:bg-[#7a3642] text-[#c7c5c5] shadow-lg shadow-[#964551]/20';
 
         modalWrapper.innerHTML = `
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
@@ -79,6 +130,7 @@ window.confirm = function(message) {
             if (content) content.classList.add('scale-95');
             setTimeout(() => {
                 modalWrapper.remove();
+                window.unlockScrollGlobal();
                 resolve(result);
             }, 300);
         };
@@ -90,6 +142,7 @@ window.confirm = function(message) {
 };
 
 window.alert = function(message) {
+    window.lockScrollGlobal();
     return new Promise((resolve) => {
         const modalWrapper = document.createElement('div');
         modalWrapper.className = 'fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
@@ -98,10 +151,10 @@ window.alert = function(message) {
         const title = isError ? 'Системная ошибка' : 'Уведомление';
         const icon = isError ? 'error' : 'info';
         
-        const iconColorClass = isError ? 'text-[#ff4a7a]' : 'text-[#ffb0cc]';
-        const iconBgClass = isError ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
-        const topGlowStyle = isError ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #ffb0cc, transparent);';
-        const btnClass = isError ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#ffb0cc] hover:bg-white text-[#0f0e0c] shadow-lg shadow-[#ffb0cc]/10';
+        const iconColorClass = isError ? 'text-[#ff4a7a]' : 'text-[#c7c5c5]';
+        const iconBgClass = isError ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#964551]/10 border-[#964551]/20';
+        const topGlowStyle = isError ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #964551, transparent);';
+        const btnClass = isError ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#964551] hover:bg-[#7a3642] text-[#c7c5c5] shadow-lg shadow-[#964551]/20';
 
         modalWrapper.innerHTML = `
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
@@ -141,6 +194,7 @@ window.alert = function(message) {
             if (content) content.classList.add('scale-95');
             setTimeout(() => {
                 modalWrapper.remove();
+                window.unlockScrollGlobal();
                 resolve();
             }, 300);
         };
@@ -175,9 +229,9 @@ window.showToast = function(message, type = 'success', title = null) {
         defaultTitle = 'Ошибка';
     } else if (type === 'info') {
         icon = 'info';
-        iconColor = 'text-[#ffb0cc]';
-        iconBg = 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
-        borderColor = 'border-l-[#ffb0cc]';
+        iconColor = 'text-[#c7c5c5]';
+        iconBg = 'bg-[#964551]/10 border-[#964551]/20';
+        borderColor = 'border-l-[#964551]';
         defaultTitle = 'Уведомление';
     } else if (type === 'warning') {
         icon = 'warning';
@@ -252,6 +306,7 @@ window.USER_ROLE_OPTIONS = [
 ];
 
 window.openStatusSelectModal = function(options, currentStatus, title = 'Выберите новый статус') {
+    window.lockScrollGlobal();
     return new Promise((resolve) => {
         const modalWrapper = document.createElement('div');
         modalWrapper.className = 'fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
@@ -279,7 +334,7 @@ window.openStatusSelectModal = function(options, currentStatus, title = 'Выб�
         modalWrapper.innerHTML = `
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
             <div class="relative w-full max-w-md bg-[#151311]/95 border border-white/10 rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] flex flex-col transform scale-95 transition-all duration-300 min-h-0 overflow-hidden modal-content">
-                <div class="absolute top-0 left-0 right-0 h-1 opacity-80 background-gradient" style="background: linear-gradient(90deg, transparent, #ffb0cc, transparent);"></div>
+                <div class="absolute top-0 left-0 right-0 h-1 opacity-80 background-gradient" style="background: linear-gradient(90deg, transparent, #964551, transparent);"></div>
                 
                 <div class="p-8 pb-6 flex items-center justify-between border-b border-white/5 shrink-0">
                     <div>
@@ -318,6 +373,7 @@ window.openStatusSelectModal = function(options, currentStatus, title = 'Выб�
             if (content) content.classList.add('scale-95');
             setTimeout(() => {
                 modalWrapper.remove();
+                window.unlockScrollGlobal();
                 resolve(result);
             }, 300);
         };
@@ -334,6 +390,53 @@ window.openStatusSelectModal = function(options, currentStatus, title = 'Выб�
         });
     });
 };
+
+// ─── CENTRALIZED SCROLL LOCK ─────────────────────────────────────────────────
+// Uses a reference counter so multiple popups don't conflict
+;(function() {
+    let _lockCount = 0;
+    let _savedScrollY = 0;
+
+    window.lockScrollGlobal = function() {
+        _lockCount++;
+        if (_lockCount === 1) {
+            _savedScrollY = window.scrollY;
+            document.body.style.top = '-' + _savedScrollY + 'px';
+            document.body.classList.add('scroll-locked');
+        }
+    };
+
+    window.unlockScrollGlobal = function() {
+        if (_lockCount <= 0) return;
+        _lockCount--;
+        if (_lockCount === 0) {
+            document.body.classList.remove('scroll-locked');
+            document.body.style.top = '';
+            window.scrollTo(0, _savedScrollY);
+        }
+    };
+
+    window.forceUnlockScrollGlobal = function() {
+        _lockCount = 0;
+        document.body.classList.remove('scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, _savedScrollY);
+    };
+
+    // Inject scroll-lock CSS once
+    const style = document.createElement('style');
+    style.textContent = `
+        body.scroll-locked {
+            position: fixed;
+            width: 100%;
+            overflow-y: scroll; /* keep scrollbar visible to prevent layout shift */
+        }
+    `;
+    document.head.appendChild(style);
+})();
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 window.maskPhoneGlobal = function(input) {
     let val = input.value.replace(/\D/g, '');
@@ -493,7 +596,7 @@ window.syncAuthStorageAndCookiesGlobal = function() {
         .loader-ring::after {
             content: ''; position: absolute; inset: -4px;
             border: 2px solid transparent;
-            border-top-color: #ffb0cc;
+            border-top-color: #c7c5c5;
             border-radius: 50%;
             animation: preloader-spin 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
@@ -519,7 +622,7 @@ window.syncAuthStorageAndCookiesGlobal = function() {
         }
         .loader-text {
             margin-top: 48px; font-family: 'Space Grotesk', sans-serif;
-            font-size: 10px; color: #ffb0cc; letter-spacing: 0.6em;
+            font-size: 10px; color: #c7c5c5; letter-spacing: 0.6em;
             text-transform: uppercase; opacity: 0.6;
             animation: preloader-text-pulse 1.5s ease-in-out infinite;
         }
@@ -529,7 +632,7 @@ window.syncAuthStorageAndCookiesGlobal = function() {
         }
         .loader-progress-bar {
             position: absolute; top: 0; left: 0; height: 100%; width: 0%;
-            background: #ffb0cc; box-shadow: 0 0 10px #ffb0cc;
+            background: #964551; box-shadow: 0 0 10px #964551;
             transition: width 0.4s ease;
         }
         @keyframes preloader-spin {
@@ -660,7 +763,7 @@ window.toggleMobileMenuGlobal = function() {
         overlay.style.pointerEvents = 'none';
         setTimeout(() => { 
             drawer.classList.add('pointer-events-none'); 
-            document.body.style.overflow = ''; // Restore scroll AFTER animation
+            window.unlockScrollGlobal(); // Restore scroll AFTER animation
         }, 600);
     } else {
         drawer.classList.remove('pointer-events-none');
@@ -668,7 +771,7 @@ window.toggleMobileMenuGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        document.body.style.overflow = 'hidden'; // Lock scroll
+        window.lockScrollGlobal(); // Lock scroll
     }
 };
 
@@ -696,7 +799,7 @@ window.toggleMobileCatalogGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        document.body.style.overflow = 'hidden'; // Lock scroll
+        window.lockScrollGlobal(); // Lock scroll
     }
 };
 
@@ -721,7 +824,7 @@ window.toggleMobileCatalogGlobal = function() {
             overlay.classList.remove('active-search');
             setTimeout(() => { 
                 overlay.classList.add('pointer-events-none'); 
-                document.body.style.overflow = ''; // Restore scroll AFTER animation
+                window.unlockScrollGlobal(); // Restore scroll AFTER animation
             }, 600);
         } else {
             overlay.classList.remove('pointer-events-none');
@@ -732,7 +835,7 @@ window.toggleMobileCatalogGlobal = function() {
             container.classList.remove('opacity-0');
             container.classList.remove('pointer-events-none');
             container.classList.add('pointer-events-auto');
-            document.body.style.overflow = 'hidden'; // Disable scroll
+            window.lockScrollGlobal(); // Disable scroll
             if(input) setTimeout(() => input.focus(), 300);
         }
     };
@@ -752,7 +855,7 @@ window.toggleCartDrawerGlobal = function() {
         overlay.style.pointerEvents = 'none';
         setTimeout(() => { 
             drawer.classList.add('pointer-events-none'); 
-            document.body.style.overflow = ''; // Restore scroll AFTER animation
+            window.unlockScrollGlobal(); // Restore scroll AFTER animation
         }, 600);
     } else {
         drawer.classList.remove('pointer-events-none');
@@ -760,7 +863,7 @@ window.toggleCartDrawerGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        document.body.style.overflow = 'hidden'; // Lock scroll
+        window.lockScrollGlobal(); // Lock scroll
         if (window.renderCartDrawerItems) window.renderCartDrawerItems();
     }
 };
@@ -780,7 +883,7 @@ window.toggleAuthModalGlobal = function() {
         overlay.style.pointerEvents = 'none';
         setTimeout(() => { 
             drawer.classList.add('pointer-events-none'); 
-            document.body.style.overflow = ''; // Restore scroll AFTER animation
+            window.unlockScrollGlobal(); // Restore scroll AFTER animation
         }, 600);
     } else {
         drawer.classList.remove('pointer-events-none');
@@ -788,7 +891,7 @@ window.toggleAuthModalGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        document.body.style.overflow = 'hidden'; // Lock scroll
+        window.lockScrollGlobal(); // Lock scroll
         if (window.checkAuthStatus) window.checkAuthStatus();
     }
 };
@@ -962,7 +1065,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isAdmin) {
         const style = `
         <style>
-            #floatingChatBtnGlobal { z-index: 5000; }
+            #floatingChatBtnGlobal {
+                z-index: 5000;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                transform: translateY(20px);
+            }
+            #floatingChatBtnGlobal.visible {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+            }
             #scrollTopBtnGlobal {
                 opacity: 0;
                 visibility: hidden;
@@ -978,20 +1092,20 @@ document.addEventListener('DOMContentLoaded', function() {
             ::-webkit-scrollbar { width: 8px; height: 8px; }
             ::-webkit-scrollbar-track { background: #151311; }
             ::-webkit-scrollbar-thumb { background: #ca7093; border-radius: 10px; border: 2px solid #151311; }
-            ::-webkit-scrollbar-thumb:hover { background: #ffb0cc; }
+            ::-webkit-scrollbar-thumb:hover { background: #964551; }
             * { scrollbar-width: thin; scrollbar-color: #ca7093 #151311; }
             .custom-scrollbar::-webkit-scrollbar { width: 4px; }
             .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 176, 204, 0.3); }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ffb0cc; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #964551; }
         </style>
         `;
         const adminFloatingBtns = `
-        <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-[96px] right-8 z-[5000] w-14 h-14 bg-[#ffb0cc] border border-[#ffb0cc]/30 text-[#0f0e0c] flex items-center justify-center hover:bg-white transition-all shadow-2xl shadow-[#ffb0cc]/30 group rounded-2xl">
+        <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-8 right-[104px] z-[5000] w-14 h-14 bg-[#964551] border border-[#964551]/30 text-[#c7c5c5] flex items-center justify-center hover:bg-white transition-all shadow-2xl shadow-[#964551]/30 group rounded-2xl">
             <span class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform">forum</span>
             <span id="floatingChatBadgeGlobal" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center hidden animate-pulse">!</span>
         </button>
 
-        <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#1d1b19] border border-[#ffb0cc] text-[#ffb0cc] flex items-center justify-center hover:bg-[#ffb0cc] hover:text-[#1d1b19] transition-all shadow-2xl shadow-[#ffb0cc]/20 group">
+        <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#1d1b19] border border-[#964551] text-[#c7c5c5] flex items-center justify-center hover:bg-[#964551] hover:text-[#c7c5c5] transition-all shadow-2xl shadow-[#964551]/20 group">
             <span class="material-symbols-outlined text-[28px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
         </button>
         `;
@@ -1022,7 +1136,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="catalog-menu-wrapper relative" id="catalogMenuWrapperGlobal">
                     <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 flex items-center gap-1 cursor-pointer no-underline" id="catalogBtnGlobal" href="/catalog">КАТАЛОГ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
                 </div>
-                <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline" href="/spravka.html">СПРАВОЧНИК</a>
                 <div class="about-menu-wrapper relative h-full flex items-center" id="aboutMenuWrapperGlobal">
                     <a class="nav-link font-label-caps text-[13px] text-on-surface-variant hover:text-primary transition-all duration-300 no-underline flex items-center gap-1 cursor-pointer" id="aboutBtnGlobal" href="/about.html">О КОМПАНИИ <span class="material-symbols-outlined text-[18px]">expand_more</span></a>
                 </div>
@@ -1036,6 +1149,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         shopping_cart
                         <span id="cartBadgeGlobal" class="absolute top-1 right-1 bg-primary text-on-primary text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
                     </button>
+                </div>
+                <!-- Apple-style Theme Toggle -->
+                <div class="apple-toggle-container group" onclick="window.toggleThemeGlobal()">
+                    <div class="apple-toggle-icons">
+                        <span class="material-symbols-outlined">dark_mode</span>
+                        <span class="material-symbols-outlined">light_mode</span>
+                    </div>
+                    <div class="apple-toggle-thumb">
+                        <span class="material-symbols-outlined theme-icon-active text-[14px]">dark_mode</span>
+                    </div>
                 </div>
                 <button id="authBtnGlobal" onclick="toggleAuthModalGlobal()" class="material-symbols-outlined text-on-surface hover:text-primary transition-all duration-300 p-2 rounded-full hover:bg-white/5 active:scale-95">person</button>
             </div>
@@ -1088,11 +1211,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
 
-                <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/spravka.html">
-                    <span class="material-symbols-outlined text-primary text-xl">menu_book</span>
-                    СПРАВОЧНИК
-                </a>
-
                 <a class="text-lg font-display-xl uppercase hover:text-primary transition-all tracking-tight border-t border-white/5 pt-4 no-underline text-on-surface flex items-center gap-3" href="/news">
                     <span class="material-symbols-outlined text-primary text-xl">newspaper</span>
                     НОВОСТИ
@@ -1100,7 +1218,19 @@ document.addEventListener('DOMContentLoaded', function() {
             </nav>
 
             <footer class="mt-auto pt-8 border-t border-white/5">
-                <div class="flex gap-4 mb-6">
+               <div class="flex items-center justify-between mb-8 p-4 bg-white/5 rounded-2xl">
+                   <span class="font-label-caps text-[11px] tracking-widest text-on-surface opacity-60">ТЕМА ОФОРМЛЕНИЯ</span>
+                   <div class="apple-toggle-container" onclick="window.toggleThemeGlobal()">
+                       <div class="apple-toggle-icons">
+                           <span class="material-symbols-outlined">dark_mode</span>
+                           <span class="material-symbols-outlined">light_mode</span>
+                       </div>
+                       <div class="apple-toggle-thumb">
+                           <span class="material-symbols-outlined theme-icon-active text-[14px]">dark_mode</span>
+                       </div>
+                   </div>
+               </div>
+               <div class="flex gap-4 mb-6">
                     <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-on-primary transition-all no-underline"><i class="fa-brands fa-vk"></i></a>
                     <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-on-primary transition-all no-underline"><i class="fa-brands fa-telegram"></i></a>
                 </div>
@@ -1422,15 +1552,65 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
-    <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-[96px] right-8 z-[5000] w-14 h-14 bg-primary border border-primary/30 text-on-primary flex items-center justify-center hover:brightness-110 transition-all shadow-2xl shadow-primary/30 group rounded-2xl">
-        <span class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform">forum</span>
-        <span id="floatingChatBadgeGlobal" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center hidden animate-pulse">!</span>
+    <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-4 right-4 md:bottom-10 md:right-32 z-[5000] w-12 h-12 md:w-16 md:h-16 bg-primary text-on-primary flex items-center justify-center shadow-[0_8px_32px_rgba(255,176,204,0.3)] hover:scale-110 active:scale-90 transition-all duration-500 group rounded-2xl md:rounded-[1.5rem]">
+        <span class="material-symbols-outlined text-[24px] md:text-[32px] group-hover:rotate-12 transition-transform">support_agent</span>
+        <span id="floatingChatBadgeGlobal" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden border-2 border-background"></span>
     </button>
 
-    <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#1d1b19] border border-[#ffb0cc] text-[#ffb0cc] flex items-center justify-center hover:bg-[#ffb0cc] hover:text-[#1d1b19] transition-all shadow-2xl shadow-[#ffb0cc]/20 group">
-        <span class="material-symbols-outlined text-[28px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
+    <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-4 left-4 md:bottom-10 md:right-10 md:left-auto z-[5000] w-12 h-12 md:w-16 md:h-16 bg-surface-container-high/80 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-primary hover:text-surface transition-all duration-500 shadow-2xl opacity-0 pointer-events-none translate-y-10 group rounded-2xl md:rounded-[1.5rem]">
+        <span class="material-symbols-outlined text-[24px] md:text-[32px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
     </button>
     `;
+
+    // Add global mobile optimization styles
+    const globalStyles = document.createElement('style');
+    globalStyles.id = 'global-mobile-optimizations';
+    globalStyles.textContent = `
+        :root { 
+            --header-height: 80px; 
+            --primary-wine: #964551;
+            --primary-wine-rgb: 150, 69, 81;
+        }
+        @media (max-width: 1024px) {
+            :root { --header-height: 64px; }
+            .px-margin-edge-mobile { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+
+        /* --- GLOBAL SECTION HEIGHTS --- */
+        section:not(#hero):not(#cta-footer-merged):not(.no-full-height) { 
+            min-height: calc(100dvh - var(--header-height)) !important;
+            height: auto !important;
+            padding-top: 4rem !important;
+            padding-bottom: 4rem !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+
+        /* Override bright pink colors with wine pink */
+        .text-primary, .text-\[#ff4a7a\] { color: var(--primary-wine) !important; }
+        .bg-primary, .bg-\[#ff4a7a\] { background-color: var(--primary-wine) !important; }
+        .border-primary, .border-\[#ff4a7a\] { border-color: var(--primary-wine) !important; }
+        .hover\:bg-primary:hover { background-color: #7a3642 !important; }
+        .pink-glow:hover { box-shadow: 0 0 20px rgba(var(--primary-wine-rgb), 0.25) !important; }
+        
+        /* Light Theme specific adjustments */
+        html.light .text-primary, html.light .material-symbols-outlined { color: var(--primary-wine); }
+        html.light .bg-primary { background-color: var(--primary-wine); color: #e7e2dd; } /* Light content on wine bg */
+        html.light .bg-primary .material-symbols-outlined { color: #e7e2dd; }
+
+        /* Admin/Telegram Chat Style */
+        .chat-bubble { border-radius: 1.5rem; padding: 1rem 1.25rem; font-size: 0.9375rem; line-height: 1.5; position: relative; max-width: 85%; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .chat-bubble-bot { background: #211f1d; color: #e7e2dd; border-bottom-left-radius: 0.25rem; border: 1px solid rgba(255,255,255,0.05); }
+        .chat-bubble-user { background: #964551; color: #0f0e0c; align-self: flex-end; border-bottom-right-radius: 0.25rem; font-weight: 500; }
+        .chat-time { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; opacity: 0.3; margin-top: 0.4rem; }
+        .ease-apple { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-animate-in { animation: modalIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .modal-animate-out { animation: modalOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes modalOut { from { opacity: 1; transform: scale(1) translateY(0); } to { opacity: 0; transform: scale(0.95) translateY(20px); } }
+    `;
+    document.head.appendChild(globalStyles);
 
     const footerHtml = `
     <footer id="globalFooter" class="bg-surface border-t border-outline-variant/20 pt-20 pb-10">
@@ -1460,7 +1640,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <ul class="space-y-4">
                         <li><a href="/" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">ГЛАВНАЯ</a></li>
                         <li><a href="/catalog" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КАТАЛОГ</a></li>
-                        <li><a href="/spravka.html" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">СПРАВОЧНИК</a></li>
                         <li><a href="/about" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">О КОМПАНИИ</a></li>
                         <li><a href="/news" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">НОВОСТИ</a></li>
                         <li><a href="/contacts" class="text-sm text-on-surface-variant hover:text-primary transition-colors no-underline uppercase tracking-wider">КОНТАКТЫ</a></li>
@@ -1524,11 +1703,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const style = `
     <style>
+        :root {
+            --header-height: 80px;
+        }
+        /* --- APPLE-STYLE TOGGLE --- */
+        .apple-toggle-container {
+            display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2px; border-radius: 99px; width: 56px; height: 28px; position: relative; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        html.light .apple-toggle-container { background: #EBEBEB; border-color: #DBDBDB; }
+        .apple-toggle-thumb {
+            width: 24px; height: 24px; background: #FFFFFF; border-radius: 50%; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            display: flex; align-items: center; justify-content: center; transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); z-index: 2;
+        }
+        html.light .apple-toggle-thumb { transform: translateX(28px); background: #FBFBFB; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .apple-toggle-icons {
+            position: absolute; width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 6px; pointer-events: none;
+        }
+        .apple-toggle-icons span { font-size: 12px; color: rgba(255, 255, 255, 0.4); }
+        html.light .apple-toggle-icons span { color: rgba(0, 0, 0, 0.15); }
+
+        /* --- THEME TRANSITIONS --- */
+        html.theme-switching *, html.theme-switching {
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease !important;
+        }
+
         #globalHeader { z-index: 1000; }
         .nav-link { position: relative; }
         .nav-link::after {
             content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
-            background: #ffb0cc; transition: width 0.3s ease;
+            background: #964551; transition: width 0.3s ease;
         }
         .nav-link:hover::after { width: 100%; }
         
@@ -1544,7 +1748,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         .mega-menu-inner {
             display: flex; max-width: 1440px; margin: 0 auto; background: #1d1b19;
-            border: 1px solid rgba(83, 67, 71, 0.2); border-top: 2px solid #ffb0cc;
+            border: 1px solid rgba(83, 67, 71, 0.2); border-top: 2px solid #964551;
             box-shadow: 0 40px 100px rgba(0,0,0,0.6); min-height: 400px;
         }
         .mega-menu-left { width: 300px; background: #1a1816; border-right: 1px solid rgba(83, 67, 71, 0.1); padding: 20px 0; }
@@ -1553,9 +1757,9 @@ document.addEventListener('DOMContentLoaded', function() {
             color: #d7c1c7; text-decoration: none; font-family: 'Space Grotesk', sans-serif;
             font-size: 14px; transition: all 0.2s; position: relative;
         }
-        .mega-cat-link:hover, .mega-cat-item.is-active .mega-cat-link { background: rgba(255,176,204,0.05); color: #ffb0cc; }
+        .mega-cat-link:hover, .mega-cat-item.is-active .mega-cat-link { background: rgba(150,69,81,0.05); color: #c7c5c5; }
         .mega-cat-item.is-active .mega-cat-link::before {
-            content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #ffb0cc;
+            content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #964551;
         }
         .mega-menu-right { flex: 1; padding: 40px; background: #211f1d; }
         .mega-submenu { display: none; }
@@ -1564,7 +1768,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .mega-submenu-title { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .mega-submenu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; }
         .mega-sub-link { color: #d7c1c7; text-decoration: none; font-size: 13px; display: block; padding: 6px 0; transition: color 0.2s; }
-        .mega-sub-link:hover { color: #ffb0cc; }
+        .mega-sub-link:hover { color: #c7c5c5; }
         
         .mega-overlay { 
             opacity: 0; pointer-events: none; visibility: hidden;
@@ -1588,8 +1792,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .mega-default-icon { font-size: 56px; color: rgba(255, 176, 204, 0.2); }
         .mega-default-title { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600; color: #e7e2dd; }
         .mega-default-desc { font-size: 14px; color: rgba(215, 193, 199, 0.5); max-width: 280px; }
-        .mega-default-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 12px 28px; border: 1px solid #ffb0cc; color: #ffb0cc; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-decoration: none; transition: all 0.3s ease; }
-        .mega-default-btn:hover { background: #ffb0cc; color: #151311; }
+        .mega-default-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 12px 28px; border: 1px solid #964551; color: #c7c5c5; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-decoration: none; transition: all 0.3s ease; }
+        .mega-default-btn:hover { background: #964551; color: #151311; }
 
         /* Compact About Menu */
         .about-compact-menu { width: auto; }
@@ -1597,7 +1801,7 @@ document.addEventListener('DOMContentLoaded', function() {
             width: 280px; 
             min-height: auto; 
             background: #1a1816;
-            border-top: 2px solid #ffb0cc;
+            border-top: 2px solid #964551;
         }
         .about-compact-menu .mega-menu-left { width: 100%; border-right: none; padding: 10px 0; }
         .about-compact-menu .mega-cat-link { padding: 10px 24px; font-size: 13px; }
@@ -1608,13 +1812,13 @@ document.addEventListener('DOMContentLoaded', function() {
             .mega-menu { display: none !important; }
         }
 
-        #scrollTopBtnGlobal {
+        #scrollTopBtnGlobal, #floatingChatBtnGlobal {
             opacity: 0;
             visibility: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateY(20px);
         }
-        #scrollTopBtnGlobal.visible {
+        #scrollTopBtnGlobal.visible, #floatingChatBtnGlobal.visible {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
@@ -1634,7 +1838,7 @@ document.addEventListener('DOMContentLoaded', function() {
             border: 2px solid #151311;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #ffb0cc;
+            background: #964551;
         }
 
         /* For Firefox */
@@ -1650,7 +1854,7 @@ document.addEventListener('DOMContentLoaded', function() {
             background: rgba(255, 176, 204, 0.3);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #ffb0cc;
+            background: #964551;
         }
 
         /* HIDE SCROLLBAR ON MOBILE */
@@ -1679,7 +1883,7 @@ document.addEventListener('DOMContentLoaded', function() {
             left: 0;
             width: 0%;
             height: 4px;
-            background: linear-gradient(90deg, #ca7093, #ffb0cc);
+            background: linear-gradient(90deg, #7a3642, #964551);
             z-index: 99999;
             box-shadow: 0 0 15px rgba(255, 176, 204, 0.5);
             transition: width 0.1s ease-out;
@@ -1690,7 +1894,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 display: none !important;
             }
         }
+
+        /* Overrides for hardcoded dark background classes in light theme */
+        html.light .bg-\[\#1d1b19\] {
+            background-color: #ebebeb !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+        html.light .bg-\[\#1d1b19\].text-\[\#c7c5c5\],
+        html.light .bg-\[\#1d1b19\] .text-\[\#c7c5c5\],
+        html.light .bg-\[\#1d1b19\] .text-\[\#ffb0cc\],
+        html.light .bg-\[\#1d1b19\] .text-\[\#e7e2dd\] {
+            color: #151311 !important;
+        }
     </style>
+
 
     `;
 
@@ -1716,6 +1933,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function openMegaMenu() {
         if (!menu || !overlay) return;
         closeAboutMenu(); // Optimization: close about menu when opening catalog
+        
+        // Reset submenus to default state
+        catItems.forEach(i => i.classList.remove('is-active'));
+        submenus.forEach(s => s.classList.remove('is-active'));
+        const defaultSub = document.querySelector('.mega-submenu-default');
+        if (defaultSub) defaultSub.classList.add('is-active');
+
         menu.classList.add('is-visible');
         overlay.classList.add('is-visible');
     }
@@ -1805,7 +2029,7 @@ document.addEventListener('DOMContentLoaded', function() {
     catItems.forEach(item => {
         item.addEventListener('mouseenter', () => {
             const sub = item.dataset.submenu;
-            showSubmenu(sub !== 'none' ? sub : 'default');
+            showSubmenu((sub && sub !== 'none') ? sub : 'default');
         });
     });
 
@@ -1933,9 +2157,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (text) text.textContent = 'СРЕДНИЙ ПАРОЛЬ';
                 if (text) text.style.color = '#ffbe5f';
             } else {
-                bar.style.backgroundColor = '#ffb0cc';
+                bar.style.backgroundColor = '#964551';
                 if (text) text.textContent = 'ОТЛИЧНЫЙ ПАРОЛЬ';
-                if (text) text.style.color = '#ffb0cc';
+                if (text) text.style.color = '#c7c5c5';
             }
         }
 
@@ -2005,6 +2229,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         document.body.appendChild(overlay);
+        window.lockScrollGlobal();
         
         setTimeout(() => {
             overlay.classList.remove('opacity-0');
@@ -2026,7 +2251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (inner) {
             inner.classList.add('opacity-0', 'translate-y-4');
         }
-        setTimeout(() => overlay.remove(), 500);
+        setTimeout(() => { overlay.remove(); window.unlockScrollGlobal(); }, 500);
     };
 
     window.showLoginFormErrorGlobal = function(message) {
@@ -2378,7 +2603,7 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuthStatus();
 
     // --- GLOBAL SCROLL & SNAPPING ENGINE ---
-    const SCROLL_DURATION_MS = 800;
+    const SCROLL_DURATION_MS = 500;
     const SCROLL_HEADER_OFFSET = 80;
     const BLOCK_SCROLL_PATH_RE = /\/(index\.html)?$|\/(services|calculator|about|logistics|fleet|certificates|contacts)(\/|\.html)?$/i;
 
@@ -2454,7 +2679,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const isBlockScrollSection = (el) => {
         if (!el || el.tagName !== 'SECTION') return false;
         const cls = el.className || '';
-        return /min-h-\[100dvh\]|min-h-screen|h-\[100dvh\]|h-screen/.test(cls) || el.id === 'cta-footer-merged';
+        return /min-h-\[100dvh\]|min-h-screen|h-\[100dvh\]|h-screen|h-\[calc\(100dvh-80px\)\]|h-\[calc\(100vh-80px\)\]|min-h-\[calc\(100vh-80px\)\]/.test(cls) || el.id === 'cta-footer-merged';
     };
 
     const getBlockScrollSections = () => {
@@ -2613,17 +2838,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const btn = document.getElementById('scrollTopBtnGlobal');
+        const chatBtn = document.getElementById('floatingChatBtnGlobal');
+        const isPopupOpen = window.checkAnyPopupOpenGlobal();
+
         if (btn) {
-            const isPopupOpen = window.checkAnyPopupOpenGlobal();
             if (window.pageYOffset > 500 && !isPopupOpen) {
                 btn.classList.add('visible');
             } else {
                 btn.classList.remove('visible');
             }
         }
+
+        if (chatBtn) {
+            const hasHero = !!document.getElementById('hero');
+            if (isPopupOpen) {
+                chatBtn.classList.remove('visible');
+            } else if (hasHero) {
+                if (window.pageYOffset > 500) {
+                    chatBtn.classList.add('visible');
+                } else {
+                    chatBtn.classList.remove('visible');
+                }
+            } else {
+                chatBtn.classList.add('visible');
+            }
+        }
     };
 
     window.addEventListener('scroll', updateScrollTopVisibility);
+    updateScrollTopVisibility();
 
     // Optimized Observer to detect popup appearances/disappearances
     const popupObserver = new MutationObserver((mutations) => {
@@ -2802,7 +3045,7 @@ window.showApplicationSuccessPopup = function(title = 'Заявка принят
         </div>
     `;
     document.body.appendChild(popup);
-    document.body.style.overflow = 'hidden'; // Lock scroll
+    window.lockScrollGlobal(); // Lock scroll
     
     // Trigger animations
     setTimeout(() => {
@@ -2828,7 +3071,7 @@ window.closeApplicationPopup = function() {
     setTimeout(() => {
         const popup = document.getElementById('applicationSuccessPopup');
         if (popup) popup.remove();
-        document.body.style.overflow = ''; // Restore scroll AFTER animation
+        window.unlockScrollGlobal(); // Restore scroll AFTER animation
     }, 500);
 };
 
@@ -2878,7 +3121,7 @@ window.openContactModalGlobal = function(title = 'Оставить заявку'
         </div>
     `;
     document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden'; // Lock scroll
+    window.lockScrollGlobal(); // Lock scroll
 
     setTimeout(() => {
         document.getElementById('modalOverlay').classList.remove('opacity-0');
@@ -2900,7 +3143,7 @@ window.closeContactModalGlobal = function() {
     setTimeout(() => {
         const modal = document.getElementById('globalContactModal');
         if (modal) modal.remove();
-        document.body.style.overflow = ''; // Restore scroll AFTER animation
+        window.unlockScrollGlobal(); // Restore scroll AFTER animation
     }, 500);
 };
 
@@ -2919,7 +3162,7 @@ window.openProductModalGlobal = async function(productId) {
         </div>
     `;
     document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
+    window.lockScrollGlobal();
 
     setTimeout(() => {
         document.getElementById('productModalOverlay').classList.remove('opacity-0');
@@ -3016,7 +3259,7 @@ window.closeProductModalGlobal = function() {
         // Only restore scroll if no other high-level modals are open
         const otherModals = document.querySelectorAll('#globalContactModal, #drawingUploadModal, #cartDrawerGlobal.translate-x-0');
         if (otherModals.length === 0) {
-            document.body.style.overflow = '';
+            window.unlockScrollGlobal();
         }
     }, 500);
 };
@@ -3136,7 +3379,7 @@ window.openDrawingUploadModal = function() {
         </div>
     `;
     document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden'; // Lock scroll
+    window.lockScrollGlobal(); // Lock scroll
 
     setTimeout(() => {
         document.getElementById('drawingOverlay').classList.remove('opacity-0');
@@ -3177,7 +3420,7 @@ window.closeDrawingModal = function() {
     setTimeout(() => {
         const modal = document.getElementById('drawingUploadModal');
         if (modal) modal.remove();
-        document.body.style.overflow = ''; // Restore scroll AFTER animation
+        window.unlockScrollGlobal(); // Restore scroll AFTER animation
     }, 500);
 };
 // Phone Masking Utility - Unified with Global
@@ -3252,9 +3495,9 @@ window.openGlobalChatDrawerGlobal = async function() {
     
     if (!token || (!isAdmin && !user)) {
         modal.innerHTML = `
-            <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="this.parentElement.remove(); document.body.style.overflow=''"></div>
+            <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="this.parentElement.remove(); window.unlockScrollGlobal()"></div>
             <div class="relative liquid-glass p-6 md:p-10 max-w-lg w-full rounded-[2.5rem] opacity-0 transition-all duration-500 ease-out pointer-events-auto shadow-2xl border border-white/10" id="globalChatModalPanel">
-                <button onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
+                <button onclick="document.getElementById('globalChatDrawerModal').remove(); window.unlockScrollGlobal()" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
                 <header class="mb-6 border-b border-white/5 pb-6 text-center">
                     <div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/30 mx-auto mb-4 shadow-lg shadow-primary/20">
                         <span class="material-symbols-outlined text-3xl">forum</span>
@@ -3265,14 +3508,14 @@ window.openGlobalChatDrawerGlobal = async function() {
                 <div class="space-y-6 text-center py-4">
                     <p class="text-sm text-on-surface-variant leading-relaxed">Для доступа к истории переписки по вашим заказам и обращениям, пожалуйста, войдите в систему.</p>
                     <div class="flex flex-col gap-4 pt-4">
-                        <button onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''; toggleAuthModalGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-primary/20">ВОЙТИ В АККАУНТ</button>
-                        <a href="/#contacts" onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''" class="text-xs text-on-surface-variant uppercase tracking-widest hover:text-primary transition-colors">Связаться другим способом</a>
+                        <button onclick="document.getElementById('globalChatDrawerModal').remove(); window.unlockScrollGlobal(); toggleAuthModalGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-primary/20">ВОЙТИ В АККАУНТ</button>
+                        <a href="/#contacts" onclick="document.getElementById('globalChatDrawerModal').remove(); window.unlockScrollGlobal()" class="text-xs text-on-surface-variant uppercase tracking-widest hover:text-primary transition-colors">Связаться другим способом</a>
                     </div>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
-        document.body.style.overflow = 'hidden';
+        window.lockScrollGlobal();
         setTimeout(() => {
             const panel = document.getElementById('globalChatModalPanel');
             if (panel && panel.previousElementSibling) panel.previousElementSibling.classList.remove('opacity-0');
@@ -3282,46 +3525,74 @@ window.openGlobalChatDrawerGlobal = async function() {
     }
 
     modal.innerHTML = `
-        <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="window.closeGlobalChatDrawerGlobal()"></div>
-        <div class="relative liquid-glass p-6 md:p-10 max-w-3xl w-full rounded-[2.5rem] opacity-0 transition-all duration-500 ease-out pointer-events-auto max-h-[90vh] flex flex-col shadow-2xl border border-white/10" id="globalChatModalPanel">
-            <button onclick="window.closeGlobalChatDrawerGlobal()" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
-            <header class="mb-6 border-b border-white/5 pb-6 shrink-0">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-3">
-                        <span class="font-label-caps text-[10px] text-primary tracking-[0.3em] uppercase font-bold">${isAdmin ? 'ПАНЕЛЬ АДМИНА' : 'ОНЛАЙН ЧАТ'}</span>
-                        <span class="flex items-center gap-1.5 text-[9px] text-primary font-bold tracking-widest uppercase">
-                            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block"></span>online
-                        </span>
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="window.closeGlobalChatDrawerGlobal()"></div>
+        <div class="relative bg-[#0f0e0c] p-0 max-w-2xl w-full rounded-3xl md:rounded-[2.5rem] opacity-0 transition-all duration-500 ease-out pointer-events-auto max-h-[95vh] h-[800px] flex flex-col shadow-2xl border border-white/5 overflow-hidden" id="globalChatModalPanel">
+            <header class="p-6 md:p-8 border-b border-white/5 flex items-center justify-between bg-[#151311]/80 backdrop-blur-xl shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                        <span class="material-symbols-outlined text-2xl">${isAdmin ? 'admin_panel_settings' : 'support_agent'}</span>
                     </div>
-                    <span class="text-[9px] text-primary bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-full uppercase tracking-widest font-bold">Telegram style</span>
+                    <div>
+                        <div class="font-display-xl text-lg uppercase tracking-tight">${isAdmin ? 'УПРАВЛЕНИЕ <span class="text-primary">ЧАТАМИ</span>' : 'ПОДДЕРЖКА <span class="text-primary">WOODMAN</span>'}</div>
+                        <div class="flex items-center gap-1.5 text-[10px] text-green-400 font-bold uppercase tracking-widest mt-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                            Online
+                        </div>
+                    </div>
                 </div>
-                <h2 class="font-display-xl text-2xl md:text-3xl leading-none text-on-surface font-bold uppercase tracking-tight">${isAdmin ? 'Чат с клиентами' : 'Чат с менеджером'}</h2>
-                <div class="mt-4 flex items-center gap-4">
-                    <label class="text-[10px] text-on-surface-variant uppercase tracking-widest font-bold opacity-60 shrink-0">Выбрать диалог:</label>
-                    <select id="globalChatTopicSelect" onchange="window.selectGlobalChatTopicGlobal(this.value)" class="flex-1 bg-surface-container-low border border-white/10 rounded-xl px-4 py-2.5 text-xs text-on-surface outline-none focus:border-primary transition-all font-body-md">
+                <div class="flex items-center gap-2">
+                    ${!isAdmin ? `<select id="globalChatTopicSelect" onchange="window.selectGlobalChatTopicGlobal(this.value)" class="hidden md:block bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-on-surface outline-none focus:border-primary/40 transition-all font-body-md min-w-[200px] cursor-pointer">
                         <option value="">Загрузка диалогов...</option>
-                    </select>
+                    </select>` : ''}
+                    <button onclick="window.closeGlobalChatDrawerGlobal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-on-surface-variant hover:text-white hover:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
                 </div>
             </header>
             
-            <div class="flex-1 flex flex-col bg-black/30 border border-white/5 rounded-3xl overflow-hidden shadow-2xl min-h-[380px] max-h-[500px]">
-                <div id="globalChatMessagesContainer" class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-4">
-                    <div class="flex items-center justify-center h-full text-on-surface-variant opacity-50 gap-3">
-                        <span class="material-symbols-outlined animate-spin text-primary">progress_activity</span>
-                        <span class="font-label-caps text-xs uppercase tracking-widest">Загрузка истории...</span>
-                    </div>
+            ${!isAdmin ? `
+                <div class="md:hidden px-6 py-3 bg-[#151311] border-b border-white/5">
+                     <select id="globalChatTopicSelectMobile" onchange="window.selectGlobalChatTopicGlobal(this.value)" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-on-surface outline-none font-body-md">
+                        <option value="">Выберите диалог...</option>
+                    </select>
                 </div>
-                <div class="p-4 border-t border-white/5 flex gap-3 shrink-0 bg-white/5 items-center">
-                    <input type="text" id="globalChatInput" placeholder="${isAdmin ? 'Написать клиенту...' : 'Написать менеджеру...'}" class="flex-1 bg-black/50 border border-white/10 rounded-2xl px-5 py-3 text-sm outline-none focus:border-primary transition-all text-on-surface placeholder:opacity-40 shadow-inner">
-                    <button id="globalChatSendBtn" onclick="window.sendGlobalChatMessageGlobal()" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-primary text-on-primary hover:brightness-110 transition-all shrink-0 shadow-lg shadow-primary/20">
-                        <span class="material-symbols-outlined text-base">send</span>
-                    </button>
+            ` : ''}
+
+            <div class="flex-1 flex overflow-hidden relative">
+                ${isAdmin ? `
+                    <div class="w-full md:w-72 border-r border-white/5 overflow-y-auto hidden md:block bg-[#0a0908]" id="chatListSidebar">
+                        <div class="p-4 border-b border-white/5">
+                            <input type="text" placeholder="Поиск..." class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-on-surface outline-none focus:border-primary/30"/>
+                        </div>
+                        <div id="activeChatsList" class="divide-y divide-white/5">
+                            <div class="p-10 text-center text-[10px] uppercase font-bold text-on-surface-variant/30 tracking-widest">Загрузка...</div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="flex-1 flex flex-col bg-[#0f0e0c] relative">
+                    <div class="absolute inset-0 opacity-[0.02] pointer-events-none" style="background-image: radial-gradient(#964551 1px, transparent 1px); background-size: 32px 32px;"></div>
+                    <div id="globalChatMessagesContainer" class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 custom-scrollbar relative z-10 flex flex-col">
+                        <div class="flex items-center justify-center h-full text-on-surface-variant opacity-30 gap-3">
+                            <span class="material-symbols-outlined animate-spin text-primary">progress_activity</span>
+                            <span class="font-label-caps text-xs uppercase tracking-widest">Загрузка истории...</span>
+                        </div>
+                    </div>
+                    
+                    <footer class="p-6 md:p-8 bg-[#151311] border-t border-white/5 shrink-0 z-20">
+                        <div class="relative flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-2 focus-within:border-primary/40 transition-all">
+                            <textarea id="globalChatInput" placeholder="Напишите сообщение..." class="flex-1 bg-transparent border-0 focus:ring-0 text-sm md:text-base text-on-surface py-2 px-3 resize-none max-h-32 outline-none h-10 custom-scrollbar" rows="1"></textarea>
+                            <button id="globalChatSendBtn" onclick="window.sendGlobalChatMessageGlobal()" class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale">
+                                <span class="material-symbols-outlined text-xl md:text-2xl">send</span>
+                            </button>
+                        </div>
+                    </footer>
                 </div>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
+    window.lockScrollGlobal();
     setTimeout(() => {
         const panel = document.getElementById('globalChatModalPanel');
         if (panel && panel.previousElementSibling) panel.previousElementSibling.classList.remove('opacity-0');
@@ -3405,7 +3676,7 @@ window.closeGlobalChatDrawerGlobal = function() {
     const overlay = modal.querySelector('.absolute');
     if(overlay) overlay.classList.add('opacity-0');
     if(panel) panel.classList.replace('modal-animate-in', 'modal-animate-out');
-    setTimeout(() => { modal.remove(); document.body.style.overflow = ''; }, 500);
+    setTimeout(() => { modal.remove(); window.unlockScrollGlobal(); }, 500);
 };
 
 window.selectGlobalChatTopicGlobal = function(val) {
@@ -3552,4 +3823,788 @@ window.sendGlobalChatMessageGlobal = async function() {
         window.renderGlobalChatMessagesGlobal();
     }
 };
+
+(function() {
+    const lightModeStyles = `
+/* --- CUSTOM PALETTE: #D6A3AB, #C7C5C5, #3B3B3B, #964551, #827D7E --- */
+html.light body,
+html.light body.bg-background,
+html.light body[class*="bg-"],
+html.light main,
+html.light main[class*="bg-"],
+html.light main[class*="overflow-"],
+html.light main.overflow-x-hidden {
+    background-color: #C7C5C5 !important;
+    color: #3B3B3B !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.light {
+    --tw-bg-opacity: 1 !important;
+    --tw-gradient-from: #C7C5C5 !important;
+    --tw-gradient-to: rgba(199, 197, 197, 0) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+/* 2. Force All Background Classes with Liquid Glass (60% Opacity) */
+html.light [class*="bg-"],
+html.light [class*="bg-surface"],
+html.light [class*="bg-white/"],
+html.light section,
+html.light aside,
+html.light footer,
+html.light article,
+html.light .glass-panel,
+html.light .glass-card,
+html.light .liquid-glass,
+html.light .modal-content,
+html.light [class*="bg-surface-container"],
+html.light .mega-menu-inner,
+html.light #cartPanelGlobal,
+html.light #authPanelGlobal,
+html.light #mobileMenuPanelGlobal,
+html.light #mobileCatalogPanelGlobal,
+html.light #searchContainerGlobal {
+    background-color: rgba(199, 197, 197, 0.6) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    background-image: none !important;
+    border-color: #827D7E !important;
+}
+
+/* Hero Stats Liquid Glass & Divider Overrides */
+html.light #hero .bg-surface\/50,
+html.light #hero .bg-surface-container-low\/50,
+html.light #hero .liquid-glass,
+html.light #hero [class*="bg-surface"],
+html.light #hero [class*="bg-surface-container-low"] {
+    background-color: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(25px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.5) !important;
+}
+
+html.light #hero .border-primary\/30,
+html.light #hero .border-l {
+    border-color: rgba(150, 69, 81, 0.25) !important;
+}
+
+/* Deep Wine Buttons (#964551) */
+html.light .bg-primary, 
+html.light .apple-toggle-thumb,
+html.light .mega-default-btn,
+html.light button.bg-primary,
+html.light [type="submit"],
+html.light .addToCartBtn,
+html.light [onclick*="addToCart"] {
+    background-color: #964551 !important; 
+    color: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    opacity: 1 !important;
+    border: none !important;
+}
+
+html.light .mega-default-btn:hover,
+html.light button.bg-primary:hover,
+html.light [type="submit"]:hover {
+    background-color: #7a3541 !important;
+    transform: translateY(-2px);
+}
+
+/* Restore Hero Image Visibility - 6px Blur */
+html.light #hero img,
+html.light section#hero img,
+html.light section:first-of-type img,
+html.light .hero-bg img {
+    opacity: 1 !important;
+    filter: blur(6px) !important;
+    mix-blend-mode: normal !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+html.light #hero .bg-gradient-to-r,
+html.light section:first-of-type .bg-gradient-to-r {
+    display: block !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    background-image: linear-gradient(to right, #FAFAFA 0%, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+html.light #hero .bg-gradient-to-b,
+html.light section:first-of-type .bg-gradient-to-b {
+    display: block !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    background-image: linear-gradient(to bottom, #FAFAFA 0%, rgba(250, 250, 250, 0.6) 60%, #FAFAFA 100%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Sidebar & Mega Menu */
+html.light .mega-menu-left {
+    background-color: rgba(199, 197, 197, 0.8) !important;
+    border-right: 1px solid #827D7E !important;
+}
+html.light .mega-cat-link:hover, 
+html.light .mega-cat-item.is-active .mega-cat-link {
+    background-color: #d6336c !important; /* Premium Pink */
+    color: #FFFFFF !important;
+}
+html.light .mega-cat-item.is-active .mega-cat-link::before {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+}
+html.light .mega-menu-right {
+    background-color: transparent !important;
+}
+html.light .mega-menu-right .mega-sub-link:hover {
+    color: #964551 !important;
+}
+
+/* 3. Text & Icons (#3B3B3B) */
+html.light [class*="text-"],
+html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6,
+html.light p, html.light span:not(.material-symbols-outlined),
+html.light a:not(.bg-primary),
+html.light .nav-link {
+    color: #3B3B3B !important;
+    opacity: 1 !important;
+}
+html.light .material-symbols-outlined:not(.text-primary) {
+    color: #3B3B3B !important;
+}
+
+/* Restore white text on Deep Wine elements */
+html.light .bg-primary *,
+html.light button.bg-primary *,
+html.light [type="submit"],
+html.light .text-white,
+html.light .mega-default-btn span {
+    color: #FFFFFF !important;
+}
+
+/* Deep Wine Accents */
+html.light .text-primary,
+html.light .text-primary * {
+    color: #964551 !important;
+}
+
+/* 5. Header Fix */
+html.light #globalHeader {
+    background-color: rgba(199, 197, 197, 0.8) !important;
+    border-bottom: 2px solid #827D7E !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    opacity: 1 !important;
+}
+
+/* 7. Borders & Scrollbars */
+html.light [class*="border-"],
+html.light .machined-border {
+    border-color: #827D7E !important;
+}
+html.light .border-primary { border-color: #964551 !important; }
+
+html.light ::-webkit-scrollbar-track { background: #C7C5C5 !important; }
+html.light ::-webkit-scrollbar-thumb { 
+    background: #964551 !important; 
+    border: 2px solid #C7C5C5 !important;
+}
+html.light * { scrollbar-color: #964551 #C7C5C5 !important; }
+
+.nav-link { position: relative; }
+.nav-link::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+    background: #964551; transition: width 0.3s ease;
+}
+.nav-link:hover::after { width: 100%; }
+
+.mega-menu {
+    opacity: 0; pointer-events: none; visibility: hidden;
+    position: fixed; top: 80px; left: 0; width: 100vw; z-index: 2000;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(-10px);
+}
+.mega-menu.is-visible { 
+    opacity: 1; pointer-events: auto; visibility: visible;
+    transform: translateY(0);
+}
+.mega-menu-inner {
+    display: flex; max-width: 1440px; margin: 0 auto; background: #C7C5C5;
+    border: 1px solid #827D7E; border-top: 2px solid #964551;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6); min-height: 400px;
+}
+.mega-menu-left { width: 300px; background: rgba(199, 197, 197, 0.9); border-right: 1px solid #827D7E; padding: 20px 0; }
+.mega-cat-link {
+    display: flex; align-items: center; gap: 12px; padding: 12px 30px;
+    color: #3B3B3B; text-decoration: none; font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; transition: all 0.2s; position: relative;
+}
+.mega-cat-link:hover, .mega-cat-item.is-active .mega-cat-link { background: #d6336c; color: #FFFFFF; }
+.mega-cat-item.is-active .mega-cat-link::before {
+    content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #d6336c;
+}
+.mega-menu-right { flex: 1; padding: 40px; background: transparent; }
+.mega-submenu { display: none; }
+.mega-submenu.is-active { display: block; animation: fadeInSub 0.3s ease; }
+@keyframes fadeInSub { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+.mega-submenu-title { font-size: 20px; font-weight: 600; color: #3B3B3B; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid #827D7E; }
+.mega-submenu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; }
+.mega-sub-link { color: #3B3B3B; text-decoration: none; font-size: 13px; display: block; padding: 6px 0; transition: color 0.2s; }
+.mega-sub-link:hover { color: #964551; }
+
+.mega-overlay { 
+    opacity: 0; pointer-events: none; visibility: hidden;
+    position: fixed; top: 80px; left: 0; width: 100vw; height: 100vh; 
+    background: rgba(0,0,0,0.5); z-index: 1999; backdrop-filter: blur(4px); 
+    transition: all 0.4s ease;
+}
+.mega-overlay.is-visible { opacity: 1; pointer-events: auto; visibility: visible; }
+
+/* === PREMIUM PINK #d6336c OVERRIDES FOR LIGHT MODE === */
+html.light .pink-slide::after,
+html:not(.dark) .pink-slide::after {
+    background-color: #d6336c !important;
+    background: #d6336c !important;
+}
+html.light .tab-btn.active,
+html.light .tab-active,
+html:not(.dark) .tab-btn.active,
+html:not(.dark) .tab-active {
+    background-color: #d6336c !important;
+    background: #d6336c !important;
+    color: #ffffff !important;
+    border-color: #d6336c !important;
+}
+html.light .active-shape-card,
+html:not(.dark) .active-shape-card {
+    border-color: #d6336c !important;
+    background-color: rgba(214, 51, 108, 0.08) !important;
+    box-shadow: 0 0 20px rgba(214, 51, 108, 0.15) !important;
+}
+html.light input:focus,
+html.light select:focus,
+html.light textarea:focus,
+html:not(.dark) input:focus,
+html:not(.dark) select:focus,
+html:not(.dark) textarea:focus {
+    border-bottom-color: #d6336c !important;
+    border-color: #d6336c !important;
+}
+html.light .industrial-glow:hover,
+html:not(.dark) .industrial-glow:hover {
+    border-color: #d6336c !important;
+    box-shadow: inset 0 0 25px rgba(214, 51, 108, 0.1) !important;
+}
+`;
+    const style = document.createElement('style');
+    style.id = 'light-mode-styles-injected';
+    style.textContent = lightModeStyles;
+    document.head.appendChild(style);
+})();
+
+/* ==========================================
+   PREMIUM CUSTOM SELECT DROPDOWN OVERLAYS
+   ========================================== */
+(function() {
+    // 1. Inject Premium Custom Select CSS
+    const styles = `
+    .custom-select-container {
+        position: relative;
+        display: inline-block;
+    }
+    .custom-select-container.w-full {
+        display: block;
+        width: 100%;
+    }
+    .custom-select-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+        outline: none !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+    }
+    
+    /* Trigger Button */
+    .custom-select-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        user-select: none;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+        background: #151311 !important;
+        color: #e7e2dd;
+        padding: 5px 12px;
+        line-height: 1.2;
+        text-align: left;
+        white-space: nowrap !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    }
+    .custom-select-trigger.large-padding {
+        padding: 7px 14px;
+        line-height: 1.2;
+    }
+    .custom-select-text {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.2;
+        flex: 1;
+        min-width: 0;
+    }
+    .custom-select-trigger:hover {
+        background: #151311 !important;
+        color: #c7c5c5;
+        box-shadow: 0 4px 14px rgba(255, 176, 204, 0.25) !important;
+    }
+    .custom-select-trigger.is-active {
+        background: #151311 !important;
+        color: #c7c5c5;
+        box-shadow: 0 4px 14px rgba(255, 176, 204, 0.3) !important;
+    }
+    
+    /* Chevron arrow */
+    .custom-select-arrow {
+        font-family: 'Material Symbols Outlined';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 16px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased;
+        transition: transform 0.3s ease;
+        margin-left: 8px;
+        color: #c7c5c5;
+        pointer-events: none;
+    }
+    .custom-select-trigger.is-active .custom-select-arrow {
+        transform: rotate(180deg);
+    }
+    
+    /* Popup Menu Overlay */
+    .custom-select-popup {
+        position: fixed;
+        z-index: 999999;
+        border-radius: 12px;
+        border: none !important;
+        border-width: 0 !important;
+        outline: none !important;
+        background: #151311 !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+        max-height: 200px;
+        overflow-y: auto;
+        opacity: 0;
+        transform: scale(0.95);
+        transform-origin: top center;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .custom-select-popup.is-open {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+    }
+    
+    /* Options */
+    .custom-select-option {
+        padding: 4px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #d7c1c7;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+        text-transform: uppercase;
+        text-align: left;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.2;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+    }
+    .custom-select-option:hover {
+        background: rgba(255, 176, 204, 0.1);
+        color: #c7c5c5;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+    }
+    .custom-select-option.is-selected {
+        background: rgba(255, 176, 204, 0.15);
+        color: #c7c5c5;
+        font-weight: 700;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+    }
+    
+    /* Scrollbar */
+    .custom-select-popup::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-select-popup::-webkit-scrollbar-track {
+        background: #151311 !important;
+    }
+    .custom-select-popup::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+    }
+    .custom-select-popup::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* --- LIGHT THEME OVERRIDES --- */
+    html.light .custom-select-trigger {
+        background: #C7C5C5 !important;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+        color: #151311;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+    html.light .custom-select-trigger:hover,
+    html.light .custom-select-trigger.is-active {
+        background: #C7C5C5 !important;
+        color: #964551;
+        box-shadow: 0 4px 14px rgba(150, 69, 81, 0.25) !important;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+    }
+    html.light .custom-select-arrow {
+        color: #964551;
+    }
+    html.light .custom-select-popup {
+        background: #C7C5C5 !important;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+    }
+    html.light .custom-select-option {
+        color: #151311;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+    }
+    html.light .custom-select-option:hover {
+        background: rgba(150, 69, 81, 0.15);
+        color: #964551;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+    }
+    html.light .custom-select-option.is-selected {
+        background: rgba(150, 69, 81, 0.25);
+        color: #964551;
+        font-weight: 700;
+        border: none !important;
+        border-width: 0 !important;
+        border-style: none !important;
+        outline: none !important;
+    }
+    html.light .custom-select-popup::-webkit-scrollbar-track {
+        background: #C7C5C5 !important;
+    }
+    html.light .custom-select-popup::-webkit-scrollbar-thumb {
+        background: rgba(150, 69, 81, 0.2);
+    }
+    html.light .custom-select-popup::-webkit-scrollbar-thumb:hover {
+        background: rgba(150, 69, 81, 0.3);
+    }
+    `;
+    
+    const styleEl = document.createElement('style');
+    styleEl.id = 'custom-select-styles-global';
+    styleEl.textContent = styles;
+    document.head.appendChild(styleEl);
+    
+    // Save reference to original select descriptors
+    const originalValueDescriptor = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    const originalIndexDescriptor = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+    
+    window.initCustomSelects = function() {
+        const selects = document.querySelectorAll('select:not([data-custom-select-initialized])');
+        
+        selects.forEach(select => {
+            if (select.classList.contains('custom-select-hidden')) return;
+            
+            // Mark select as decorated
+            select.setAttribute('data-custom-select-initialized', 'true');
+            
+            // Create container and inherit layout classes
+            const container = document.createElement('div');
+            container.className = 'custom-select-container';
+            
+            const layoutClasses = ['w-full', 'w-72', 'md:w-72', 'max-w-xs', 'max-w-sm', 'max-w-md', 'max-w-lg', 'flex-1', 'grow', 'shrink'];
+            select.classList.forEach(cls => {
+                if (layoutClasses.includes(cls) || cls.startsWith('w-') || cls.startsWith('md:w-') || cls.startsWith('lg:w-') || cls.startsWith('max-w-')) {
+                    container.classList.add(cls);
+                }
+            });
+            
+            // Inject container into DOM
+            select.parentNode.insertBefore(container, select);
+            container.appendChild(select);
+            select.classList.add('custom-select-hidden');
+            
+            // Find and hide hardcoded select chevrons (such as in catalog toolbar)
+            const parent = container.parentNode;
+            if (parent) {
+                Array.from(parent.children).forEach(sib => {
+                    if (sib !== container && sib.classList.contains('material-symbols-outlined') && 
+                        (sib.textContent.trim() === 'expand_more' || sib.textContent.trim() === 'expand_less')) {
+                        sib.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Create trigger element
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'custom-select-trigger';
+            if (select.classList.contains('p-4') || select.classList.contains('py-3') || select.classList.contains('py-4')) {
+                trigger.classList.add('large-padding');
+            }
+            
+            const textSpan = document.createElement('span');
+            textSpan.className = 'custom-select-text';
+            
+            const arrowSpan = document.createElement('span');
+            arrowSpan.className = 'custom-select-arrow material-symbols-outlined';
+            arrowSpan.textContent = 'expand_more';
+            
+            trigger.appendChild(textSpan);
+            trigger.appendChild(arrowSpan);
+            container.appendChild(trigger);
+            
+            // Create popup panel
+            const popup = document.createElement('div');
+            popup.className = 'custom-select-popup';
+            container.appendChild(popup);
+            
+            // Function to build/rebuild custom options from native options
+            function rebuildOptions() {
+                popup.innerHTML = '';
+                const options = select.options;
+                
+                for (let i = 0; i < options.length; i++) {
+                    const opt = options[i];
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'custom-select-option';
+                    optDiv.textContent = opt.textContent;
+                    optDiv.setAttribute('data-value', opt.value);
+                    
+                    if (opt.selected) {
+                        optDiv.classList.add('is-selected');
+                        textSpan.textContent = opt.textContent;
+                    }
+                    
+                    optDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (select.value !== opt.value) {
+                            select.value = opt.value;
+                            // Dispatch standard event
+                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        closePopup();
+                    });
+                    
+                    popup.appendChild(optDiv);
+                }
+                
+                if (!textSpan.textContent && options.length > 0) {
+                    textSpan.textContent = options[0].textContent;
+                }
+            }
+            
+            rebuildOptions();
+            
+            function positionPopup() {
+                const triggerRect = trigger.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const popupMaxH = 200;
+                const spaceBelow = viewportHeight - triggerRect.bottom;
+                const spaceAbove = triggerRect.top;
+
+                popup.style.width = triggerRect.width + 'px';
+                popup.style.left = triggerRect.left + 'px';
+
+                if (spaceBelow >= Math.min(popupMaxH, 120) || spaceBelow >= spaceAbove) {
+                    // Open downward
+                    popup.style.top = (triggerRect.bottom + 6) + 'px';
+                    popup.style.bottom = 'auto';
+                    popup.style.transformOrigin = 'top center';
+                } else {
+                    // Open upward
+                    popup.style.bottom = (viewportHeight - triggerRect.top + 6) + 'px';
+                    popup.style.top = 'auto';
+                    popup.style.transformOrigin = 'bottom center';
+                }
+            }
+
+            function togglePopup() {
+                const isOpen = popup.classList.contains('is-open');
+                if (isOpen) {
+                    closePopup();
+                } else {
+                    // Close other selects
+                    document.querySelectorAll('.custom-select-popup.is-open').forEach(p => {
+                        if (p !== popup) {
+                            p.classList.remove('is-open');
+                            const prevTrigger = p._customSelectTrigger;
+                            if (prevTrigger) prevTrigger.classList.remove('is-active');
+                        }
+                    });
+
+                    // Move popup to body (portal) to escape overflow:hidden parents
+                    if (popup.parentNode !== document.body) {
+                        document.body.appendChild(popup);
+                        popup._customSelectTrigger = trigger;
+                    }
+
+                    positionPopup();
+                    popup.classList.add('is-open');
+                    trigger.classList.add('is-active');
+                }
+            }
+            
+            function closePopup() {
+                popup.classList.remove('is-open');
+                trigger.classList.remove('is-active');
+            }
+
+            // Reposition on scroll/resize while open
+            function onScrollResize() {
+                if (popup.classList.contains('is-open')) {
+                    positionPopup();
+                }
+            }
+            window.addEventListener('scroll', onScrollResize, true);
+            window.addEventListener('resize', onScrollResize);
+            
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                togglePopup();
+            });
+            
+            // Watch for changes in native options (e.g. calculator re-population)
+            const obs = new MutationObserver(() => {
+                rebuildOptions();
+            });
+            obs.observe(select, { childList: true });
+            
+            // Store sync link
+            select._syncCustomSelect = function() {
+                rebuildOptions();
+            };
+        });
+    };
+    
+    // Intercept setter/getter of native value properties to support programmatic values update
+    if (originalValueDescriptor && originalValueDescriptor.set) {
+        Object.defineProperty(HTMLSelectElement.prototype, 'value', {
+            get() {
+                return originalValueDescriptor.get.call(this);
+            },
+            set(val) {
+                originalValueDescriptor.set.call(this, val);
+                if (typeof this._syncCustomSelect === 'function') {
+                    this._syncCustomSelect();
+                }
+            },
+            configurable: true
+        });
+    }
+    
+    if (originalIndexDescriptor && originalIndexDescriptor.set) {
+        Object.defineProperty(HTMLSelectElement.prototype, 'selectedIndex', {
+            get() {
+                return originalIndexDescriptor.get.call(this);
+            },
+            set(idx) {
+                originalIndexDescriptor.set.call(this, idx);
+                if (typeof this._syncCustomSelect === 'function') {
+                    this._syncCustomSelect();
+                }
+            },
+            configurable: true
+        });
+    }
+    
+    // Click outside handler
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-select-popup.is-open').forEach(p => {
+            p.classList.remove('is-open');
+            const t = p._customSelectTrigger;
+            if (t) t.classList.remove('is-active');
+        });
+    });
+    
+    // Auto initialize and setup global observer for newly added selects
+    const globalObserver = new MutationObserver((mutations) => {
+        let hasNewSelect = false;
+        for (let mutation of mutations) {
+            for (let node of mutation.addedNodes) {
+                if (node.nodeType === 1) {
+                    if (node.tagName === 'SELECT' && !node.hasAttribute('data-custom-select-initialized') && !node.classList.contains('custom-select-hidden')) {
+                        hasNewSelect = true;
+                        break;
+                    }
+                    if (node.querySelector && node.querySelector('select:not([data-custom-select-initialized]):not(.custom-select-hidden)')) {
+                        hasNewSelect = true;
+                        break;
+                    }
+                }
+            }
+            if (hasNewSelect) break;
+        }
+        if (hasNewSelect) {
+            window.initCustomSelects();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        window.initCustomSelects();
+        globalObserver.observe(document.body, { childList: true, subtree: true });
+    });
+})();
 
