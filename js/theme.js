@@ -146,7 +146,7 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
-        /* Glass Panels, Menus, & Popups - Global Sync */
+        /* Glass Panels, Menus, Popups & Lead Forms - Global Sync */
         html:not(.dark) .bg-surface,
         html:not(.dark) .bg-surface-container,
         html:not(.dark) .bg-surface-container-lowest,
@@ -158,8 +158,10 @@
         html:not(.dark) #authPanelGlobal,
         html:not(.dark) #mobileMenuPanelGlobal,
         html:not(.dark) #mobileCatalogPanelGlobal,
-        html:not(.dark) #searchContainerGlobal {
-            background-color: rgba(255, 255, 255, 0.85) !important;
+        html:not(.dark) #searchContainerGlobal,
+        html:not(.dark) section#cta-footer-merged .bg-surface,
+        html:not(.dark) section#cta-footer-merged .bg-primary/10 {
+            background-color: rgba(255, 255, 255, 0.9) !important;
             backdrop-filter: blur(35px) saturate(210%) !important;
             -webkit-backdrop-filter: blur(35px) saturate(210%) !important;
             border: 1px solid rgba(255, 255, 255, 1) !important;
@@ -167,11 +169,21 @@
             color: var(--color-on-bg) !important;
         }
 
+        /* Border Sync for Light Mode (Transform dark borders to subtle light ones) */
+        html:not(.dark) .border-white/5,
+        html:not(.dark) .border-white/10,
+        html:not(.dark) .border-white/20,
+        html:not(.dark) .border-outline-variant/10,
+        html:not(.dark) .border-outline-variant/20,
+        html:not(.dark) .border-outline-variant/30 {
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
         /* Forms & Inputs in Light Mode */
         html:not(.dark) input,
         html:not(.dark) select,
         html:not(.dark) textarea {
-            background-color: rgba(0, 0, 0, 0.03) !important;
+            background-color: rgba(0, 0, 0, 0.02) !important;
             border: 1px solid rgba(0, 0, 0, 0.1) !important;
             color: var(--color-on-bg) !important;
         }
@@ -182,29 +194,40 @@
             border-color: var(--color-primary) !important;
             box-shadow: 0 0 0 4px rgba(150, 69, 81, 0.1) !important;
         }
+        html:not(.dark) input::placeholder,
+        html:not(.dark) textarea::placeholder {
+            color: rgba(0, 0, 0, 0.4) !important;
+        }
 
-        /* Mega Menu Overrides */
+        /* Mega Menu & Catalog Panels */
         html:not(.dark) .mega-menu-left {
-            background-color: rgba(0, 0, 0, 0.03) !important;
+            background-color: rgba(0, 0, 0, 0.02) !important;
             border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
         }
-        html:not(.dark) .mega-cat-link {
+        html:not(.dark) .mega-cat-link,
+        html:not(.dark) .mobile-nav-link {
             color: var(--color-on-bg) !important;
         }
-        html:not(.dark) .mega-sub-link {
+        html:not(.dark) .mega-sub-link,
+        html:not(.dark) .text-on-surface-variant {
             color: var(--color-on-surface-variant) !important;
         }
+        html:not(.dark) .bg-white/5,
+        html:not(.dark) .bg-white/10 {
+            background-color: rgba(0, 0, 0, 0.03) !important;
+        }
 
-        /* Card Highlights Restoration */
+        /* Card Highlights Restoration & Enhancement */
         .card-enter, .pink-glow {
             transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) !important;
         }
         html:not(.dark) .card-enter:hover,
-        html:not(.dark) .pink-glow:hover {
+        html:not(.dark) .pink-glow:hover,
+        html:not(.dark) .group:hover .pink-glow {
             background-color: #FFFFFF !important;
             border-color: var(--color-primary) !important;
             box-shadow: 0 15px 45px rgba(150, 69, 81, 0.12), 0 0 0 1px var(--color-primary) !important;
-            transform: translateY(-5px) scale(1.01) !important;
+            transform: translateY(-5px) scale(1.005) !important;
         }
 
         /* 404 Page Theme Sync */
