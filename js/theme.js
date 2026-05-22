@@ -146,12 +146,13 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
         }
 
-        /* Glass Panels, Menus, Popups & Lead Forms - Global Sync */
+        /* Glass Panels, Menus, Popups, Lead Forms & Services - Global Sync */
         html:not(.dark) .bg-surface,
         html:not(.dark) .bg-surface-container,
         html:not(.dark) .bg-surface-container-lowest,
         html:not(.dark) .glass-panel,
         html:not(.dark) .glass-card,
+        html:not(.dark) .liquid-glass,
         html:not(.dark) .mega-menu-inner,
         html:not(.dark) .price-block,
         html:not(.dark) #cartPanelGlobal,
@@ -161,12 +162,26 @@
         html:not(.dark) #searchContainerGlobal,
         html:not(.dark) section#cta-footer-merged .bg-surface,
         html:not(.dark) section#cta-footer-merged .bg-primary/10 {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            backdrop-filter: blur(35px) saturate(210%) !important;
-            -webkit-backdrop-filter: blur(35px) saturate(210%) !important;
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(40px) saturate(210%) !important;
+            -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
             border: 1px solid rgba(255, 255, 255, 1) !important;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), inset 0 0 30px rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05), inset 0 0 30px rgba(255, 255, 255, 0.8) !important;
             color: var(--color-on-bg) !important;
+        }
+
+        /* Specific fix for dark-gray buttons and interactive elements in light mode */
+        html:not(.dark) button.liquid-glass,
+        html:not(.dark) a.liquid-glass,
+        html:not(.dark) .bg-surface-container button:not(.bg-primary) {
+            background-color: rgba(0, 0, 0, 0.04) !important;
+            color: var(--color-on-bg) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+        html:not(.dark) button.liquid-glass:hover,
+        html:not(.dark) a.liquid-glass:hover {
+            background-color: rgba(0, 0, 0, 0.08) !important;
+            border-color: var(--color-primary) !important;
         }
 
         /* Border Sync for Light Mode (Transform dark borders to subtle light ones) */
@@ -175,8 +190,22 @@
         html:not(.dark) .border-white/20,
         html:not(.dark) .border-outline-variant/10,
         html:not(.dark) .border-outline-variant/20,
-        html:not(.dark) .border-outline-variant/30 {
+        html:not(.dark) .border-outline-variant/30,
+        html:not(.dark) .divide-white/5,
+        html:not(.dark) .divide-white/10 {
             border-color: rgba(0, 0, 0, 0.08) !important;
+            border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* Table & Grid fixes for Light Mode */
+        html:not(.dark) .metal-grid-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px) !important;
+        }
+        html:not(.dark) thead tr.bg-white/5 {
+            background-color: rgba(0, 0, 0, 0.03) !important;
+        }
+        html:not(.dark) tbody tr:hover {
+            background-color: rgba(150, 69, 81, 0.05) !important;
         }
 
         /* Forms & Inputs in Light Mode */
