@@ -152,13 +152,13 @@
             border-color: rgba(150, 69, 81, 0.25);
         }
 
-        /* Light Theme Header (Premium Liquid Glass) */
+        /* Light Theme Header (Transparent) */
         html:not(.dark) #globalHeader {
-            background-color: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(25px) saturate(210%);
-            -webkit-backdrop-filter: blur(25px) saturate(210%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02), inset 0 0 15px rgba(255, 255, 255, 0.4);
+            background-color: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border-bottom: none;
+            box-shadow: none;
         }
 
         /* Complete reset for Hero section in Light Mode */
