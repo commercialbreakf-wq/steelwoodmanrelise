@@ -121,17 +121,65 @@
                         opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        /* --- LIQUID GLASS & LIGHT THEME MAGIC --- */
+        /* --- LIQUID GLASS & THEME SYNC --- */
+        
+        /* Global Header (Liquid Glass) */
+        #globalHeader {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Dark Theme Header (Dark Liquid Glass) */
+        .dark #globalHeader {
+            background-color: rgba(21, 19, 17, 0.7);
+            backdrop-filter: blur(25px) saturate(210%);
+            -webkit-backdrop-filter: blur(25px) saturate(210%);
+            border-bottom: 1px solid rgba(150, 69, 81, 0.15);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Light Theme Header (Premium Glass) */
+        html:not(.dark) #globalHeader {
+            background-color: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Glass Panels, Menus, & Popups - Global Sync */
         html:not(.dark) .bg-surface,
         html:not(.dark) .bg-surface-container,
         html:not(.dark) .bg-surface-container-lowest,
         html:not(.dark) .glass-panel,
-        html:not(.dark) .price-block {
-            background-color: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(25px) saturate(200%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.5);
+        html:not(.dark) .glass-card,
+        html:not(.dark) .mega-menu-inner,
+        html:not(.dark) .price-block,
+        html:not(.dark) #cartPanelGlobal,
+        html:not(.dark) #authPanelGlobal,
+        html:not(.dark) #mobileMenuPanelGlobal,
+        html:not(.dark) #mobileCatalogPanelGlobal,
+        html:not(.dark) #searchContainerGlobal {
+            background-color: rgba(255, 255, 255, 0.75) !important;
+            backdrop-filter: blur(30px) saturate(210%) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(210%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.9) !important;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05), inset 0 0 20px rgba(255, 255, 255, 0.6) !important;
+            color: var(--color-on-bg) !important;
+        }
+
+        /* Mega Menu Overrides */
+        html:not(.dark) .mega-menu-left {
+            background-color: rgba(0, 0, 0, 0.02) !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) .mega-cat-link {
+            color: var(--color-on-bg) !important;
+        }
+        html:not(.dark) .mega-sub-link {
+            color: var(--color-on-surface-variant) !important;
+        }
+        html:not(.dark) .mega-sub-link:hover {
+            color: var(--color-primary) !important;
         }
 
         /* Hero Stats Liquid Glass & Divider Overrides */
@@ -150,15 +198,6 @@
         html:not(.dark) #hero .border-primary/30,
         html:not(.dark) #hero .border-l {
             border-color: rgba(150, 69, 81, 0.25);
-        }
-
-        /* Light Theme Header (Transparent) */
-        html:not(.dark) #globalHeader {
-            background-color: transparent;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            border-bottom: none;
-            box-shadow: none;
         }
 
         /* Complete reset for Hero section in Light Mode */
