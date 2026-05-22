@@ -74,7 +74,6 @@
 
 // --- PREMIUM IRON WOODMAN GLOBAL MODAL OVERRIDES FOR ALERT & CONFIRM ---
 window.confirm = function(message) {
-    window.lockScrollGlobal();
     return new Promise((resolve) => {
         const modalWrapper = document.createElement('div');
         modalWrapper.className = 'fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
@@ -130,7 +129,6 @@ window.confirm = function(message) {
             if (content) content.classList.add('scale-95');
             setTimeout(() => {
                 modalWrapper.remove();
-                window.unlockScrollGlobal();
                 resolve(result);
             }, 300);
         };
@@ -142,7 +140,6 @@ window.confirm = function(message) {
 };
 
 window.alert = function(message) {
-    window.lockScrollGlobal();
     return new Promise((resolve) => {
         const modalWrapper = document.createElement('div');
         modalWrapper.className = 'fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
@@ -194,7 +191,6 @@ window.alert = function(message) {
             if (content) content.classList.add('scale-95');
             setTimeout(() => {
                 modalWrapper.remove();
-                window.unlockScrollGlobal();
                 resolve();
             }, 300);
         };
@@ -306,7 +302,6 @@ window.USER_ROLE_OPTIONS = [
 ];
 
 window.openStatusSelectModal = function(options, currentStatus, title = 'Выберите новый статус') {
-    window.lockScrollGlobal();
     return new Promise((resolve) => {
         const modalWrapper = document.createElement('div');
         modalWrapper.className = 'fixed inset-0 z-[999999] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
@@ -373,7 +368,6 @@ window.openStatusSelectModal = function(options, currentStatus, title = 'Выб�
             if (content) content.classList.add('scale-95');
             setTimeout(() => {
                 modalWrapper.remove();
-                window.unlockScrollGlobal();
                 resolve(result);
             }, 300);
         };
@@ -436,7 +430,56 @@ window.openStatusSelectModal = function(options, currentStatus, title = 'Выб�
 })();
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─── AUTO SCROLL-LOCK via MutationObserver ───────────────────────────────────
+// Watches for any full-screen fixed overlay appended to <body> and auto-locks
+// scroll. When that element is removed, scroll is auto-restored.
+// This acts as a universal safety net for all current & future popups.
+;(function() {
+    // Track which observed nodes we've locked for
+    const _trackedNodes = new WeakMap();
+
+    function isFullscreenOverlay(node) {
+        if (node.nodeType !== 1) return false;
+        const cls = node.className || '';
+        // Must be fixed + inset-0 (covers full screen) and have a high z-index
+        const isFixed = cls.includes('fixed') && cls.includes('inset-0');
+        const hasHighZ = /z-\[([3-9]\d{3}|[1-9]\d{4})\]/.test(cls) || cls.includes('z-50') || cls.includes('z-[');
+        return isFixed && hasHighZ;
+    }
+
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            // Added nodes
+            for (const node of mutation.addedNodes) {
+                if (isFullscreenOverlay(node)) {
+                    // Only lock if not already locked by this node
+                    if (!_trackedNodes.has(node)) {
+                        window.lockScrollGlobal();
+                        _trackedNodes.set(node, true);
+                    }
+                }
+            }
+            // Removed nodes
+            for (const node of mutation.removedNodes) {
+                if (_trackedNodes.has(node)) {
+                    window.unlockScrollGlobal();
+                    _trackedNodes.delete(node);
+                }
+            }
+        }
+    });
+
+    // Start observing after DOM is ready
+    if (document.body) {
+        observer.observe(document.body, { childList: true });
+    } else {
+        document.addEventListener('DOMContentLoaded', () => {
+            observer.observe(document.body, { childList: true });
+        });
+    }
+})();
 // ─────────────────────────────────────────────────────────────────────────────
+
 
 window.maskPhoneGlobal = function(input) {
     let val = input.value.replace(/\D/g, '');
@@ -1566,39 +1609,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const globalStyles = document.createElement('style');
     globalStyles.id = 'global-mobile-optimizations';
     globalStyles.textContent = `
-        :root { 
-            --header-height: 80px; 
-            --primary-wine: #964551;
-            --primary-wine-rgb: 150, 69, 81;
-        }
+        :root { --header-height: 80px; }
         @media (max-width: 1024px) {
             :root { --header-height: 64px; }
+            section:not(#hero):not(#cta-footer-merged):not(.no-full-height) { 
+                min-height: calc(100dvh - var(--header-height)) !important;
+                height: auto !important;
+                padding-top: 4rem !important;
+                padding-bottom: 4rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+            }
             .px-margin-edge-mobile { padding-left: 20px !important; padding-right: 20px !important; }
         }
-
-        /* --- GLOBAL SECTION HEIGHTS --- */
-        section:not(#hero):not(#cta-footer-merged):not(.no-full-height) { 
-            min-height: calc(100dvh - var(--header-height)) !important;
-            height: auto !important;
-            padding-top: 4rem !important;
-            padding-bottom: 4rem !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-        }
-
-        /* Override bright pink colors with wine pink */
-        .text-primary, .text-\[#ff4a7a\] { color: var(--primary-wine) !important; }
-        .bg-primary, .bg-\[#ff4a7a\] { background-color: var(--primary-wine) !important; }
-        .border-primary, .border-\[#ff4a7a\] { border-color: var(--primary-wine) !important; }
-        .hover\:bg-primary:hover { background-color: #7a3642 !important; }
-        .pink-glow:hover { box-shadow: 0 0 20px rgba(var(--primary-wine-rgb), 0.25) !important; }
-        
-        /* Light Theme specific adjustments */
-        html.light .text-primary, html.light .material-symbols-outlined { color: var(--primary-wine); }
-        html.light .bg-primary { background-color: var(--primary-wine); color: #e7e2dd; } /* Light content on wine bg */
-        html.light .bg-primary .material-symbols-outlined { color: #e7e2dd; }
-
         /* Admin/Telegram Chat Style */
         .chat-bubble { border-radius: 1.5rem; padding: 1rem 1.25rem; font-size: 0.9375rem; line-height: 1.5; position: relative; max-width: 85%; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .chat-bubble-bot { background: #211f1d; color: #e7e2dd; border-bottom-left-radius: 0.25rem; border: 1px solid rgba(255,255,255,0.05); }
@@ -1703,9 +1727,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const style = `
     <style>
-        :root {
-            --header-height: 80px;
-        }
         /* --- APPLE-STYLE TOGGLE --- */
         .apple-toggle-container {
             display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
