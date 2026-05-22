@@ -4130,15 +4130,6 @@ html:not(.dark) a[href="/"] .text-primary {
 }
 
 
-/* 5. Header Fix */
-html.light #globalHeader {
-    background-color: rgba(199, 197, 197, 0.8) !important;
-    border-bottom: 2px solid #827D7E !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    opacity: 1 !important;
-}
-
 /* 7. Borders & Scrollbars */
 html.light [class*="border-"],
 html.light .machined-border {
