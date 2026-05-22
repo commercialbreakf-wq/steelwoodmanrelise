@@ -4045,36 +4045,6 @@ html.light [type="submit"]:hover {
     transform: translateY(-2px);
 }
 
-/* Restore Hero Image Visibility - 6px Blur */
-html.light #hero img,
-html.light section#hero img,
-html.light section:first-of-type img,
-html.light .hero-bg img {
-    opacity: 1 !important;
-    filter: blur(6px) !important;
-    mix-blend-mode: normal !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-html.light #hero .bg-gradient-to-r,
-html.light section:first-of-type .bg-gradient-to-r {
-    display: block !important;
-    opacity: 1 !important;
-    background: transparent !important;
-    background-image: linear-gradient(to right, #FAFAFA 0%, rgba(250, 250, 250, 0.8) 50%, rgba(250, 250, 250, 0) 100%) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-html.light #hero .bg-gradient-to-b,
-html.light section:first-of-type .bg-gradient-to-b {
-    display: block !important;
-    opacity: 1 !important;
-    background: transparent !important;
-    background-image: linear-gradient(to bottom, #FAFAFA 0%, rgba(250, 250, 250, 0.6) 60%, #FAFAFA 100%) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
 /* Sidebar & Mega Menu */
 html.light .mega-menu-left {
     background-color: rgba(199, 197, 197, 0.8) !important;
