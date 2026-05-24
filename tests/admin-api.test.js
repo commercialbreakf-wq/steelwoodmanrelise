@@ -5,7 +5,15 @@ const app = require('../api/[...slug]');
 jest.mock('@supabase/supabase-js', () => {
   const mockResult = { data: [], error: null };
   const chainable = {
-    select: jest.fn().mockReturnThis(),
+    select: jest.fn().mockImplementation(function() {
+      if (!this._upsertData) {
+        this._upsertData = [
+          { id: '1', name: 'Product 1', price_ton: 10000 },
+          { id: '2', name: 'Product 2', price_ton: 20000 }
+        ];
+      }
+      return this;
+    }),
     update: jest.fn().mockImplementation(function(data) {
       this._upsertData = data;
       return this;
@@ -40,7 +48,10 @@ jest.mock('@supabase/supabase-js', () => {
     }
   };
 
-  const mockFrom = jest.fn(() => chainable);
+  const mockFrom = jest.fn(() => {
+    chainable._upsertData = null;
+    return chainable;
+  });
 
   return {
     createClient: jest.fn(() => ({

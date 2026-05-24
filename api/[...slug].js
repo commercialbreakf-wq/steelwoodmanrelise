@@ -38,8 +38,6 @@ let isOrdersWarming = false;
 let isLeadsWarming = false;
 
 async function warmProducts() {
-  if (isProductsWarming) return;
-  isProductsWarming = true;
   try {
     const { data, error } = await supabase.from('products').select('*');
     if (!error && data) {
@@ -50,8 +48,6 @@ async function warmProducts() {
     }
   } catch (e) {
     console.error('[CACHE] Products warming failed:', e.message);
-  } finally {
-    isProductsWarming = false;
   }
 }
 
@@ -80,8 +76,6 @@ function removeFromProductCache(productId) {
 }
 
 async function warmUsers() {
-  if (isUsersWarming) return;
-  isUsersWarming = true;
   try {
     const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
     if (!error && data) {
@@ -92,14 +86,10 @@ async function warmUsers() {
     }
   } catch (e) {
     console.error('[CACHE] Users warming failed:', e.message);
-  } finally {
-    isUsersWarming = false;
   }
 }
 
 async function warmOrders() {
-  if (isOrdersWarming) return;
-  isOrdersWarming = true;
   try {
     const { data, error } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
     if (!error && data) {
@@ -110,14 +100,10 @@ async function warmOrders() {
     }
   } catch (e) {
     console.error('[CACHE] Orders warming failed:', e.message);
-  } finally {
-    isOrdersWarming = false;
   }
 }
 
 async function warmLeads() {
-  if (isLeadsWarming) return;
-  isLeadsWarming = true;
   try {
     const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
     if (!error && data) {
@@ -128,29 +114,27 @@ async function warmLeads() {
     }
   } catch (e) {
     console.error('[CACHE] Leads warming failed:', e.message);
-  } finally {
-    isLeadsWarming = false;
   }
 }
 
-function clearProductsCache() {
+async function clearProductsCache() {
   console.log('[CACHE] Triggering immediate proactive Products refresh...');
-  warmProducts();
+  await warmProducts();
 }
 
-function clearUsersCache() {
+async function clearUsersCache() {
   console.log('[CACHE] Triggering immediate proactive Users refresh...');
-  warmUsers();
+  await warmUsers();
 }
 
-function clearOrdersCache() {
+async function clearOrdersCache() {
   console.log('[CACHE] Triggering immediate proactive Orders refresh...');
-  warmOrders();
+  await warmOrders();
 }
 
-function clearLeadsCache() {
+async function clearLeadsCache() {
   console.log('[CACHE] Triggering immediate proactive Leads refresh...');
-  warmLeads();
+  await warmLeads();
 }
 
 // Proactive warm up on startup
@@ -317,7 +301,7 @@ router.get('/admin/products', authenticateAdmin, async (req, res) => {
   if (allProductsInMemory.length === 0) {
     await warmProducts();
   }
-  console.log(`[CACHE] Serving ${allProductsInMemory.length} admin products from memory.`);
+  console.log(`[CACHE] Serving ${allProductsInMemory.length} admin products.`);
   res.json(allProductsInMemory);
 });
 
@@ -345,9 +329,12 @@ router.put('/admin/products/:id', authenticateAdmin, async (req, res) => {
 router.delete('/admin/products/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { error } = await supabase.from('products').delete().eq('id', id);
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error('[API] Error deleting product:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
   removeFromProductCache(id);
-  res.json({ success: true });
+  res.json({ success: true, deletedId: id });
 });
 
 router.post('/admin/bulk-update', authenticateAdmin, async (req, res) => {
@@ -381,7 +368,6 @@ router.post('/admin/bulk-update', authenticateAdmin, async (req, res) => {
     }
 
     if (data && data.length > 0) {
-      // Use the data returned from Supabase to update the cache directly
       updateProductCache(data);
     }
 
@@ -415,10 +401,8 @@ router.post('/admin/bulk-delete', authenticateAdmin, async (req, res) => {
 
 // Users Management
 router.get('/admin/users', authenticateAdmin, async (req, res) => {
-  if (allUsersInMemory.length === 0) {
-    await warmUsers();
-  }
-  console.log(`[CACHE] Serving ${allUsersInMemory.length} admin users from memory.`);
+  await warmUsers();
+  console.log(`[CACHE] Serving ${allUsersInMemory.length} admin users (freshly warmed).`);
   res.json(allUsersInMemory);
 });
 
@@ -430,7 +414,7 @@ router.put('/admin/users/:id', authenticateAdmin, async (req, res) => {
   if (idx !== -1) {
     allUsersInMemory[idx] = { ...allUsersInMemory[idx], ...data };
   }
-  warmUsers();
+  await warmUsers();
   res.json(data);
 });
 
@@ -445,7 +429,7 @@ router.delete('/admin/users/:id', authenticateAdmin, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   
   allUsersInMemory = allUsersInMemory.filter(u => String(u.id) !== String(id));
-  warmUsers();
+  await warmUsers();
   res.json({ success: true });
 });
 
@@ -480,7 +464,7 @@ router.put('/admin/orders/:id', authenticateAdmin, async (req, res) => {
   } else {
     allOrdersInMemory.unshift(data);
   }
-  warmOrders();
+  await warmOrders();
   res.json(data);
 });
 
@@ -489,15 +473,24 @@ router.delete('/admin/orders/:id', authenticateAdmin, async (req, res) => {
   console.log(`[API] Admin DELETE Order: ${id}`);
 
   // First delete referencing order_items rows
-  const { error: itemsError } = await supabase.from('order_items').delete().eq('order_id', id);  if (itemsError) return res.status(500).json({ error: itemsError.message });
+  const { error: itemsError } = await supabase.from('order_items').delete().eq('order_id', id);
+  if (itemsError) {
+    console.error(`[API] Error deleting order items for order ${id}:`, itemsError);
+    return res.status(500).json({ error: itemsError.message });
+  }
 
   // Then delete the order itself
-  const { error } = await supabase.from('orders').delete().eq('id', id);
-  if (error) return res.status(500).json({ error: error.message });
+  const { data, error } = await supabase.from('orders').delete().eq('id', id).select();
+  if (error) {
+    console.error(`[API] Error deleting order ${id}:`, error);
+    return res.status(500).json({ error: error.message });
+  }
+  
+  console.log(`[API] Deleted order data:`, data);
 
   allOrdersInMemory = allOrdersInMemory.filter(o => String(o.id) !== String(id));
-  warmOrders();
-  res.json({ success: true });
+  await warmOrders();
+  res.json({ success: true, deleted: data });
 });
 
 router.post('/admin/orders/batch-update', authenticateAdmin, async (req, res) => {
@@ -550,18 +543,22 @@ router.put('/admin/leads/:id', authenticateAdmin, async (req, res) => {
   } else {
     allLeadsInMemory.unshift(data);
   }
-  warmLeads();
+  await warmLeads();
   res.json(data);
 });
 
 router.delete('/admin/leads/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   console.log(`[API] Admin DELETE Lead: ${id}`);
-  const { error } = await supabase.from('leads').delete().eq('id', id);
-  if (error) return res.status(500).json({ error: error.message });
+  const { data, error } = await supabase.from('leads').delete().eq('id', id).select();
+  if (error) {
+    console.error(`[API] Error deleting lead ${id}:`, error);
+    return res.status(500).json({ error: error.message });
+  }
+  console.log(`[API] Deleted lead data:`, data);
   allLeadsInMemory = allLeadsInMemory.filter(l => String(l.id) !== String(id));
-  warmLeads();
-  res.json({ success: true });
+  await warmLeads();
+  res.json({ success: true, deleted: data });
 });
 
 router.post('/admin/leads/batch-update', authenticateAdmin, async (req, res) => {
@@ -667,9 +664,7 @@ router.get('/health', async (req, res) => {
 
 // API: Get filters
 router.get('/filters', async (req, res) => {
-  if (allProductsInMemory.length === 0) {
-    await warmProducts();
-  }
+  await warmProducts();
 
   const activeProducts = allProductsInMemory.filter(p => p.vstatus !== 'archived');
   const counts = activeProducts.reduce((acc, r) => {
@@ -698,11 +693,9 @@ router.get('/filters', async (req, res) => {
 
 // API: Get products (Completely in-memory for sub-millisecond loads!)
 router.get('/products', async (req, res) => {
-  const { category, parent_category, search, vid, length, width, page = 1, limit = 12 } = req.query;
+  const { category, parent_category, search, vid, length, width, page = 1, limit = 12, sort } = req.query;
 
-  if (allProductsInMemory.length === 0) {
-    await warmProducts();
-  }
+  await warmProducts();
 
   let list = allProductsInMemory.filter(p => p.vstatus !== 'archived');
 
@@ -738,19 +731,40 @@ router.get('/products', async (req, res) => {
     );
   }
 
-  // Sort by category ascending, name ascending to match Postgres order
-  list.sort((a, b) => {
-    const catA = (a.category || '').toLowerCase();
-    const catB = (b.category || '').toLowerCase();
-    if (catA < catB) return -1;
-    if (catA > catB) return 1;
-    
-    const nameA = (a.name || '').toLowerCase();
-    const nameB = (b.name || '').toLowerCase();
-    if (nameA < nameB) return -1;
-    if (nameA > nameB) return 1;
-    return 0;
-  });
+  // Handle dynamic sorting
+  if (sort === 'price_asc') {
+    list.sort((a, b) => {
+      const pa = Number(a.price_ton || a.price_unit) || 0;
+      const pb = Number(b.price_ton || b.price_unit) || 0;
+      if (pa === 0 && pb > 0) return 1;
+      if (pb === 0 && pa > 0) return -1;
+      return pa - pb;
+    });
+  } else if (sort === 'price_desc') {
+    list.sort((a, b) => {
+      const pa = Number(a.price_ton || a.price_unit) || 0;
+      const pb = Number(b.price_ton || b.price_unit) || 0;
+      return pb - pa;
+    });
+  } else if (sort === 'name_asc') {
+    list.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'ru'));
+  } else if (sort === 'name_desc') {
+    list.sort((a, b) => (b.name || '').localeCompare(a.name || '', 'ru'));
+  } else {
+    // Default sort: category ascending, name ascending to match Postgres order
+    list.sort((a, b) => {
+      const catA = (a.category || '').toLowerCase();
+      const catB = (b.category || '').toLowerCase();
+      if (catA < catB) return -1;
+      if (catA > catB) return 1;
+      
+      const nameA = (a.name || '').toLowerCase();
+      const nameB = (b.name || '').toLowerCase();
+      if (nameA < nameB) return -1;
+      if (nameA > nameB) return 1;
+      return 0;
+    });
+  }
 
   const count = list.length;
   const safePage = Math.max(1, parseInt(page) || 1);
