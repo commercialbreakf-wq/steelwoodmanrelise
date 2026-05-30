@@ -13,15 +13,14 @@
     document.documentElement.classList.add(savedTheme);
     
     window.toggleThemeGlobal = function() {
-        const doc = document.documentElement;
-        const currentTheme = doc.classList.contains('light') ? 'light' : 'dark';
+        const currentTheme = document.documentElement.classList.contains('light') ? 'light' : 'dark';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
         // Add temporary switching class for smooth transition
-        doc.classList.add('theme-transitioning');
+        document.documentElement.classList.add('theme-switching');
         
-        doc.classList.remove('dark', 'light');
-        doc.classList.add(newTheme);
+        document.documentElement.classList.remove('dark', 'light');
+        document.documentElement.classList.add(newTheme);
         localStorage.setItem('theme', newTheme);
         
         // Dispatch event for components that might need to react
@@ -30,10 +29,10 @@
         // Update any toggle buttons on page
         updateToggleVisuals(newTheme);
         
-        // Remove switching class after transition (matching CSS 0.25s)
+        // Remove switching class after transition
         setTimeout(() => {
-            doc.classList.remove('theme-transitioning');
-        }, 250);
+            document.documentElement.classList.remove('theme-switching');
+        }, 600);
     };
 
     function updateToggleVisuals(theme) {
@@ -48,7 +47,7 @@
         
         activeIcons.forEach(icon => {
             icon.textContent = theme === 'light' ? 'light_mode' : 'dark_mode';
-            icon.style.color = theme === 'light' ? '#c7c5c5' : '#FFD60A';
+            icon.style.color = theme === 'light' ? '#FF9500' : '#FFD60A';
         });
     }
     
@@ -83,10 +82,10 @@ window.confirm = function(message) {
         const title = isDestructive ? 'Подтверждение удаления' : 'Системный запрос';
         const icon = isDestructive ? 'delete_forever' : 'help_center';
         
-        const iconColorClass = isDestructive ? 'text-[#ff4a7a]' : 'text-[#c7c5c5]';
-        const iconBgClass = isDestructive ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#964551]/10 border-[#964551]/20';
-        const topGlowStyle = isDestructive ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #964551, transparent);';
-        const btnClass = isDestructive ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#964551] hover:bg-[#7a3642] text-[#c7c5c5] shadow-lg shadow-[#964551]/20';
+        const iconColorClass = isDestructive ? 'text-[#ff4a7a]' : 'text-[#ffb0cc]';
+        const iconBgClass = isDestructive ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
+        const topGlowStyle = isDestructive ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #ffb0cc, transparent);';
+        const btnClass = isDestructive ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#ffb0cc] hover:bg-white text-[#0f0e0c] shadow-lg shadow-[#ffb0cc]/10';
 
         modalWrapper.innerHTML = `
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
@@ -149,10 +148,10 @@ window.alert = function(message) {
         const title = isError ? 'Системная ошибка' : 'Уведомление';
         const icon = isError ? 'error' : 'info';
         
-        const iconColorClass = isError ? 'text-[#ff4a7a]' : 'text-[#c7c5c5]';
-        const iconBgClass = isError ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#964551]/10 border-[#964551]/20';
-        const topGlowStyle = isError ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #964551, transparent);';
-        const btnClass = isError ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#964551] hover:bg-[#7a3642] text-[#c7c5c5] shadow-lg shadow-[#964551]/20';
+        const iconColorClass = isError ? 'text-[#ff4a7a]' : 'text-[#ffb0cc]';
+        const iconBgClass = isError ? 'bg-[#ff4a7a]/10 border-[#ff4a7a]/20' : 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
+        const topGlowStyle = isError ? 'background: linear-gradient(90deg, transparent, #ff4a7a, transparent);' : 'background: linear-gradient(90deg, transparent, #ffb0cc, transparent);';
+        const btnClass = isError ? 'bg-[#ff4a7a] hover:bg-[#ff2a60] text-white shadow-lg shadow-[#ff4a7a]/20' : 'bg-[#ffb0cc] hover:bg-white text-[#0f0e0c] shadow-lg shadow-[#ffb0cc]/10';
 
         modalWrapper.innerHTML = `
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
@@ -226,9 +225,9 @@ window.showToast = function(message, type = 'success', title = null) {
         defaultTitle = 'Ошибка';
     } else if (type === 'info') {
         icon = 'info';
-        iconColor = 'text-[#c7c5c5]';
-        iconBg = 'bg-[#964551]/10 border-[#964551]/20';
-        borderColor = 'border-l-[#964551]';
+        iconColor = 'text-[#ffb0cc]';
+        iconBg = 'bg-[#ffb0cc]/10 border-[#ffb0cc]/20';
+        borderColor = 'border-l-[#ffb0cc]';
         defaultTitle = 'Уведомление';
     } else if (type === 'warning') {
         icon = 'warning';
@@ -330,7 +329,7 @@ window.openStatusSelectModal = function(options, currentStatus, title = 'Выб�
         modalWrapper.innerHTML = `
             <div class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity modal-backdrop"></div>
             <div class="relative w-full max-w-md bg-[#151311]/95 border border-white/10 rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] flex flex-col transform scale-95 transition-all duration-300 min-h-0 overflow-hidden modal-content">
-                <div class="absolute top-0 left-0 right-0 h-1 opacity-80 background-gradient" style="background: linear-gradient(90deg, transparent, #964551, transparent);"></div>
+                <div class="absolute top-0 left-0 right-0 h-1 opacity-80 background-gradient" style="background: linear-gradient(90deg, transparent, #ffb0cc, transparent);"></div>
                 
                 <div class="p-8 pb-6 flex items-center justify-between border-b border-white/5 shrink-0">
                     <div>
@@ -385,102 +384,6 @@ window.openStatusSelectModal = function(options, currentStatus, title = 'Выб�
         });
     });
 };
-
-// ─── CENTRALIZED SCROLL LOCK ─────────────────────────────────────────────────
-// Uses a reference counter so multiple popups don't conflict
-;(function() {
-    let _lockCount = 0;
-    let _savedScrollY = 0;
-
-    window.lockScrollGlobal = function() {
-        _lockCount++;
-        if (_lockCount === 1) {
-            _savedScrollY = window.scrollY;
-            document.body.style.top = '-' + _savedScrollY + 'px';
-            document.body.classList.add('scroll-locked');
-        }
-    };
-
-    window.unlockScrollGlobal = function() {
-        if (_lockCount <= 0) return;
-        _lockCount--;
-        if (_lockCount === 0) {
-            document.body.classList.remove('scroll-locked');
-            document.body.style.top = '';
-            window.scrollTo(0, _savedScrollY);
-        }
-    };
-
-    window.forceUnlockScrollGlobal = function() {
-        _lockCount = 0;
-        document.body.classList.remove('scroll-locked');
-        document.body.style.top = '';
-        window.scrollTo(0, _savedScrollY);
-    };
-
-    // Inject scroll-lock CSS once
-    const style = document.createElement('style');
-    style.textContent = `
-        body.scroll-locked {
-            position: fixed;
-            width: 100%;
-            overflow-y: scroll; /* keep scrollbar visible to prevent layout shift */
-        }
-    `;
-    document.head.appendChild(style);
-})();
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ─── AUTO SCROLL-LOCK via MutationObserver ───────────────────────────────────
-// Watches for any full-screen fixed overlay appended to <body> and auto-locks
-// scroll. When that element is removed, scroll is auto-restored.
-// This acts as a universal safety net for all current & future popups.
-;(function() {
-    // Track which observed nodes we've locked for
-    const _trackedNodes = new WeakMap();
-
-    function isFullscreenOverlay(node) {
-        if (node.nodeType !== 1) return false;
-        const cls = node.className || '';
-        // Must be fixed + inset-0 (covers full screen) and have a high z-index
-        const isFixed = cls.includes('fixed') && cls.includes('inset-0');
-        const hasHighZ = /z-\[([3-9]\d{3}|[1-9]\d{4})\]/.test(cls) || cls.includes('z-50') || cls.includes('z-[');
-        return isFixed && hasHighZ;
-    }
-
-    const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-            // Added nodes
-            for (const node of mutation.addedNodes) {
-                if (isFullscreenOverlay(node)) {
-                    // Only lock if not already locked by this node
-                    if (!_trackedNodes.has(node)) {
-                        window.lockScrollGlobal();
-                        _trackedNodes.set(node, true);
-                    }
-                }
-            }
-            // Removed nodes
-            for (const node of mutation.removedNodes) {
-                if (_trackedNodes.has(node)) {
-                    window.unlockScrollGlobal();
-                    _trackedNodes.delete(node);
-                }
-            }
-        }
-    });
-
-    // Start observing after DOM is ready
-    if (document.body) {
-        observer.observe(document.body, { childList: true });
-    } else {
-        document.addEventListener('DOMContentLoaded', () => {
-            observer.observe(document.body, { childList: true });
-        });
-    }
-})();
-// ─────────────────────────────────────────────────────────────────────────────
-
 
 window.maskPhoneGlobal = function(input) {
     let val = input.value.replace(/\D/g, '');
@@ -585,7 +488,8 @@ window.parseJwtGlobal = function(token) {
 
 window.isTokenExpiredGlobal = function(token) {
     const payload = window.parseJwtGlobal(token);
-    if (!payload || !payload.exp) return true;
+    if (!payload) return true;
+    if (!payload.exp) return false;
     const now = Math.floor(Date.now() / 1000);
     return payload.exp < now;
 };
@@ -618,11 +522,7 @@ window.syncAuthStorageAndCookiesGlobal = function() {
     const preloaderStyles = `
         #globalPreloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(21, 19, 17, 0.8) !important;
-            backdrop-filter: blur(25px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.02), inset 0 0 40px rgba(255, 176, 204, 0.02) !important;
-            z-index: 999999; 
+            background: #151311; z-index: 999999; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
             pointer-events: auto;
@@ -644,7 +544,7 @@ window.syncAuthStorageAndCookiesGlobal = function() {
         .loader-ring::after {
             content: ''; position: absolute; inset: -4px;
             border: 2px solid transparent;
-            border-top-color: #c7c5c5;
+            border-top-color: #ffb0cc;
             border-radius: 50%;
             animation: preloader-spin 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
@@ -670,7 +570,7 @@ window.syncAuthStorageAndCookiesGlobal = function() {
         }
         .loader-text {
             margin-top: 48px; font-family: 'Space Grotesk', sans-serif;
-            font-size: 10px; color: #c7c5c5; letter-spacing: 0.6em;
+            font-size: 10px; color: #ffb0cc; letter-spacing: 0.6em;
             text-transform: uppercase; opacity: 0.6;
             animation: preloader-text-pulse 1.5s ease-in-out infinite;
         }
@@ -680,7 +580,7 @@ window.syncAuthStorageAndCookiesGlobal = function() {
         }
         .loader-progress-bar {
             position: absolute; top: 0; left: 0; height: 100%; width: 0%;
-            background: #964551; box-shadow: 0 0 10px #964551;
+            background: #ffb0cc; box-shadow: 0 0 10px #ffb0cc;
             transition: width 0.4s ease;
         }
         @keyframes preloader-spin {
@@ -699,41 +599,6 @@ window.syncAuthStorageAndCookiesGlobal = function() {
             50% { opacity: 0.8; }
         }
         body.preloader-active { overflow: hidden !important; height: 100vh !important; }
- 
-        /* Light Theme Preloader (Liquid Glass & Contrast Overrides) */
-        html.light #globalPreloader, html:not(.dark) #globalPreloader {
-            background: rgba(250, 250, 250, 0.8) !important;
-            backdrop-filter: blur(25px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.5), inset 0 0 40px rgba(214, 51, 108, 0.03) !important;
-        }
-        html.light .loader-ring, html:not(.dark) .loader-ring {
-            border-color: rgba(214, 51, 108, 0.08) !important;
-        }
-        html.light .loader-ring::after, html:not(.dark) .loader-ring::after {
-            border-top-color: #d6336c !important;
-        }
-        html.light .loader-hex, html:not(.dark) .loader-hex {
-            background: rgba(214, 51, 108, 0.03) !important;
-            border-color: rgba(214, 51, 108, 0.2) !important;
-        }
-        html.light .loader-hex::before, html:not(.dark) .loader-hex::before {
-            background: linear-gradient(to bottom, transparent, rgba(214, 51, 108, 0.3), transparent) !important;
-        }
-        html.light .loader-logo, html:not(.dark) .loader-logo {
-            filter: drop-shadow(0 0 15px rgba(214, 51, 108, 0.3)) !important;
-        }
-        html.light .loader-text, html:not(.dark) .loader-text {
-            color: #3B3B3B !important;
-            opacity: 0.8 !important;
-        }
-        html.light .loader-progress-track, html:not(.dark) .loader-progress-track {
-            background: rgba(214, 51, 108, 0.1) !important;
-        }
-        html.light .loader-progress-bar, html:not(.dark) .loader-progress-bar {
-            background: #d6336c !important;
-            box-shadow: 0 0 10px rgba(214, 51, 108, 0.5) !important;
-        }
     `;
 
     const inject = () => {
@@ -846,7 +711,7 @@ window.toggleMobileMenuGlobal = function() {
         overlay.style.pointerEvents = 'none';
         setTimeout(() => { 
             drawer.classList.add('pointer-events-none'); 
-            window.unlockScrollGlobal(); // Restore scroll AFTER animation
+            document.body.style.overflow = ''; // Restore scroll AFTER animation
         }, 600);
     } else {
         drawer.classList.remove('pointer-events-none');
@@ -854,7 +719,7 @@ window.toggleMobileMenuGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        window.lockScrollGlobal(); // Lock scroll
+        document.body.style.overflow = 'hidden'; // Lock scroll
     }
 };
 
@@ -882,7 +747,7 @@ window.toggleMobileCatalogGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        window.lockScrollGlobal(); // Lock scroll
+        document.body.style.overflow = 'hidden'; // Lock scroll
     }
 };
 
@@ -907,7 +772,7 @@ window.toggleMobileCatalogGlobal = function() {
             overlay.classList.remove('active-search');
             setTimeout(() => { 
                 overlay.classList.add('pointer-events-none'); 
-                window.unlockScrollGlobal(); // Restore scroll AFTER animation
+                document.body.style.overflow = ''; // Restore scroll AFTER animation
             }, 600);
         } else {
             overlay.classList.remove('pointer-events-none');
@@ -918,7 +783,7 @@ window.toggleMobileCatalogGlobal = function() {
             container.classList.remove('opacity-0');
             container.classList.remove('pointer-events-none');
             container.classList.add('pointer-events-auto');
-            window.lockScrollGlobal(); // Disable scroll
+            document.body.style.overflow = 'hidden'; // Disable scroll
             if(input) setTimeout(() => input.focus(), 300);
         }
     };
@@ -938,7 +803,7 @@ window.toggleCartDrawerGlobal = function() {
         overlay.style.pointerEvents = 'none';
         setTimeout(() => { 
             drawer.classList.add('pointer-events-none'); 
-            window.unlockScrollGlobal(); // Restore scroll AFTER animation
+            document.body.style.overflow = ''; // Restore scroll AFTER animation
         }, 600);
     } else {
         drawer.classList.remove('pointer-events-none');
@@ -946,7 +811,7 @@ window.toggleCartDrawerGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        window.lockScrollGlobal(); // Lock scroll
+        document.body.style.overflow = 'hidden'; // Lock scroll
         if (window.renderCartDrawerItems) window.renderCartDrawerItems();
     }
 };
@@ -966,7 +831,7 @@ window.toggleAuthModalGlobal = function() {
         overlay.style.pointerEvents = 'none';
         setTimeout(() => { 
             drawer.classList.add('pointer-events-none'); 
-            window.unlockScrollGlobal(); // Restore scroll AFTER animation
+            document.body.style.overflow = ''; // Restore scroll AFTER animation
         }, 600);
     } else {
         drawer.classList.remove('pointer-events-none');
@@ -974,7 +839,7 @@ window.toggleAuthModalGlobal = function() {
         panel.classList.add('translate-x-0');
         overlay.classList.remove('opacity-0');
         overlay.style.pointerEvents = 'auto';
-        window.lockScrollGlobal(); // Lock scroll
+        document.body.style.overflow = 'hidden'; // Lock scroll
         if (window.checkAuthStatus) window.checkAuthStatus();
     }
 };
@@ -1163,34 +1028,32 @@ document.addEventListener('DOMContentLoaded', function() {
             #scrollTopBtnGlobal {
                 opacity: 0;
                 visibility: hidden;
-                pointer-events: none;
                 transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 transform: translateY(20px);
             }
             #scrollTopBtnGlobal.visible {
                 opacity: 1;
                 visibility: visible;
-                pointer-events: auto;
                 transform: translateY(0);
             }
             /* --- PREMIUM PINK SCROLLBAR --- */
             ::-webkit-scrollbar { width: 8px; height: 8px; }
             ::-webkit-scrollbar-track { background: #151311; }
             ::-webkit-scrollbar-thumb { background: #ca7093; border-radius: 10px; border: 2px solid #151311; }
-            ::-webkit-scrollbar-thumb:hover { background: #964551; }
+            ::-webkit-scrollbar-thumb:hover { background: #ffb0cc; }
             * { scrollbar-width: thin; scrollbar-color: #ca7093 #151311; }
             .custom-scrollbar::-webkit-scrollbar { width: 4px; }
             .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 176, 204, 0.3); }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #964551; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #ffb0cc; }
         </style>
         `;
         const adminFloatingBtns = `
-        <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-8 right-[104px] z-[5000] w-14 h-14 bg-[#964551] border border-[#964551]/30 text-[#c7c5c5] flex items-center justify-center hover:bg-white transition-all shadow-2xl shadow-[#964551]/30 group rounded-2xl">
+        <button id="floatingChatBtnGlobal" onclick="openGlobalChatDrawerGlobal()" class="fixed bottom-8 right-[104px] z-[5000] w-14 h-14 bg-[#ffb0cc] border border-[#ffb0cc]/30 text-[#0f0e0c] flex items-center justify-center hover:bg-white transition-all shadow-2xl shadow-[#ffb0cc]/30 group rounded-2xl">
             <span class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform">forum</span>
             <span id="floatingChatBadgeGlobal" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center hidden animate-pulse">!</span>
         </button>
 
-        <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#1d1b19] border border-[#964551] text-[#c7c5c5] flex items-center justify-center hover:bg-[#964551] hover:text-[#c7c5c5] transition-all shadow-2xl shadow-[#964551]/20 group">
+        <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#1d1b19] border border-[#ffb0cc] text-[#ffb0cc] flex items-center justify-center hover:bg-[#ffb0cc] hover:text-[#1d1b19] transition-all shadow-2xl shadow-[#ffb0cc]/20 group">
             <span class="material-symbols-outlined text-[28px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
         </button>
         `;
@@ -1205,14 +1068,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="flex justify-between items-center h-20 px-4 md:px-margin-edge w-full max-w-container-max mx-auto">
             <div class="flex items-center gap-4 group">
                 <button id="mobileMenuBtnGlobal" onclick="toggleMobileMenuGlobal()" class="md:hidden material-symbols-outlined text-on-surface hover:text-primary transition-colors">menu</button>
-                <a class="logo-link-hover-effect flex items-center gap-4 whitespace-nowrap no-underline" href="/">
-                    <div class="relative logo-img-container">
-                        <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 logo-bg-glow transition-opacity duration-500"></div>
-                        <img src="/images/logo_icon.png" alt="Железный Дровосек" class="logo-img w-14 h-14 md:w-16 md:h-16 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.4)]">
+                <a class="flex items-center gap-4 hover:opacity-80 transition-opacity whitespace-nowrap no-underline" href="/">
+                    <div class="relative group/logo">
+                        <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 group-hover/logo:opacity-100 transition-opacity"></div>
+                        <img src="/images/logo_icon.png" alt="Железный Дровосек" class="w-14 h-14 md:w-16 md:h-16 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.4)]">
                     </div>
                     <div class="flex flex-col items-start leading-none">
-                        <span class="logo-text-part-1 font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
-                        <span class="logo-text-part-2 font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
+                        <span class="font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
+                        <span class="font-display-xl text-[20px] md:text-[24px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
                     </div>
                 </a>
             </div>
@@ -1255,14 +1118,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="mobileMenuOverlayGlobal" class="absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 transition-opacity duration-500 pointer-events-none" onclick="toggleMobileMenuGlobal()"></div>
         <div id="mobileMenuPanelGlobal" class="absolute top-0 left-0 w-[85%] max-w-sm h-full bg-surface/90 backdrop-blur-[40px] border-r border-white/10 -translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.33,1,0.68,1)] pointer-events-auto p-8 flex flex-col">
             <header class="flex justify-between items-center mb-10">
-                <a href="/" class="logo-link-hover-effect flex items-center gap-4 leading-none no-underline">
-                    <div class="relative logo-img-container">
-                        <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 logo-bg-glow transition-opacity duration-500"></div>
-                        <img src="/images/logo_icon.png" alt="Logo" class="logo-img w-14 h-14 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_15px_rgba(255,176,204,0.3)]">
-                    </div>
+                <a href="/" class="flex items-center gap-4 leading-none no-underline">
+                    <img src="/images/logo_icon.png" alt="Logo" class="w-14 h-14 object-cover rounded-full border-2 border-primary/30 shadow-[0_0_15px_rgba(255,176,204,0.3)]">
                     <div class="flex flex-col items-start leading-none">
-                        <span class="logo-text-part-1 font-display-xl text-[20px] text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
-                        <span class="logo-text-part-2 font-display-xl text-[20px] text-primary font-semibold uppercase">ДРОВОСЕК</span>
+                        <span class="font-display-xl text-[20px] text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
+                        <span class="font-display-xl text-[20px] text-primary font-semibold uppercase">ДРОВОСЕК</span>
                     </div>
                 </a>
                 <button onclick="toggleMobileMenuGlobal()" class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-white/5">close</button>
@@ -1645,7 +1505,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="floatingChatBadgeGlobal" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden border-2 border-background"></span>
     </button>
 
-    <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-4 left-4 md:bottom-10 md:right-10 md:left-auto z-[5000] w-12 h-12 md:w-16 md:h-16 bg-surface-container-high/80 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-primary hover:text-surface transition-all duration-500 shadow-2xl group rounded-2xl md:rounded-[1.5rem]">
+    <button id="scrollTopBtnGlobal" onclick="scrollToTopGlobal()" class="fixed bottom-4 left-4 md:bottom-10 md:right-10 md:left-auto z-[5000] w-12 h-12 md:w-16 md:h-16 bg-surface-container-high/80 backdrop-blur-md border border-white/10 text-primary flex items-center justify-center hover:bg-primary hover:text-surface transition-all duration-500 shadow-2xl opacity-0 pointer-events-none translate-y-10 group rounded-2xl md:rounded-[1.5rem]">
         <span class="material-symbols-outlined text-[24px] md:text-[32px] group-hover:-translate-y-1 transition-transform">arrow_upward</span>
     </button>
     `;
@@ -1671,7 +1531,7 @@ document.addEventListener('DOMContentLoaded', function() {
         /* Admin/Telegram Chat Style */
         .chat-bubble { border-radius: 1.5rem; padding: 1rem 1.25rem; font-size: 0.9375rem; line-height: 1.5; position: relative; max-width: 85%; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .chat-bubble-bot { background: #211f1d; color: #e7e2dd; border-bottom-left-radius: 0.25rem; border: 1px solid rgba(255,255,255,0.05); }
-        .chat-bubble-user { background: #964551; color: #c7c5c5; align-self: flex-end; border-bottom-right-radius: 0.25rem; font-weight: 500; }
+        .chat-bubble-user { background: #ffb0cc; color: #0f0e0c; align-self: flex-end; border-bottom-right-radius: 0.25rem; font-weight: 500; }
         .chat-time { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; opacity: 0.3; margin-top: 0.4rem; }
         .ease-apple { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-animate-in { animation: modalIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -1687,14 +1547,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-gutter mb-20">
                 <!-- Branding Column -->
                 <div class="md:col-span-4 space-y-8">
-                    <a class="logo-link-hover-effect flex items-center gap-4 no-underline" href="/">
-                        <div class="relative logo-img-container">
-                            <div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full opacity-40 logo-bg-glow transition-opacity duration-500"></div>
-                            <img src="/images/logo_icon.png" alt="Железный Дровосек" class="logo-img w-16 h-16 object-cover relative z-10 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.3)]">
-                        </div>
+                    <a class="flex items-center gap-4 hover:opacity-80 transition-opacity no-underline" href="/">
+                        <img src="/images/logo_icon.png" alt="Железный Дровосек" class="w-16 h-16 object-cover rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(255,176,204,0.3)]">
                         <div class="flex flex-col items-start leading-none">
-                            <span class="logo-text-part-1 font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
-                            <span class="logo-text-part-2 font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
+                            <span class="font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-on-surface font-semibold uppercase">ЖЕЛЕЗНЫЙ</span>
+                            <span class="font-display-xl text-[22px] md:text-[26px] leading-tight tracking-tight text-primary font-semibold uppercase">ДРОВОСЕК</span>
                         </div>
                     </a>
                     <p class="text-on-surface-variant text-sm leading-relaxed max-w-sm opacity-80">
@@ -1797,66 +1654,166 @@ document.addEventListener('DOMContentLoaded', function() {
             transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease !important;
         }
 
-        /* --- PREMIUM LOGO HOVER EFFECT --- */
-        .logo-link-hover-effect {
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .logo-link-hover-effect:hover {
-            opacity: 1 !important;
-        }
-        .logo-link-hover-effect .logo-img {
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        box-shadow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        border-color 0.4s ease;
-        }
-        .logo-link-hover-effect:hover .logo-img {
-            transform: scale(1.08) rotate(15deg);
-            border-color: #ca7093 !important;
-            box-shadow: 0 0 25px rgba(255, 176, 204, 0.7) !important;
-        }
-        .logo-link-hover-effect .logo-bg-glow {
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        opacity 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .logo-link-hover-effect:hover .logo-bg-glow {
-            opacity: 1 !important;
-            transform: scale(1.2);
-        }
-        .logo-link-hover-effect .logo-text-part-1,
-        .logo-link-hover-effect .logo-text-part-2 {
-            display: inline-block;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-                        color 0.3s ease,
-                        text-shadow 0.4s ease,
-                        letter-spacing 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .logo-link-hover-effect:hover .logo-text-part-1 {
-            transform: translateX(4px);
-            letter-spacing: 0.03em;
-            color: #ffffff !important;
-        }
-        .logo-link-hover-effect:hover .logo-text-part-2 {
-            transform: translateX(6px);
-            letter-spacing: 0.05em;
-            color: #ca7093 !important;
-            text-shadow: 0 0 15px rgba(255, 176, 204, 0.6);
+        /* --- CUSTOM PALETTE: #D6A3AB, #C7C5C5, #3B3B3B, #964551, #827D7E --- */
+        html.light body,
+        html.light body.bg-background,
+        html.light body[class*="bg-"],
+        html.light main,
+        html.light main[class*="bg-"],
+        html.light main[class*="overflow-"],
+        html.light main.overflow-x-hidden {
+            background-color: #C7C5C5 !important;
+            color: #3B3B3B !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
         }
 
-        /* Light mode adjustments */
-        html.light .logo-link-hover-effect:hover .logo-img,
-        html:not(.dark) .logo-link-hover-effect:hover .logo-img {
-            border-color: #d6336c !important;
-            box-shadow: 0 0 20px rgba(214, 51, 108, 0.5) !important;
+        html.light {
+            --tw-bg-opacity: 1 !important;
+            --tw-gradient-from: #C7C5C5 !important;
+            --tw-gradient-to: rgba(199, 197, 197, 0) !important;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
         }
-        html.light .logo-link-hover-effect:hover .logo-text-part-1,
-        html:not(.dark) .logo-link-hover-effect:hover .logo-text-part-1 {
-            color: #000000 !important;
+
+        /* 2. Force All Background Classes with Liquid Glass (60% Opacity) */
+        html.light [class*="bg-"],
+        html.light [class*="bg-surface"],
+        html.light [class*="bg-white/"],
+        html.light section,
+        html.light aside,
+        html.light footer,
+        html.light article,
+        html.light .glass-panel,
+        html.light .glass-card,
+        html.light .liquid-glass,
+        html.light .modal-content,
+        html.light [class*="bg-surface-container"],
+        html.light .mega-menu-inner,
+        html.light #cartPanelGlobal,
+        html.light #authPanelGlobal,
+        html.light #mobileMenuPanelGlobal,
+        html.light #mobileCatalogPanelGlobal,
+        html.light #searchContainerGlobal {
+            background-color: rgba(199, 197, 197, 0.6) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            background-image: none !important;
+            border-color: #827D7E !important;
         }
-        html.light .logo-link-hover-effect:hover .logo-text-part-2,
-        html:not(.dark) .logo-link-hover-effect:hover .logo-text-part-2 {
-            text-shadow: 0 0 12px rgba(214, 51, 108, 0.5) !important;
-            color: #d6336c !important;
+        
+        /* Deep Wine Buttons (#964551) */
+        html.light .bg-primary, 
+        html.light .apple-toggle-thumb,
+        html.light .mega-default-btn,
+        html.light button.bg-primary,
+        html.light [type="submit"],
+        html.light .addToCartBtn,
+        html.light [onclick*="addToCart"] {
+            background-color: #964551 !important; 
+            color: #FFFFFF !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            opacity: 1 !important;
+            border: none !important;
         }
+
+        html.light .mega-default-btn:hover,
+        html.light button.bg-primary:hover,
+        html.light [type="submit"]:hover {
+            background-color: #7a3541 !important;
+            transform: translateY(-2px);
+        }
+
+        /* Restore Hero Image Visibility */
+        html.light #hero img,
+        html.light section:first-of-type img,
+        html.light .hero-bg img {
+            opacity: 1 !important;
+            filter: brightness(0.75) contrast(1.1) !important;
+        }
+        html.light #hero .bg-gradient-to-r,
+        html.light section:first-of-type .bg-gradient-to-r {
+            background-image: linear-gradient(to right, rgba(59, 59, 59, 0.6), transparent) !important;
+        }
+
+        /* Sidebar & Mega Menu */
+        html.light .mega-menu-left {
+            background-color: rgba(199, 197, 197, 0.8) !important;
+            border-right: 1px solid #827D7E !important;
+        }
+        html.light .mega-cat-link:hover, 
+        html.light .mega-cat-item.is-active .mega-cat-link {
+            background-color: #D6A3AB !important; /* Dusty Rose */
+            color: #FFFFFF !important;
+        }
+        html.light .mega-menu-right {
+            background-color: transparent !important;
+        }
+        html.light .mega-menu-right .mega-sub-link:hover {
+            color: #964551 !important;
+        }
+        html.light .mega-default-title {
+            color: #3B3B3B !important;
+        }
+        html.light .mega-default-desc {
+            color: #827D7E !important;
+        }
+
+        /* 3. Text & Icons (#3B3B3B) */
+        html.light [class*="text-"],
+        html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6,
+        html.light p, html.light span:not(.material-symbols-outlined),
+        html.light a:not(.bg-primary),
+        html.light .nav-link {
+            color: #3B3B3B !important;
+            opacity: 1 !important;
+        }
+        html.light .material-symbols-outlined:not(.text-primary) {
+            color: #3B3B3B !important;
+        }
+
+        /* Restore white text on Deep Wine elements */
+        html.light .bg-primary *,
+        html.light button.bg-primary *,
+        html.light [type="submit"],
+        html.light .text-white,
+        html.light .mega-default-btn span {
+            color: #FFFFFF !important;
+        }
+        
+        /* Deep Wine Accents */
+        html.light .text-primary,
+        html.light .text-primary * {
+            color: #964551 !important;
+        }
+
+        /* 5. Header Fix */
+        html.light #globalHeader {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            z-index: 1000 !important;
+            background-color: rgba(199, 197, 197, 0.8) !important;
+            border-bottom: 2px solid #827D7E !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            opacity: 1 !important;
+        }
+        
+        /* 7. Borders & Scrollbars */
+        html.light [class*="border-"],
+        html.light .machined-border {
+            border-color: #827D7E !important;
+        }
+        html.light .border-primary { border-color: #964551 !important; }
+
+        html.light ::-webkit-scrollbar-track { background: #C7C5C5 !important; }
+        html.light ::-webkit-scrollbar-thumb { 
+            background: #964551 !important; 
+            border: 2px solid #C7C5C5 !important;
+        }
+        html.light * { scrollbar-color: #964551 #C7C5C5 !important; }
 
         #globalHeader { z-index: 1000; }
         .nav-link { position: relative; }
@@ -1878,7 +1835,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         .mega-menu-inner {
             display: flex; max-width: 1440px; margin: 0 auto; background: #1d1b19;
-            border: 1px solid rgba(83, 67, 71, 0.2); border-top: 2px solid #964551;
+            border: 1px solid rgba(83, 67, 71, 0.2); border-top: 2px solid #ffb0cc;
             box-shadow: 0 40px 100px rgba(0,0,0,0.6); min-height: 400px;
         }
         .mega-menu-left { width: 300px; background: #1a1816; border-right: 1px solid rgba(83, 67, 71, 0.1); padding: 20px 0; }
@@ -1887,9 +1844,9 @@ document.addEventListener('DOMContentLoaded', function() {
             color: #d7c1c7; text-decoration: none; font-family: 'Space Grotesk', sans-serif;
             font-size: 14px; transition: all 0.2s; position: relative;
         }
-        .mega-cat-link:hover, .mega-cat-item.is-active .mega-cat-link { background: rgba(150,69,81,0.05); color: #c7c5c5; }
+        .mega-cat-link:hover, .mega-cat-item.is-active .mega-cat-link { background: rgba(255,176,204,0.05); color: #ffb0cc; }
         .mega-cat-item.is-active .mega-cat-link::before {
-            content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #964551;
+            content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #ffb0cc;
         }
         .mega-menu-right { flex: 1; padding: 40px; background: #211f1d; }
         .mega-submenu { display: none; }
@@ -1898,7 +1855,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .mega-submenu-title { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .mega-submenu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; }
         .mega-sub-link { color: #d7c1c7; text-decoration: none; font-size: 13px; display: block; padding: 6px 0; transition: color 0.2s; }
-        .mega-sub-link:hover { color: #c7c5c5; }
+        .mega-sub-link:hover { color: #ffb0cc; }
         
         .mega-overlay { 
             opacity: 0; pointer-events: none; visibility: hidden;
@@ -1916,24 +1873,14 @@ document.addEventListener('DOMContentLoaded', function() {
             will-change: transform, opacity;
             backface-visibility: hidden;
         }
-        
-        /* LIQUID GLASS EFFECT FOR DARK THEME */
-        html.dark #cartPanelGlobal, 
-        html.dark #authPanelGlobal {
-            background: rgba(21, 19, 17, 0.4) !important;
-            backdrop-filter: blur(40px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
-            border-left: 1px solid rgba(255, 176, 204, 0.1) !important;
-            box-shadow: -20px 0 80px rgba(0, 0, 0, 0.6), inset 1px 0 0 rgba(255, 255, 255, 0.05) !important;
-        }
         #mobileMenuPanelGlobal { box-shadow: 20px 0 60px rgba(0,0,0,0.5); }
         
         .mega-default-content { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; gap: 16px; }
         .mega-default-icon { font-size: 56px; color: rgba(255, 176, 204, 0.2); }
         .mega-default-title { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 600; color: #e7e2dd; }
         .mega-default-desc { font-size: 14px; color: rgba(215, 193, 199, 0.5); max-width: 280px; }
-        .mega-default-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 12px 28px; border: 1px solid #964551; color: #c7c5c5; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-decoration: none; transition: all 0.3s ease; }
-        .mega-default-btn:hover { background: #964551; color: #c7c5c5; }
+        .mega-default-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 12px 28px; border: 1px solid #ffb0cc; color: #ffb0cc; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-decoration: none; transition: all 0.3s ease; }
+        .mega-default-btn:hover { background: #ffb0cc; color: #151311; }
 
         /* Compact About Menu */
         .about-compact-menu { width: auto; }
@@ -1941,7 +1888,7 @@ document.addEventListener('DOMContentLoaded', function() {
             width: 280px; 
             min-height: auto; 
             background: #1a1816;
-            border-top: 2px solid #964551;
+            border-top: 2px solid #ffb0cc;
         }
         .about-compact-menu .mega-menu-left { width: 100%; border-right: none; padding: 10px 0; }
         .about-compact-menu .mega-cat-link { padding: 10px 24px; font-size: 13px; }
@@ -1955,14 +1902,12 @@ document.addEventListener('DOMContentLoaded', function() {
         #scrollTopBtnGlobal, #floatingChatBtnGlobal {
             opacity: 0;
             visibility: hidden;
-            pointer-events: none;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateY(20px);
         }
         #scrollTopBtnGlobal.visible, #floatingChatBtnGlobal.visible {
             opacity: 1;
             visibility: visible;
-            pointer-events: auto;
             transform: translateY(0);
         }
 
@@ -1980,7 +1925,7 @@ document.addEventListener('DOMContentLoaded', function() {
             border: 2px solid #151311;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #964551;
+            background: #ffb0cc;
         }
 
         /* For Firefox */
@@ -1996,7 +1941,7 @@ document.addEventListener('DOMContentLoaded', function() {
             background: rgba(255, 176, 204, 0.3);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #964551;
+            background: #ffb0cc;
         }
 
         /* HIDE SCROLLBAR ON MOBILE */
@@ -2025,7 +1970,7 @@ document.addEventListener('DOMContentLoaded', function() {
             left: 0;
             width: 0%;
             height: 4px;
-            background: linear-gradient(90deg, #7a3642, #964551);
+            background: linear-gradient(90deg, #ca7093, #ffb0cc);
             z-index: 99999;
             box-shadow: 0 0 15px rgba(255, 176, 204, 0.5);
             transition: width 0.1s ease-out;
@@ -2042,8 +1987,7 @@ document.addEventListener('DOMContentLoaded', function() {
             background-color: #ebebeb !important;
             border-color: rgba(0, 0, 0, 0.08) !important;
         }
-        html.light .bg-\[\#1d1b19\].text-\[\#c7c5c5\],
-        html.light .bg-\[\#1d1b19\] .text-\[\#c7c5c5\],
+        html.light .bg-\[\#1d1b19\].text-\[\#ffb0cc\],
         html.light .bg-\[\#1d1b19\] .text-\[\#ffb0cc\],
         html.light .bg-\[\#1d1b19\] .text-\[\#e7e2dd\] {
             color: #151311 !important;
@@ -2299,9 +2243,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (text) text.textContent = 'СРЕДНИЙ ПАРОЛЬ';
                 if (text) text.style.color = '#ffbe5f';
             } else {
-                bar.style.backgroundColor = '#964551';
+                bar.style.backgroundColor = '#ffb0cc';
                 if (text) text.textContent = 'ОТЛИЧНЫЙ ПАРОЛЬ';
-                if (text) text.style.color = '#c7c5c5';
+                if (text) text.style.color = '#ffb0cc';
             }
         }
 
@@ -2371,7 +2315,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         document.body.appendChild(overlay);
-        window.lockScrollGlobal();
         
         setTimeout(() => {
             overlay.classList.remove('opacity-0');
@@ -2393,7 +2336,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (inner) {
             inner.classList.add('opacity-0', 'translate-y-4');
         }
-        setTimeout(() => { overlay.remove(); window.unlockScrollGlobal(); }, 500);
+        setTimeout(() => overlay.remove(), 500);
     };
 
     window.showLoginFormErrorGlobal = function(message) {
@@ -2820,19 +2763,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const isBlockScrollSection = (el) => {
         if (!el || el.tagName !== 'SECTION') return false;
-        if (el.classList.contains('no-full-height')) return false;
-        if (el.id === 'hero' || el.id === 'cta-footer-merged') return true;
-        
         const cls = el.className || '';
-        // Matches Tailwind full-height classes including the new dynamic header-height ones
-        const hasFullHeightClass = /min-h-\[100dvh\]|min-h-screen|h-\[100dvh\]|h-screen|h-\[calc\(100(dvh|vh)-(80px|var\(--header-height\))\)\]|min-h-\[calc\(100(dvh|vh)-(80px|var\(--header-height\))\)\]/.test(cls);
-        
-        if (hasFullHeightClass) return true;
-        
-        // On block-scroll pages, sections are typically intended to be snapped unless opted out
-        if (isBlockScrollPage()) return true;
-        
-        return false;
+        return /min-h-\[100dvh\]|min-h-screen|h-\[100dvh\]|h-screen|h-\[calc\(100dvh-80px\)\]|h-\[calc\(100vh-80px\)\]|min-h-\[calc\(100vh-80px\)\]/.test(cls) || el.id === 'cta-footer-merged';
     };
 
     const getBlockScrollSections = () => {
@@ -3198,7 +3130,7 @@ window.showApplicationSuccessPopup = function(title = 'Заявка принят
         </div>
     `;
     document.body.appendChild(popup);
-    window.lockScrollGlobal(); // Lock scroll
+    document.body.style.overflow = 'hidden'; // Lock scroll
     
     // Trigger animations
     setTimeout(() => {
@@ -3224,7 +3156,7 @@ window.closeApplicationPopup = function() {
     setTimeout(() => {
         const popup = document.getElementById('applicationSuccessPopup');
         if (popup) popup.remove();
-        window.unlockScrollGlobal(); // Restore scroll AFTER animation
+        document.body.style.overflow = ''; // Restore scroll AFTER animation
     }, 500);
 };
 
@@ -3274,7 +3206,7 @@ window.openContactModalGlobal = function(title = 'Оставить заявку'
         </div>
     `;
     document.body.appendChild(modal);
-    window.lockScrollGlobal(); // Lock scroll
+    document.body.style.overflow = 'hidden'; // Lock scroll
 
     setTimeout(() => {
         document.getElementById('modalOverlay').classList.remove('opacity-0');
@@ -3296,7 +3228,7 @@ window.closeContactModalGlobal = function() {
     setTimeout(() => {
         const modal = document.getElementById('globalContactModal');
         if (modal) modal.remove();
-        window.unlockScrollGlobal(); // Restore scroll AFTER animation
+        document.body.style.overflow = ''; // Restore scroll AFTER animation
     }, 500);
 };
 
@@ -3315,7 +3247,7 @@ window.openProductModalGlobal = async function(productId) {
         </div>
     `;
     document.body.appendChild(modal);
-    window.lockScrollGlobal();
+    document.body.style.overflow = 'hidden';
 
     setTimeout(() => {
         document.getElementById('productModalOverlay').classList.remove('opacity-0');
@@ -3412,7 +3344,7 @@ window.closeProductModalGlobal = function() {
         // Only restore scroll if no other high-level modals are open
         const otherModals = document.querySelectorAll('#globalContactModal, #drawingUploadModal, #cartDrawerGlobal.translate-x-0');
         if (otherModals.length === 0) {
-            window.unlockScrollGlobal();
+            document.body.style.overflow = '';
         }
     }, 500);
 };
@@ -3532,7 +3464,7 @@ window.openDrawingUploadModal = function() {
         </div>
     `;
     document.body.appendChild(modal);
-    window.lockScrollGlobal(); // Lock scroll
+    document.body.style.overflow = 'hidden'; // Lock scroll
 
     setTimeout(() => {
         document.getElementById('drawingOverlay').classList.remove('opacity-0');
@@ -3573,7 +3505,7 @@ window.closeDrawingModal = function() {
     setTimeout(() => {
         const modal = document.getElementById('drawingUploadModal');
         if (modal) modal.remove();
-        window.unlockScrollGlobal(); // Restore scroll AFTER animation
+        document.body.style.overflow = ''; // Restore scroll AFTER animation
     }, 500);
 };
 // Phone Masking Utility - Unified with Global
@@ -3648,9 +3580,9 @@ window.openGlobalChatDrawerGlobal = async function() {
     
     if (!token || (!isAdmin && !user)) {
         modal.innerHTML = `
-            <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="this.parentElement.remove(); window.unlockScrollGlobal()"></div>
+            <div class="absolute inset-0 bg-black/95 backdrop-blur-2xl opacity-0 transition-opacity duration-500 pointer-events-auto" onclick="this.parentElement.remove(); document.body.style.overflow=''"></div>
             <div class="relative liquid-glass p-6 md:p-10 max-w-lg w-full rounded-[2.5rem] opacity-0 transition-all duration-500 ease-out pointer-events-auto shadow-2xl border border-white/10" id="globalChatModalPanel">
-                <button onclick="document.getElementById('globalChatDrawerModal').remove(); window.unlockScrollGlobal()" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
+                <button onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors z-20">close</button>
                 <header class="mb-6 border-b border-white/5 pb-6 text-center">
                     <div class="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/30 mx-auto mb-4 shadow-lg shadow-primary/20">
                         <span class="material-symbols-outlined text-3xl">forum</span>
@@ -3661,14 +3593,14 @@ window.openGlobalChatDrawerGlobal = async function() {
                 <div class="space-y-6 text-center py-4">
                     <p class="text-sm text-on-surface-variant leading-relaxed">Для доступа к истории переписки по вашим заказам и обращениям, пожалуйста, войдите в систему.</p>
                     <div class="flex flex-col gap-4 pt-4">
-                        <button onclick="document.getElementById('globalChatDrawerModal').remove(); window.unlockScrollGlobal(); toggleAuthModalGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-primary/20">ВОЙТИ В АККАУНТ</button>
-                        <a href="/#contacts" onclick="document.getElementById('globalChatDrawerModal').remove(); window.unlockScrollGlobal()" class="text-xs text-on-surface-variant uppercase tracking-widest hover:text-primary transition-colors">Связаться другим способом</a>
+                        <button onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''; toggleAuthModalGlobal()" class="w-full py-5 bg-primary text-on-primary font-label-caps text-xs uppercase tracking-[0.2em] font-bold rounded-full hover:brightness-110 transition-all shadow-lg shadow-primary/20">ВОЙТИ В АККАУНТ</button>
+                        <a href="/#contacts" onclick="document.getElementById('globalChatDrawerModal').remove(); document.body.style.overflow=''" class="text-xs text-on-surface-variant uppercase tracking-widest hover:text-primary transition-colors">Связаться другим способом</a>
                     </div>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
-        window.lockScrollGlobal();
+        document.body.style.overflow = 'hidden';
         setTimeout(() => {
             const panel = document.getElementById('globalChatModalPanel');
             if (panel && panel.previousElementSibling) panel.previousElementSibling.classList.remove('opacity-0');
@@ -3724,7 +3656,7 @@ window.openGlobalChatDrawerGlobal = async function() {
                 ` : ''}
 
                 <div class="flex-1 flex flex-col bg-[#0f0e0c] relative">
-                    <div class="absolute inset-0 opacity-[0.02] pointer-events-none" style="background-image: radial-gradient(#964551 1px, transparent 1px); background-size: 32px 32px;"></div>
+                    <div class="absolute inset-0 opacity-[0.02] pointer-events-none" style="background-image: radial-gradient(#ffb0cc 1px, transparent 1px); background-size: 32px 32px;"></div>
                     <div id="globalChatMessagesContainer" class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 custom-scrollbar relative z-10 flex flex-col">
                         <div class="flex items-center justify-center h-full text-on-surface-variant opacity-30 gap-3">
                             <span class="material-symbols-outlined animate-spin text-primary">progress_activity</span>
@@ -3745,7 +3677,7 @@ window.openGlobalChatDrawerGlobal = async function() {
         </div>
     `;
     document.body.appendChild(modal);
-    window.lockScrollGlobal();
+    document.body.style.overflow = 'hidden';
     setTimeout(() => {
         const panel = document.getElementById('globalChatModalPanel');
         if (panel && panel.previousElementSibling) panel.previousElementSibling.classList.remove('opacity-0');
@@ -3829,7 +3761,7 @@ window.closeGlobalChatDrawerGlobal = function() {
     const overlay = modal.querySelector('.absolute');
     if(overlay) overlay.classList.add('opacity-0');
     if(panel) panel.classList.replace('modal-animate-in', 'modal-animate-out');
-    setTimeout(() => { modal.remove(); window.unlockScrollGlobal(); }, 500);
+    setTimeout(() => { modal.remove(); document.body.style.overflow = ''; }, 500);
 };
 
 window.selectGlobalChatTopicGlobal = function(val) {
@@ -3977,6 +3909,212 @@ window.sendGlobalChatMessageGlobal = async function() {
     }
 };
 
+(function() {
+    const lightModeStyles = `
+/* --- CUSTOM PALETTE: #D6A3AB, #C7C5C5, #3B3B3B, #964551, #827D7E --- */
+html.light body,
+html.light body.bg-background,
+html.light body[class*="bg-"],
+html.light main,
+html.light main[class*="bg-"],
+html.light main[class*="overflow-"],
+html.light main.overflow-x-hidden {
+    background-color: #C7C5C5 !important;
+    color: #3B3B3B !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.light {
+    --tw-bg-opacity: 1 !important;
+    --tw-gradient-from: #C7C5C5 !important;
+    --tw-gradient-to: rgba(199, 197, 197, 0) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+/* 2. Force All Background Classes with Liquid Glass (60% Opacity) */
+html.light [class*="bg-"],
+html.light [class*="bg-surface"],
+html.light [class*="bg-white/"],
+html.light section,
+html.light aside,
+html.light footer,
+html.light article,
+html.light .glass-panel,
+html.light .glass-card,
+html.light .liquid-glass,
+html.light .modal-content,
+html.light [class*="bg-surface-container"],
+html.light .mega-menu-inner,
+html.light #cartPanelGlobal,
+html.light #authPanelGlobal,
+html.light #mobileMenuPanelGlobal,
+html.light #mobileCatalogPanelGlobal,
+html.light #searchContainerGlobal {
+    background-color: rgba(199, 197, 197, 0.6) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    background-image: none !important;
+    border-color: #827D7E !important;
+}
+
+/* Deep Wine Buttons (#964551) */
+html.light .bg-primary, 
+html.light .apple-toggle-thumb,
+html.light .mega-default-btn,
+html.light button.bg-primary,
+html.light [type="submit"],
+html.light .addToCartBtn,
+html.light [onclick*="addToCart"] {
+    background-color: #964551 !important; 
+    color: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    opacity: 1 !important;
+    border: none !important;
+}
+
+html.light .mega-default-btn:hover,
+html.light button.bg-primary:hover,
+html.light [type="submit"]:hover {
+    background-color: #7a3541 !important;
+    transform: translateY(-2px);
+}
+
+/* Restore Hero Image Visibility - Remove Lightening Overlay */
+html.light #hero img,
+html.light section:first-of-type img,
+html.light .hero-bg img {
+    opacity: 1 !important;
+    filter: brightness(0.85) contrast(1.1) !important;
+}
+html.light #hero .bg-gradient-to-r,
+html.light section:first-of-type .bg-gradient-to-r {
+    background-image: linear-gradient(to right, rgba(59, 59, 59, 0.7), transparent) !important;
+}
+
+/* Sidebar & Mega Menu */
+html.light .mega-menu-left {
+    background-color: rgba(199, 197, 197, 0.8) !important;
+    border-right: 1px solid #827D7E !important;
+}
+html.light .mega-cat-link:hover, 
+html.light .mega-cat-item.is-active .mega-cat-link {
+    background-color: #D6A3AB !important; /* Dusty Rose */
+    color: #FFFFFF !important;
+}
+html.light .mega-menu-right {
+    background-color: transparent !important;
+}
+html.light .mega-menu-right .mega-sub-link:hover {
+    color: #964551 !important;
+}
+
+/* 3. Text & Icons (#3B3B3B) */
+html.light [class*="text-"],
+html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6,
+html.light p, html.light span:not(.material-symbols-outlined),
+html.light a:not(.bg-primary),
+html.light .nav-link {
+    color: #3B3B3B !important;
+    opacity: 1 !important;
+}
+html.light .material-symbols-outlined:not(.text-primary) {
+    color: #3B3B3B !important;
+}
+
+/* Restore white text on Deep Wine elements */
+html.light .bg-primary *,
+html.light button.bg-primary *,
+html.light [type="submit"],
+html.light .text-white,
+html.light .mega-default-btn span {
+    color: #FFFFFF !important;
+}
+
+/* Deep Wine Accents */
+html.light .text-primary,
+html.light .text-primary * {
+    color: #964551 !important;
+}
+
+/* 5. Header Fix */
+html.light #globalHeader {
+    background-color: rgba(199, 197, 197, 0.8) !important;
+    border-bottom: 2px solid #827D7E !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    opacity: 1 !important;
+}
+
+/* 7. Borders & Scrollbars */
+html.light [class*="border-"],
+html.light .machined-border {
+    border-color: #827D7E !important;
+}
+html.light .border-primary { border-color: #964551 !important; }
+
+html.light ::-webkit-scrollbar-track { background: #C7C5C5 !important; }
+html.light ::-webkit-scrollbar-thumb { 
+    background: #964551 !important; 
+    border: 2px solid #C7C5C5 !important;
+}
+html.light * { scrollbar-color: #964551 #C7C5C5 !important; }
+
+.nav-link { position: relative; }
+.nav-link::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+    background: #964551; transition: width 0.3s ease;
+}
+.nav-link:hover::after { width: 100%; }
+
+.mega-menu {
+    opacity: 0; pointer-events: none; visibility: hidden;
+    position: fixed; top: 80px; left: 0; width: 100vw; z-index: 2000;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(-10px);
+}
+.mega-menu.is-visible { 
+    opacity: 1; pointer-events: auto; visibility: visible;
+    transform: translateY(0);
+}
+.mega-menu-inner {
+    display: flex; max-width: 1440px; margin: 0 auto; background: #C7C5C5;
+    border: 1px solid #827D7E; border-top: 2px solid #964551;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6); min-height: 400px;
+}
+.mega-menu-left { width: 300px; background: rgba(199, 197, 197, 0.9); border-right: 1px solid #827D7E; padding: 20px 0; }
+.mega-cat-link {
+    display: flex; align-items: center; gap: 12px; padding: 12px 30px;
+    color: #3B3B3B; text-decoration: none; font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; transition: all 0.2s; position: relative;
+}
+.mega-cat-link:hover, .mega-cat-item.is-active .mega-cat-link { background: #D6A3AB; color: #FFFFFF; }
+.mega-cat-item.is-active .mega-cat-link::before {
+    content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; background: #964551;
+}
+.mega-menu-right { flex: 1; padding: 40px; background: transparent; }
+.mega-submenu { display: none; }
+.mega-submenu.is-active { display: block; animation: fadeInSub 0.3s ease; }
+@keyframes fadeInSub { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+.mega-submenu-title { font-size: 20px; font-weight: 600; color: #3B3B3B; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid #827D7E; }
+.mega-submenu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 20px; }
+.mega-sub-link { color: #3B3B3B; text-decoration: none; font-size: 13px; display: block; padding: 6px 0; transition: color 0.2s; }
+.mega-sub-link:hover { color: #964551; }
+
+.mega-overlay { 
+    opacity: 0; pointer-events: none; visibility: hidden;
+    position: fixed; top: 80px; left: 0; width: 100vw; height: 100vh; 
+    background: rgba(0,0,0,0.5); z-index: 1999; backdrop-filter: blur(4px); 
+    transition: all 0.4s ease;
+}
+.mega-overlay.is-visible { opacity: 1; pointer-events: auto; visibility: visible; }
+`;
+    const style = document.createElement('style');
+    style.id = 'light-mode-styles-injected';
+    style.textContent = lightModeStyles;
+    document.head.appendChild(style);
+})();
 
 /* ==========================================
    PREMIUM CUSTOM SELECT DROPDOWN OVERLAYS
@@ -4021,20 +4159,16 @@ window.sendGlobalChatMessageGlobal = async function() {
         text-transform: uppercase;
         letter-spacing: 0.05em;
         user-select: none;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
-        background: #151311 !important;
+        border: 1px solid rgba(83, 67, 71, 0.1);
+        background: rgba(29, 27, 25, 0.3);
         color: #e7e2dd;
-        padding: 5px 12px;
+        padding: 3px 10px;
         line-height: 1.2;
         text-align: left;
         white-space: nowrap !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
     }
     .custom-select-trigger.large-padding {
-        padding: 7px 14px;
+        padding: 5px 12px;
         line-height: 1.2;
     }
     .custom-select-text {
@@ -4046,14 +4180,14 @@ window.sendGlobalChatMessageGlobal = async function() {
         min-width: 0;
     }
     .custom-select-trigger:hover {
-        background: #151311 !important;
-        color: #c7c5c5;
-        box-shadow: 0 4px 14px rgba(255, 176, 204, 0.25) !important;
+        border-color: rgba(255, 176, 204, 0.4);
+        background: rgba(255, 176, 204, 0.05);
+        color: #ffb0cc;
     }
     .custom-select-trigger.is-active {
-        background: #151311 !important;
-        color: #c7c5c5;
-        box-shadow: 0 4px 14px rgba(255, 176, 204, 0.3) !important;
+        border-color: #ffb0cc;
+        background: rgba(255, 176, 204, 0.05);
+        color: #ffb0cc;
     }
     
     /* Chevron arrow */
@@ -4072,7 +4206,7 @@ window.sendGlobalChatMessageGlobal = async function() {
         -webkit-font-smoothing: antialiased;
         transition: transform 0.3s ease;
         margin-left: 8px;
-        color: #c7c5c5;
+        color: #ffb0cc;
         pointer-events: none;
     }
     .custom-select-trigger.is-active .custom-select-arrow {
@@ -4081,14 +4215,16 @@ window.sendGlobalChatMessageGlobal = async function() {
     
     /* Popup Menu Overlay */
     .custom-select-popup {
-        position: fixed;
-        z-index: 999999;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        margin-top: 6px;
+        z-index: 9999;
         border-radius: 12px;
-        border: none !important;
-        border-width: 0 !important;
-        outline: none !important;
-        background: #151311 !important;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+        border: 1px solid rgba(83, 67, 71, 0.3);
+        background: #1d1b19;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
         max-height: 200px;
         overflow-y: auto;
         opacity: 0;
@@ -4105,7 +4241,7 @@ window.sendGlobalChatMessageGlobal = async function() {
     
     /* Options */
     .custom-select-option {
-        padding: 4px 12px;
+        padding: 3px 12px;
         font-size: 13px;
         font-weight: 500;
         color: #d7c1c7;
@@ -4117,27 +4253,15 @@ window.sendGlobalChatMessageGlobal = async function() {
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         line-height: 1.2;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
     }
     .custom-select-option:hover {
         background: rgba(255, 176, 204, 0.1);
-        color: #c7c5c5;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
+        color: #ffb0cc;
     }
     .custom-select-option.is-selected {
         background: rgba(255, 176, 204, 0.15);
-        color: #c7c5c5;
+        color: #ffb0cc;
         font-weight: 700;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
     }
     
     /* Scrollbar */
@@ -4145,7 +4269,7 @@ window.sendGlobalChatMessageGlobal = async function() {
         width: 6px;
     }
     .custom-select-popup::-webkit-scrollbar-track {
-        background: #151311 !important;
+        background: transparent;
     }
     .custom-select-popup::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.1);
@@ -4157,63 +4281,37 @@ window.sendGlobalChatMessageGlobal = async function() {
     
     /* --- LIGHT THEME OVERRIDES --- */
     html.light .custom-select-trigger {
-        background: #C7C5C5 !important;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
+        background: #ebebeb;
+        border: 1px solid rgba(0, 0, 0, 0.08);
         color: #151311;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
     }
     html.light .custom-select-trigger:hover,
     html.light .custom-select-trigger.is-active {
-        background: #C7C5C5 !important;
-        color: #964551;
-        box-shadow: 0 4px 14px rgba(150, 69, 81, 0.25) !important;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
+        border-color: rgba(0, 0, 0, 0.15);
+        background: #e0e0e0;
+        color: #151311;
     }
     html.light .custom-select-arrow {
-        color: #964551;
+        color: #151311;
     }
     html.light .custom-select-popup {
-        background: #C7C5C5 !important;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
+        background: #ebebeb;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         backdrop-filter: blur(25px) saturate(180%);
         -webkit-backdrop-filter: blur(25px) saturate(180%);
     }
     html.light .custom-select-option {
         color: #151311;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
     }
     html.light .custom-select-option:hover {
-        background: rgba(150, 69, 81, 0.15);
-        color: #964551;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
+        background: #e0e0e0;
+        color: #151311;
     }
     html.light .custom-select-option.is-selected {
-        background: rgba(150, 69, 81, 0.25);
-        color: #964551;
+        background: #d5d5d5;
+        color: #151311;
         font-weight: 700;
-        border: none !important;
-        border-width: 0 !important;
-        border-style: none !important;
-        outline: none !important;
-    }
-    html.light .custom-select-popup::-webkit-scrollbar-track {
-        background: #C7C5C5 !important;
     }
     html.light .custom-select-popup::-webkit-scrollbar-thumb {
         background: rgba(150, 69, 81, 0.2);
@@ -4329,29 +4427,6 @@ window.sendGlobalChatMessageGlobal = async function() {
             
             rebuildOptions();
             
-            function positionPopup() {
-                const triggerRect = trigger.getBoundingClientRect();
-                const viewportHeight = window.innerHeight;
-                const popupMaxH = 200;
-                const spaceBelow = viewportHeight - triggerRect.bottom;
-                const spaceAbove = triggerRect.top;
-
-                popup.style.width = triggerRect.width + 'px';
-                popup.style.left = triggerRect.left + 'px';
-
-                if (spaceBelow >= Math.min(popupMaxH, 120) || spaceBelow >= spaceAbove) {
-                    // Open downward
-                    popup.style.top = (triggerRect.bottom + 6) + 'px';
-                    popup.style.bottom = 'auto';
-                    popup.style.transformOrigin = 'top center';
-                } else {
-                    // Open upward
-                    popup.style.bottom = (viewportHeight - triggerRect.top + 6) + 'px';
-                    popup.style.top = 'auto';
-                    popup.style.transformOrigin = 'bottom center';
-                }
-            }
-
             function togglePopup() {
                 const isOpen = popup.classList.contains('is-open');
                 if (isOpen) {
@@ -4361,20 +4436,29 @@ window.sendGlobalChatMessageGlobal = async function() {
                     document.querySelectorAll('.custom-select-popup.is-open').forEach(p => {
                         if (p !== popup) {
                             p.classList.remove('is-open');
-                            const prevTrigger = p._customSelectTrigger;
-                            if (prevTrigger) prevTrigger.classList.remove('is-active');
+                            p.previousElementSibling.classList.remove('is-active');
                         }
                     });
-
-                    // Move popup to body (portal) to escape overflow:hidden parents
-                    if (popup.parentNode !== document.body) {
-                        document.body.appendChild(popup);
-                        popup._customSelectTrigger = trigger;
-                    }
-
-                    positionPopup();
+                    
                     popup.classList.add('is-open');
                     trigger.classList.add('is-active');
+                    
+                    // Prevent popup showing outside viewport height
+                    const rect = popup.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    if (rect.bottom > viewportHeight && rect.top > rect.height) {
+                        popup.style.top = 'auto';
+                        popup.style.bottom = '100%';
+                        popup.style.marginTop = '0';
+                        popup.style.marginBottom = '6px';
+                        popup.style.transformOrigin = 'bottom center';
+                    } else {
+                        popup.style.top = '100%';
+                        popup.style.bottom = 'auto';
+                        popup.style.marginTop = '6px';
+                        popup.style.marginBottom = '0';
+                        popup.style.transformOrigin = 'top center';
+                    }
                 }
             }
             
@@ -4382,15 +4466,6 @@ window.sendGlobalChatMessageGlobal = async function() {
                 popup.classList.remove('is-open');
                 trigger.classList.remove('is-active');
             }
-
-            // Reposition on scroll/resize while open
-            function onScrollResize() {
-                if (popup.classList.contains('is-open')) {
-                    positionPopup();
-                }
-            }
-            window.addEventListener('scroll', onScrollResize, true);
-            window.addEventListener('resize', onScrollResize);
             
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -4445,8 +4520,7 @@ window.sendGlobalChatMessageGlobal = async function() {
     document.addEventListener('click', () => {
         document.querySelectorAll('.custom-select-popup.is-open').forEach(p => {
             p.classList.remove('is-open');
-            const t = p._customSelectTrigger;
-            if (t) t.classList.remove('is-active');
+            p.previousElementSibling.classList.remove('is-active');
         });
     });
     

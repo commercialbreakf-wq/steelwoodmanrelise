@@ -1,0 +1,18 @@
+User-agent: Yandex
+Allow: /
+Disallow: /admin
+Disallow: /cabinet
+Disallow: /cart
+Disallow: /reset-password
+Disallow: /api/
+Host: https://zhelezniydrovosek.ru
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /cabinet
+Disallow: /cart
+Disallow: /reset-password
+Disallow: /api/
+
+Sitemap: https://zhelezniydrovosek.ru/sitemap.xml

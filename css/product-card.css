@@ -1,0 +1,58 @@
+/* Layout adjustments */
+.product-card .right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.price-block {
+  flex-shrink: 0;
+}
+
+
+/* Ensure product name stays on a single line with ellipsis */
+.product-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card container adjustments for responsive layout */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .product-card {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+/* Glass panel enhancements (reusing existing design tokens) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(25px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Adjust price block to align nicely with calculator on larger screens */
+@media (min-width: 1024px) {
+  .price-block {
+    margin-right: 2rem;
+  }
+}
+
+/* Ensure buttons have consistent hover/active effects */
+button {
+  transition: all 0.2s ease;
+}
+button:hover {
+  transform: translateY(-2px);
+}
+button:active {
+  transform: scale(0.95);
+}

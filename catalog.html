@@ -8,14 +8,32 @@
     })();
   </script>
 <meta charset="utf-8"/>
+    <title>Каталог металлопроката — Цены и наличие | Железный Дровосек</title>
+    <meta name="description" content="Полный каталог металлопроката: арматура, трубы, листовой прокат, балки, швеллеры, профнастил. Актуальные цены, наличие на складе." />
+    <meta name="keywords" content="каталог металла, цены на металлопрокат, купить арматуру, купить трубы" />
+    <meta property="og:title" content="Каталог металлопроката — Цены и наличие | Железный Дровосек" />
+    <meta property="og:description" content="Полный каталог металлопроката: арматура, трубы, листовой прокат, балки, швеллеры, профнастил. Актуальные цены, наличие на складе." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://zhelezniydrovosek.ru/catalog" />
+    <meta property="og:image" content="https://zhelezniydrovosek.ru/images/logo_premium.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Каталог металлопроката — Цены и наличие | Железный Дровосек" />
+    <meta name="twitter:description" content="Полный каталог металлопроката: арматура, трубы, листовой прокат, балки, швеллеры, профнастил. Актуальные цены, наличие на складе." />
+    <meta name="twitter:image" content="https://zhelezniydrovosek.ru/images/logo_premium.png" />
+    <meta name="theme-color" content="#ca7093" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=5" />
+    <link rel="icon" type="image/png" href="/images/logo_icon.png?v=5" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/images/logo_icon.png?v=5" />
+    <link rel="mask-icon" href="/images/favicon.svg?v=5" color="#ca7093" />
+  
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Каталог металлопроката — ЖЕЛЕЗНЫЙ ДРОВОСЕК</title>
-<meta name="description" content="Полный каталог металлопроката: арматура, трубы, листовой прокат, балки, швеллеры, профнастил. Актуальные цены, наличие на складе."/>
+
+
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="/js/shared-ui.js?v=8" defer></script>
-<script src="/js/theme.js?v=1"></script>
+<script src="/js/shared-ui.js?v=21" defer></script>
+<script src="/js/theme.js?v=6"></script>
 <style>
 .liquid-glass {
     background: rgba(255, 255, 255, 0.03);
@@ -28,6 +46,53 @@
 .pink-glow:hover{box-shadow:0 0 20px rgba(150,69,81,0.25)}
 .card-enter{animation:cardIn .5s cubic-bezier(.16,1,.3,1) both}
 @keyframes cardIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* Premium Mobile Filter Buttons Transitions */
+#mobileFilterButtonsWrapper {
+    gap: 0px;
+    transition: gap 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#mobileFilterButtonsWrapper.split-gap {
+    gap: 8px;
+}
+
+#categoriesToggleBtn {
+    transition: flex-basis 0.5s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 100%;
+    max-width: 100%;
+}
+#categoriesToggleBtn.split-width {
+    flex-basis: calc(50% - 4px);
+    max-width: calc(50% - 4px);
+}
+
+#filterToggleBtn {
+    transition: flex-basis 0.5s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding-left 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding-right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0%;
+    max-width: 0%;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9) translateX(20px);
+    overflow: hidden;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border: none !important;
+}
+
+#filterToggleBtn.show-btn {
+    flex-basis: calc(50% - 4px);
+    max-width: calc(50% - 4px);
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1) translateX(0);
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    border: none !important;
+}
 
 /* Sidebar Filter Custom Styles (Borderless, Premium highlights) */
 .filter-parent-category {
@@ -137,17 +202,17 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 html.light .nested-filter-container {
-    background-color: rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(15px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
 }
 .filter-size-header {
     font-size: 9px !important;
     font-weight: 700 !important;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #e7e2dd;
-    margin-bottom: 6px;
-    opacity: 0.5;
+    text-on-surface-variant/60 font-medium md:text-on-surface-variant md:font-bold md:opacity-50
 }
 html.light .filter-size-header {
     color: #151311;
@@ -160,7 +225,12 @@ html.light .filter-size-header {
     background-color: #1a1816 !important;
 }
 html.light .compact-select {
-    background-color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    color: #151311 !important;
 }
 
 /* Ensure active subcategory text uses light gray, and hover uses dark text on dark theme */
@@ -177,38 +247,35 @@ html.light .compact-select {
 
 /* Light Theme Overrides for Sidebar Filters */
 html.light .filter-parent-category {
-    background-color: #C7C5C5 !important;
-    color: #3b3b3b !important;
-    border: none !important;
-    border-width: 0 !important;
-    border-style: none !important;
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+    color: #151311 !important;
     outline: none !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 }
 html.light .filter-parent-category:hover {
-    background-color: rgba(150, 69, 81, 0.08) !important;
+    background: rgba(255, 255, 255, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.9) !important;
     color: #964551 !important;
-    border: none !important;
-    border-width: 0 !important;
-    border-style: none !important;
-    outline: none !important;
 }
 html.light .filter-parent-category:hover span,
 html.light .filter-parent-category:hover .material-symbols-outlined {
     color: #964551 !important;
 }
 html.light .filter-parent-category.is-active {
-    background-color: #964551 !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 14px rgba(150, 69, 81, 0.25) !important;
-    border: none !important;
-    border-width: 0 !important;
-    border-style: none !important;
+    background: rgba(202, 112, 147, 0.15) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+    border: 1px solid rgba(202, 112, 147, 0.4) !important;
+    color: #ca7093 !important;
+    box-shadow: 0 8px 24px rgba(202, 112, 147, 0.15) !important;
     outline: none !important;
 }
 html.light .filter-parent-category.is-active span,
 html.light .filter-parent-category.is-active .material-symbols-outlined {
-    color: #ffffff !important;
+    color: #ca7093 !important;
 }
 html.light .filter-subcategory {
     background-color: transparent !important;
@@ -227,8 +294,8 @@ html.light .filter-subcategory:hover {
     outline: none !important;
 }
 html.light .filter-subcategory.is-active {
-    background-color: rgba(150, 69, 81, 0.12) !important;
-    color: #964551 !important;
+    background-color: rgba(202, 112, 147, 0.12) !important;
+    color: #ca7093 !important;
     font-weight: 700 !important;
     border: none !important;
     border-width: 0 !important;
@@ -237,15 +304,259 @@ html.light .filter-subcategory.is-active {
     outline: none !important;
 }
 html.light .filter-subcategory.is-active .filter-subcategory-name,
-html.light .filter-subcategory.is-active .filter-subcategory-count,
+html.light .filter-subcategory.is-active .filter-subcategory-count {
+    color: #ca7093 !important;
+    opacity: 1 !important;
+}
 html.light .filter-subcategory:hover .filter-subcategory-name,
 html.light .filter-subcategory:hover .filter-subcategory-count {
     color: #964551 !important;
     opacity: 1 !important;
 }
+html.light #sortSelect {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    color: #151311 !important;
+}
+
+/* Centered Parameters Modal on Mobile */
+@media (max-width: 767px) {
+    #topBarFilters {
+        display: none !important; /* Hide by default from main flow */
+    }
+    .params-modal-active #topBarFilters {
+        display: flex !important;
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: calc(100% - 32px) !important;
+        max-width: 360px !important;
+        background: #151311 !important;
+        border: 1px solid rgba(202, 112, 147, 0.25) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(202, 112, 147, 0.15) !important;
+        border-radius: 20px !important;
+        padding: 24px !important;
+        z-index: 7000 !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    }
+    html.light .params-modal-active #topBarFilters {
+        background: rgba(250, 250, 250, 0.9) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border: 1px solid rgba(202, 112, 147, 0.3) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 20px rgba(202, 112, 147, 0.1) !important;
+    }
+    .params-modal-active #topBarFilters > div {
+        width: 100% !important;
+    }
+    @keyframes modalScaleUp {
+        from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+        to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+}
+
+#paramsModalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 6999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+#paramsModalOverlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
 </style>
+
+
+
+
+<style id="custom-preloader-style">
+        #globalPreloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(21, 19, 17, 0.8) !important;
+            backdrop-filter: blur(25px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.02), inset 0 0 40px rgba(202, 112, 147, 0.02) !important;
+            z-index: 999999; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
+            pointer-events: auto;
+        }
+        #globalPreloader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .preloader-visual {
+            position: relative; width: 180px; height: 180px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .loader-ring {
+            position: absolute; inset: 0;
+            border: 1px solid rgba(202, 112, 147, 0.05);
+            border-radius: 50%;
+        }
+        .loader-ring::after {
+            content: ''; position: absolute; inset: -4px;
+            border: 2px solid transparent;
+            border-top-color: #c7c5c5;
+            border-radius: 50%;
+            animation: preloader-spin 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .loader-hex {
+            width: 100px; height: 100px;
+            background: rgba(202, 112, 147, 0.03);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(202, 112, 147, 0.2);
+            animation: preloader-pulse 2s ease-in-out infinite;
+            position: relative; overflow: hidden;
+        }
+        .loader-hex::before {
+            content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
+            background: linear-gradient(to bottom, transparent, rgba(202, 112, 147, 0.3), transparent);
+            animation: preloader-scan 3s ease-in-out infinite;
+        }
+        .loader-logo {
+            width: 64px; height: 64px; object-fit: cover; border-radius: 50%;
+            filter: drop-shadow(0 0 15px rgba(202, 112, 147, 0.4));
+            z-index: 10;
+            opacity: 0.9;
+        }
+        .loader-text {
+            margin-top: 48px; font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px; color: #c7c5c5; letter-spacing: 0.6em;
+            text-transform: uppercase; opacity: 0.6;
+            animation: preloader-text-pulse 1.5s ease-in-out infinite;
+        }
+        .loader-progress-track {
+            width: 200px; height: 1px; background: rgba(202, 112, 147, 0.1);
+            margin-top: 16px; position: relative; overflow: hidden;
+        }
+        .loader-progress-bar {
+            position: absolute; top: 0; left: 0; height: 100%; width: 0%;
+            background: #964551; box-shadow: 0 0 10px #964551;
+            transition: width 0.4s ease;
+        }
+        @keyframes preloader-spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes preloader-pulse {
+            0%, 100% { transform: scale(1); border-color: rgba(202, 112, 147, 0.2); }
+            50% { transform: scale(1.02); border-color: rgba(202, 112, 147, 0.5); }
+        }
+        @keyframes preloader-scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        @keyframes preloader-text-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        body.preloader-active { overflow: hidden !important; height: 100vh !important; }
+ 
+        /* Light Theme Preloader (Liquid Glass & Contrast Overrides) */
+        html.light #globalPreloader, html:not(.dark) #globalPreloader {
+            background-color: rgba(250, 250, 250, 0.75) !important;
+            backdrop-filter: blur(25px) saturate(200%) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.5), inset 0 0 40px rgba(202, 112, 147, 0.03) !important;
+        }
+        html.light .loader-ring, html:not(.dark) .loader-ring {
+            border-color: rgba(202, 112, 147, 0.08) !important;
+        }
+        html.light .loader-ring::after, html:not(.dark) .loader-ring::after {
+            border-top-color: #ca7093 !important;
+        }
+        html.light .loader-hex, html:not(.dark) .loader-hex {
+            background: rgba(202, 112, 147, 0.03) !important;
+            border-color: rgba(202, 112, 147, 0.2) !important;
+        }
+        html.light .loader-hex::before, html:not(.dark) .loader-hex::before {
+            background: linear-gradient(to bottom, transparent, rgba(202, 112, 147, 0.3), transparent) !important;
+        }
+        html.light .loader-logo, html:not(.dark) .loader-logo {
+            filter: drop-shadow(0 0 15px rgba(202, 112, 147, 0.3)) !important;
+        }
+        html.light .loader-text, html:not(.dark) .loader-text {
+            color: #3B3B3B !important;
+            opacity: 0.8 !important;
+        }
+        html.light .loader-progress-track, html:not(.dark) .loader-progress-track {
+            background: rgba(202, 112, 147, 0.1) !important;
+        }
+        html.light .loader-progress-bar, html:not(.dark) .loader-progress-bar {
+            background: #ca7093 !important;
+            box-shadow: 0 0 10px rgba(202, 112, 147, 0.5) !important;
+        }
+/* Overlay and tab styles */
+.glassmorphism {
+  background: rgba(21,19,17,0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  border-radius: 16px;
+}
+.category-tab {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.category-tab.active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+</style>
+<script>
+  document.documentElement.classList.add('js-loading');
+</script>
+
 </head>
 <body class="bg-background text-on-background font-body-md selection:bg-primary selection:text-on-primary">
+
+            <div id="globalPreloader">
+                <div class="preloader-visual">
+                    <div class="loader-ring"></div>
+                    <div class="loader-hex">
+                        <img src="/images/logo_icon.png" class="loader-logo" alt="IW">
+                    </div>
+                </div>
+                <div class="loader-text">Инициализация систем</div>
+                <div class="loader-progress-track">
+                    <div class="loader-progress-bar" id="globalPreloaderBar"></div>
+                </div>
+            </div>
+            <script>
+                document.body.classList.add('preloader-active');
+                setTimeout(() => {
+                    const bar = document.getElementById('globalPreloaderBar');
+                    if (bar) bar.style.width = '30%';
+                }, 100);
+                setTimeout(() => {
+                    const bar = document.getElementById('globalPreloaderBar');
+                    if (bar) bar.style.width = '65%';
+                }, 400);
+            </script>
+
+
+
+
 
 <!-- Shared Header -->
 
@@ -256,27 +567,30 @@ html.light .filter-subcategory:hover .filter-subcategory-count {
 <nav id="breadcrumbs" class="flex items-center gap-2 font-label-caps text-[11px] md:text-[12px] text-on-surface-variant overflow-x-auto whitespace-nowrap pb-2 md:pb-0">
 <a class="hover:text-primary transition-colors no-underline" href="/">ГЛАВНАЯ</a>
 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="cursor-pointer hover:text-primary transition-colors" onclick="resetFilters()">КАТАЛОГ</span>
-</nav>
+<a class="cursor-pointer hover:text-primary transition-colors" href="/catalog-select">КАТАЛОГ</a>
+</nav><div id="mobileFilterButtonsWrapper" class="md:hidden mb-6 sticky top-[72px] z-20 flex">
+    <button id="categoriesToggleBtn" onclick="toggleFilters()" class="py-3.5 bg-surface-container border border-outline-variant/20 text-on-surface font-bold uppercase text-[10px] tracking-wider flex items-center justify-center gap-1.5 rounded-xl shadow-lg backdrop-blur-md active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-base">category</span>
+        <span id="categoriesToggleBtnLabel">ВЫБЕРИТЕ КАТЕГОРИЮ</span>
+    </button>
+    <button id="filterToggleBtn" onclick="openParamsModal()" class="py-3.5 bg-primary text-on-primary font-bold uppercase text-[10px] tracking-wider flex items-center justify-center gap-1.5 rounded-xl shadow-[0_8px_20px_rgba(202,112,147,0.3)] backdrop-blur-md active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-base">tune</span>
+        ПАРАМЕТРЫ
+    </button>
+</div>
 <div class="relative w-full md:w-96">
-<input id="searchInput" class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary outline-none py-3 px-4 rounded-xl font-label-caps text-xs md:text-label-caps transition-all text-on-surface" placeholder="ПОИСК ПО КАТАЛОГУ..." type="text"/>
+<input id="searchInput" aria-label="Поиск по каталогу" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary outline-none py-3 px-4 rounded-xl font-label-caps text-xs md:text-label-caps transition-all text-on-surface" placeholder="ПОИСК ПО КАТАЛОГУ..." type="text"/>
 <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
 </div>
 </div>
 
 
-<div class="md:hidden mb-6 sticky top-[72px] z-20">
-    <button id="filterToggleBtn" onclick="toggleFilters()" class="w-full py-4 bg-primary text-on-primary font-bold uppercase text-[10px] tracking-[0.2em] flex items-center justify-center gap-2 rounded-2xl shadow-[0_12px_40px_rgba(255,176,204,0.3)] backdrop-blur-md active:scale-95 transition-all">
-        <span class="material-symbols-outlined text-lg">filter_list</span>
-        ФИЛЬТРЫ КАТАЛОГА
-    </button>
-</div>
-
 <!-- Main Content Grid -->
 <div class="flex flex-col md:flex-row gap-gutter relative">
 <!-- Sidebar Filters (Drawer on mobile, Sidebar on desktop) -->
-<div id="filterDrawerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[6000] opacity-0 pointer-events-none transition-opacity duration-500 md:hidden" onclick="toggleFilters()"></div>
-<aside id="catalogSidebar" class="fixed md:static inset-y-0 left-0 w-[85%] max-w-[340px] md:w-64 bg-[#0f0e0c] md:bg-transparent z-[6001] md:z-auto translate-x-[-100%] md:translate-x-0 transition-transform duration-500 ease-apple md:block flex flex-col shadow-2xl md:shadow-none border-r border-white/5 md:border-0 overflow-hidden h-full">
+<div id="paramsModalOverlay" onclick="closeParamsModal()"></div>
+<div id="filterDrawerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[6000] opacity-0 pointer-events-none transition-opacity duration-150 md:hidden" onclick="toggleFilters()"></div>
+<aside id="catalogSidebar" class="fixed md:static inset-y-0 left-0 w-[85%] max-w-[340px] md:w-64 bg-surface-container-lowest md:bg-transparent z-[6001] md:z-auto translate-x-[-100%] md:translate-x-0 transition-transform duration-500 ease-apple md:block flex flex-col shadow-2xl md:shadow-none border-r border-white/5 md:border-0 overflow-hidden h-full">
     <div class="flex items-center justify-between p-5 md:hidden border-b border-outline-variant/10 bg-surface-container shrink-0">
         <div>
             <h3 class="font-display-xl text-lg uppercase tracking-tight">Фильтры</h3>
@@ -294,9 +608,8 @@ html.light .filter-subcategory:hover .filter-subcategory-count {
         </div>
         
         <div class="flex flex-col gap-2 pb-6 md:pb-0 mt-0 md:mt-4">
-            <button onclick="window.innerWidth < 768 ? toggleFilters() : resetFilters()" class="w-full py-3.5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 hover:shadow-[0_8px_24px_rgba(255,176,204,0.15)] transition-all duration-300 rounded-xl uppercase font-bold border-none active:scale-95">
-                <span class="md:hidden">ПОКАЗАТЬ</span>
-                <span class="hidden md:inline">ПОКАЗАТЬ ВСЕ ТОВАРЫ</span>
+            <button onclick="applyFilters(true)" class="w-full py-3.5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 hover:shadow-[0_8px_24px_rgba(202, 112, 147,0.15)] transition-all duration-300 rounded-xl uppercase font-bold border-none active:scale-95">
+                ПРИМЕНИТЬ ПАРАМЕТРЫ
             </button>
             <button onclick="resetFilters()" class="w-full py-3.5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-300 rounded-xl uppercase font-bold bg-white/[0.02]">
                 СБРОСИТЬ ФИЛЬТРЫ
@@ -313,26 +626,62 @@ html.light .filter-subcategory:hover .filter-subcategory-count {
 <!-- Product List Container -->
 <div class="flex-1 min-w-0">
     <!-- Toolbar: Sorting & Desktop count -->
-    <div class="mb-6 md:mb-8 bg-[#1d1b19] md:bg-transparent p-1 md:p-0 rounded-2xl border border-white/5 md:border-0">
-        <div class="flex flex-col md:flex-row md:items-center justify-between">
-             <div class="w-full md:w-auto">
-                 <div class="relative group w-full md:w-72">
-                     <select id="sortSelect" onchange="applySort(this.value)" class="w-full bg-surface-container border-none outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer appearance-none transition-all">
-                         <option value="default" class="bg-[#1d1b19] text-[#e7e2dd]">СОРТИРОВКА: ПО УМОЛЧАНИЮ</option>
-                         <option value="price_asc" class="bg-[#1d1b19] text-[#e7e2dd]">СНАЧАЛА ДЕШЕВЛЕ</option>
-                         <option value="price_desc" class="bg-[#1d1b19] text-[#e7e2dd]">СНАЧАЛА ДОРОЖЕ</option>
-                         <option value="name_asc" class="bg-[#1d1b19] text-[#e7e2dd]">ПО НАЗВАНИЮ (А-Я)</option>
-                         <option value="name_desc" class="bg-[#1d1b19] text-[#e7e2dd]">ПО НАЗВАНИЮ (Я-А)</option>
-                     </select>
-                 </div>
-             </div>
-             <div class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest hidden md:block">
-                Страница <span id="currentPageDisplay" class="text-primary">1</span>
+    <div class="mb-6 md:mb-8 bg-surface-container md:bg-transparent p-1 md:p-0 rounded-2xl border border-white/5 md:border-0">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+             <!-- Left side: Parameter Dropdowns & External Actions -->
+             <div id="topBarFilters" class="flex flex-wrap gap-3 flex-1 min-w-0 items-end"></div>
+             
+             <!-- Right side: Page text & Custom Sorting Dropdown -->
+             <div class="flex flex-col items-center md:items-end shrink-0 gap-2 select-none w-full md:w-auto">
+                  <div class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest whitespace-nowrap w-full text-center md:text-right">
+                     Страница <span id="currentPageDisplay" class="text-primary">1</span>
+                  </div>
+                  <div class="relative w-full md:w-60" id="sortDropdownContainer" onclick="event.stopPropagation()">
+                      <button onclick="toggleCustomDropdown('sortDropdown')" id="sortDropdownBtn" class="w-full bg-white/[0.02] border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary font-label-caps text-[10px] tracking-widest outline-none focus:ring-0 shadow-md py-3.5 px-4 rounded-xl font-bold cursor-pointer flex items-center justify-between transition-all duration-300 select-none">
+                          <span id="sortDropdownLabel" class="truncate">СОРТИРОВКА: ПО УМОЛЧАНИЮ</span>
+                          <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
+                      </button>
+                      <div id="sortDropdown" class="custom-dropdown-menu absolute right-0 top-full mt-2 w-full min-w-[240px] rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
+                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">СОРТИРОВКА</div>
+                          <div class="grid grid-cols-1 gap-0.5 px-0.5">
+                              <div onclick="selectCustomSort('default')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span id="sort-opt-default" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-[#ca7093] border-[#ca7093]">✔</span>
+                                  <span class="text-on-surface/90 font-medium">ПО УМОЛЧАНИЮ</span>
+                              </div>
+                              <div onclick="selectCustomSort('price_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span id="sort-opt-price_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span class="text-on-surface/90 font-medium">СНАЧАЛА ДЕШЕВЛЕ</span>
+                              </div>
+                              <div onclick="selectCustomSort('price_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span id="sort-opt-price_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span class="text-on-surface/90 font-medium">СНАЧАЛА ДОРОЖЕ</span>
+                              </div>
+                              <div onclick="selectCustomSort('name_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span id="sort-opt-name_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (А-Я)</span>
+                              </div>
+                              <div onclick="selectCustomSort('name_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span id="sort-opt-name_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (Я-А)</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
              </div>
         </div>
     </div>
 
-    <div id="productGrid" class="flex flex-col gap-4"></div>
+    <!-- Table Header (Desktop Only) -->
+    <div class="hidden md:flex items-center px-4 py-2 border-b border-outline-variant/10 text-[9px] font-bold text-on-surface-variant uppercase tracking-widest font-label-caps gap-4 mb-2">
+        <div class="flex-1">Наименование</div>
+        <div class="w-24">Стандарт / Сталь</div>
+        <div class="w-24">Размеры</div>
+        <div class="w-28 text-right pr-2">Цена</div>
+        <div class="w-28 text-center">Количество</div>
+        <div class="w-12 text-center">Купить</div>
+    </div>
+
+    <div id="productGrid" class="flex flex-col gap-2"></div>
     <p id="noResults" class="hidden text-center text-on-surface-variant py-20 text-lg font-display-xl uppercase tracking-widest opacity-50">
         <span class="material-symbols-outlined text-6xl block mb-4">search_off</span>
         Товары не найдены
@@ -343,6 +692,9 @@ html.light .filter-subcategory:hover .filter-subcategory-count {
 </div>
 </div>
 </main>
+
+
+
 
 <footer id="globalFooter"></footer>
 
@@ -376,15 +728,31 @@ function toggleFilters() {
     }
 }
 
+function openParamsModal() {
+    document.body.classList.add('params-modal-active');
+    const overlay = document.getElementById('paramsModalOverlay');
+    if (overlay) overlay.classList.add('active');
+    window.lockScrollGlobal();
+}
+
+function closeParamsModal() {
+    document.body.classList.remove('params-modal-active');
+    const overlay = document.getElementById('paramsModalOverlay');
+    if (overlay) overlay.classList.remove('active');
+    window.unlockScrollGlobal();
+}
+
 let currentPage = 1;
 const itemsPerPage = 20;
 let currentSort = 'default';
 let activeFilters = {
     parentCategory: [],
     category: [],
-    vid: null,
-    length: null,
-    width: null
+    vid: [],
+    length: [],
+    width: [],
+    type: [],
+    l3: []
 };
 let searchQuery = '';
 let filterData = { parentCategories: [], categories: {}, totalCount: 0 };
@@ -395,6 +763,24 @@ async function loadFilters() {
     try {
         const res = await fetch('/api/filters');
         filterData = await res.json();
+        
+        // Resolve the actual parent category if the current parent category is "Популярные категории"
+        if (activeFilters.parentCategory.includes('Популярные категории') && activeFilters.category.length > 0) {
+            const activeCatName = activeFilters.category[0];
+            let realParentCat = '';
+            for (const [p, cats] of Object.entries(filterData.categories)) {
+                if (p === 'Популярные категории') continue;
+                if (cats.some(c => c.name === activeCatName)) {
+                    realParentCat = p;
+                    break;
+                }
+            }
+            if (realParentCat) {
+                activeFilters.parentCategory = [realParentCat];
+                openSections.clear();
+                openSections.add(realParentCat);
+            }
+        }
         
         if (activeFilters.category.length > 0 && activeFilters.parentCategory.length === 0) {
             activeFilters.category.forEach(catName => {
@@ -422,10 +808,27 @@ async function loadCategoryFilters(category) {
         const res = await fetch(`/api/category-filters?category=${encodeURIComponent(category)}`);
         categoryFiltersCache[category] = await res.json();
         renderFilters();
+        // Start auto-refresh if not already started
+        if (!window._autoRefreshStarted) {
+          setInterval(() => loadFilters(), 60000); // refresh every 60 seconds
+          window._autoRefreshStarted = true;
+        }
     } catch (e) { console.error(`Failed to load filters for ${category}`, e); }
 }
 
+function saveFilters() {
+    try {
+        localStorage.setItem('catalog_active_filters', JSON.stringify(activeFilters));
+        localStorage.setItem('catalog_search_query', searchQuery);
+        localStorage.setItem('catalog_current_page', currentPage);
+        localStorage.setItem('catalog_current_sort', currentSort);
+    } catch (e) {
+        console.error('Failed to save filters to localStorage', e);
+    }
+}
+
 async function fetchProducts() {
+    saveFilters();
     const grid = document.getElementById('productGrid');
     const noResults = document.getElementById('noResults');
     const paginationDiv = document.getElementById('pagination');
@@ -440,9 +843,11 @@ async function fetchProducts() {
     
     if (activeFilters.parentCategory.length > 0) params.append('parent_category', activeFilters.parentCategory.join(','));
     if (activeFilters.category.length > 0) params.append('category', activeFilters.category.join(','));
-    if (activeFilters.vid) params.append('vid', activeFilters.vid);
-    if (activeFilters.length) params.append('length', activeFilters.length);
-    if (activeFilters.width) params.append('width', activeFilters.width);
+    if (activeFilters.vid.length > 0) params.append('vid', activeFilters.vid.join(','));
+    if (activeFilters.length.length > 0) params.append('length', activeFilters.length.join(','));
+    if (activeFilters.width.length > 0) params.append('width', activeFilters.width.join(','));
+    if (activeFilters.type && activeFilters.type.length > 0) params.append('type', activeFilters.type.join(','));
+    if (activeFilters.l3 && activeFilters.l3.length > 0) params.append('l3', activeFilters.l3.join(','));
     if (searchQuery) params.append('search', searchQuery);
     if (currentSort !== 'default') params.append('sort', currentSort);
 
@@ -496,7 +901,7 @@ function updateBreadcrumbs() {
     let html = `
         <a class="hover:text-primary transition-colors no-underline" href="/">ГЛАВНАЯ</a>
         <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-        <span class="cursor-pointer hover:text-primary transition-colors" onclick="resetFilters()">КАТАЛОГ</span>
+        <a class="cursor-pointer hover:text-primary transition-colors" href="/catalog-select">КАТАЛОГ</a>
     `;
     
     if (activeFilters.parentCategory.length > 0) {
@@ -522,12 +927,14 @@ function renderFilters() {
     updateBreadcrumbs();
     const container = document.getElementById('categoryFilters');
 
-    let filtersHtml = filterData.parentCategories.map(p => {
+    // Exclude 'Популярные категории' from sidebar filter categories
+    let filtersHtml = filterData.parentCategories.filter(p => p !== 'Популярные категории').map(p => {
         const icons = {
-          'Черный металлопрокат': 'construction',
-          'Листовой металлопрокат': 'layers',
-          'Трубный металлопрокат': 'radio_button_unchecked',
-          'Кровля и фасад': 'roofing'
+          'Популярные категории': 'star',
+          'Чёрный металлопрокат': 'construction',
+          'Нержавеющая сталь': 'shield',
+          'Специальные стали': 'workspace_premium',
+          'Кровельные материалы': 'roofing'
         };
         const icon = icons[p] || 'inventory_2';
         const isExpanded = openSections.has(p);
@@ -548,60 +955,14 @@ function renderFilters() {
               <div class="pl-2 space-y-0.5">
                 ${categories.map(cat => {
                   const isActiveCat = activeFilters.category.includes(cat.name);
-                  let catHtml = `
-                    <div onclick="setFilter('category', '${cat.name}')" class="filter-subcategory ${isActiveCat ? 'is-active' : ''}">
-                      <span class="filter-subcategory-name">${cat.name}</span>
-                      <span class="filter-subcategory-count">${cat.count}</span>
+                  return `
+                    <div class="mb-1">
+                      <div onclick="setFilter('category', '${cat.name}')" class="filter-subcategory ${isActiveCat ? 'is-active' : ''}">
+                        <span class="filter-subcategory-name">${cat.name}</span>
+                        <span class="filter-subcategory-count">${cat.count}</span>
+                      </div>
                     </div>
                   `;
-
-                  if (isActiveCat && categoryFiltersCache[cat.name]) {
-                    const cf = categoryFiltersCache[cat.name];
-                    let subFilters = `<div class="nested-filter-container animate-fadeIn">`;                    
-                    const getUniqueFilters = (arr) => {
-                        const groups = {};
-                        arr.forEach(item => {
-                            if (!item) return;
-                            const str = item.toString();
-                            const normalized = str.toLowerCase().replace(/окрашенный|оцинкованный|полиэстер|профнастил|односторонний|двусторонний|металлочерепица|водосток/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').replace(/,/g, '.').trim();
-                            if (!normalized) return;
-                            if (!groups[normalized] || str.length > groups[normalized].length) groups[normalized] = str;
-                        });
-                        return Object.values(groups);
-                    };
-
-                    const rawSizes = [...new Set([...cf.vids, ...cf.widths])];
-                    const allSizes = getUniqueFilters(rawSizes).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-
-                    if (allSizes.length > 0) {
-                      subFilters += `<div>
-                        <h4 class="filter-size-header">РАЗМЕРЫ / ВИД</h4>
-                        <select onchange="setFilterSize(this.value, '${cat.name}')" class="w-full compact-select border-none outline-none focus:ring-0 shadow-sm text-on-surface py-2 px-3 rounded-md cursor-pointer transition-all">
-                          <option value="">Все размеры</option>
-                          ${allSizes.map(s => {
-                            const cleanLabel = s.toString().replace(/Швеллер|Балка|Арматура|Лист|Труба|Профнастил|сетка|окрашенный|оцинкованный|полиэстер|односторонний|двусторонний/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').trim();
-                            return `<option value="${s}" ${activeFilters.vid === s || activeFilters.width === s ? 'selected' : ''}>${cleanLabel || s}</option>`;
-                          }).join('')}
-                        </select>
-                      </div>`;
-                    }
-
-                    if (cf.lengths.length > 0 && p !== 'Кровля и фасад') {
-                      const uniqueLengths = getUniqueFilters(cf.lengths).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-                      subFilters += `<div class="mt-2">
-                        <h4 class="filter-size-header">ДЛИНА</h4>
-                        <select onchange="setFilter('length', this.value)" class="w-full compact-select border-none outline-none focus:ring-0 shadow-sm text-on-surface py-2 px-3 rounded-md cursor-pointer transition-all">
-                          <option value="">Любая длина</option>
-                          ${uniqueLengths.map(l => `<option value="${l}" ${activeFilters.length === l ? 'selected' : ''}>${l}</option>`).join('')}
-                        </select>
-                      </div>`;
-                    }
-                    
-                    subFilters += `</div>`;
-                    catHtml += subFilters;
-                  }
-                  
-                  return catHtml;
                 }).join('')}
               </div>
             </div>
@@ -610,11 +971,389 @@ function renderFilters() {
     }).join('');
 
     container.innerHTML = filtersHtml;
+
+    // Render top bar custom dropdowns with checkboxes and apply button
+    const topBarContainer = document.getElementById('topBarFilters');
+    if (topBarContainer) {
+        let topFiltersHtml = '';
+        const activeCat = activeFilters.category[0];
+        if (activeCat && categoryFiltersCache[activeCat]) {
+            const cf = categoryFiltersCache[activeCat];
+            
+            const getUniqueFilters = (arr) => {
+                const groups = {};
+                arr.forEach(item => {
+                    if (!item) return;
+                    const str = item.toString();
+                    const normalized = str.toLowerCase().replace(/окрашенный|оцинкованный|полиэстер|профнастил|односторонний|двусторонний|металлочерепица|водосток/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').replace(/,/g, '.').trim();
+                    if (!normalized) return;
+                    if (!groups[normalized] || str.length > groups[normalized].length) groups[normalized] = str;
+                });
+                return Object.values(groups);
+            };
+
+            // 1. Size Dropdown Rendering
+            const rawSizes = [...new Set([...cf.vids, ...cf.widths])];
+            const allSizes = getUniqueFilters(rawSizes).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+            if (allSizes.length > 0) {
+                const selectedSizesCount = activeFilters.vid.length + activeFilters.width.length;
+                const sizeLabel = selectedSizesCount > 0 ? `РАЗМЕРЫ: ВЫБРАНО (${selectedSizesCount})` : 'РАЗМЕРЫ / ВИД: ВСЕ';
+                const sizeDropdownWidth = allSizes.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
+                const sizeCols = allSizes.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
+                
+                topFiltersHtml += `
+                  <div class="relative w-full md:w-60" id="sizeDropdownContainer" onclick="event.stopPropagation()">
+                    <button onclick="toggleCustomDropdown('sizeDropdown')" class="w-full bg-surface-container border border-outline-variant/20 hover:border-primary outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer flex items-center justify-between transition-all select-none">
+                      <span class="truncate">${sizeLabel}</span>
+                      <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
+                    </button>
+                    <div id="sizeDropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${sizeDropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
+                      <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ РАЗМЕРЫ</div>
+                      <div class="grid ${sizeCols} gap-0.5 max-h-[220px] overflow-y-auto custom-scrollbar px-0.5">
+                        ${allSizes.map(s => {
+                          const cleanLabel = s.toString().replace(/Швеллер|Балка|Арматура|Лист|Труба|Профнастил|сетка|окрашенный|оцинкованный|полиэстер|односторонний|двусторонний/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').trim();
+                          const isActiveVid = activeFilters.vid.includes(s) || activeFilters.width.includes(s);
+                          return `
+                            <div onclick="toggleFilterParam('vid', '${s}', '${activeCat}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                              <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded text-white text-[8px] font-bold transition-all ${isActiveVid ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
+                                ${isActiveVid ? '✔' : ''}
+                              </span>
+                              <span class="text-on-surface/90 font-medium truncate">${cleanLabel || s}</span>
+                            </div>
+                          `;
+                        }).join('')}
+                      </div>
+                      <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedSizesCount > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
+                    </div>
+                  </div>
+                `;
+            }
+
+            // 2. Length Dropdown Rendering
+            let parentCategory = '';
+            for (const [p, cats] of Object.entries(filterData.categories)) {
+                if (cats.some(c => c.name === activeCat)) {
+                    parentCategory = p;
+                    break;
+                }
+            }
+
+            if (cf.l3 && cf.l3.length > 0) {
+                const uniqueL3 = getUniqueFilters(cf.l3).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+                if (uniqueL3.length > 0) {
+                    const selectedL3Count = activeFilters.l3.length;
+                    const l3Label = selectedL3Count > 0 ? `ПОДГРУППА: ВЫБРАНО (${selectedL3Count})` : 'ПОДГРУППА: ЛЮБАЯ';
+                    const l3DropdownWidth = uniqueL3.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
+                    const l3Cols = uniqueL3.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
+
+                    topFiltersHtml += `
+                      <div class="relative w-full md:w-60" id="l3DropdownContainer" onclick="event.stopPropagation()">
+                        <button onclick="toggleCustomDropdown('l3Dropdown')" class="w-full bg-surface-container border border-outline-variant/20 hover:border-primary outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer flex items-center justify-between transition-all select-none">
+                          <span class="truncate">${l3Label}</span>
+                          <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
+                        </button>
+                        <div id="l3Dropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${l3DropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
+                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ ПОДГРУППУ</div>
+                          <div class="grid ${l3Cols} gap-0.5 max-h-[220px] overflow-y-auto custom-scrollbar px-0.5">
+                            ${uniqueL3.map(v => {
+                              const isActiveL3 = activeFilters.l3.includes(v);
+                              return `
+                                <div onclick="toggleFilterParam('l3', '${v.replace(/'/g, "\\'")}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all ${isActiveL3 ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
+                                    ${isActiveL3 ? '✔' : ''}
+                                  </span>
+                                  <span class="text-on-surface/90 font-medium truncate">${v}</span>
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                          <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedL3Count > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
+                        </div>
+                      </div>
+                    `;
+                }
+            }
+
+            if (cf.lengths && cf.lengths.length > 0 && parentCategory !== 'Кровельные материалы' && parentCategory !== 'Кровля и фасад') {
+                const uniqueLengths = getUniqueFilters(cf.lengths).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+                if (uniqueLengths.length > 0) {
+                    const selectedLengthsCount = activeFilters.length.length;
+                    const lengthLabel = selectedLengthsCount > 0 ? `ДЛИНА: ВЫБРАНО (${selectedLengthsCount})` : 'ДЛИНА: ЛЮБАЯ';
+                    const lengthDropdownWidth = uniqueLengths.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
+                    const lengthCols = uniqueLengths.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
+
+                    topFiltersHtml += `
+                      <div class="relative w-full md:w-60" id="lengthDropdownContainer" onclick="event.stopPropagation()">
+                        <button onclick="toggleCustomDropdown('lengthDropdown')" class="w-full bg-surface-container border border-outline-variant/20 hover:border-primary outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer flex items-center justify-between transition-all select-none">
+                          <span class="truncate">${lengthLabel}</span>
+                          <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
+                        </button>
+                        <div id="lengthDropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${lengthDropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
+                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ ДЛИНУ</div>
+                          <div class="grid ${lengthCols} gap-0.5 max-h-[180px] overflow-y-auto custom-scrollbar px-0.5">
+                            ${uniqueLengths.map(l => {
+                              const isActiveLen = activeFilters.length.includes(l);
+                              return `
+                                <div onclick="toggleFilterParam('length', '${l}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all ${isActiveLen ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
+                                    ${isActiveLen ? '✔' : ''}
+                                  </span>
+                                  <span class="text-on-surface/90 font-medium truncate">${l}</span>
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                          <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedLengthsCount > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
+                        </div>
+                      </div>
+                    `;
+                }
+            }
+
+            // 3. Steel Type (Grade) Dropdown Rendering
+            if (cf.types && cf.types.length > 0) {
+                const uniqueTypes = getUniqueFilters(cf.types).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+                if (uniqueTypes.length > 0) {
+                    const selectedTypesCount = activeFilters.type.length;
+                    const typeLabel = selectedTypesCount > 0 ? `МАРКА СТАЛИ: ВЫБРАНО (${selectedTypesCount})` : 'МАРКА СТАЛИ: ВСЕ';
+                    const typeDropdownWidth = uniqueTypes.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
+                    const typeCols = uniqueTypes.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
+
+                    topFiltersHtml += `
+                      <div class="relative w-full md:w-60" id="typeDropdownContainer" onclick="event.stopPropagation()">
+                        <button onclick="toggleCustomDropdown('typeDropdown')" class="w-full bg-surface-container border border-outline-variant/20 hover:border-primary outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer flex items-center justify-between transition-all select-none">
+                          <span class="truncate">${typeLabel}</span>
+                          <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
+                        </button>
+                        <div id="typeDropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${typeDropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
+                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ МАРКУ СТАЛИ</div>
+                          <div class="grid ${typeCols} gap-0.5 max-h-[180px] overflow-y-auto custom-scrollbar px-0.5">
+                            ${uniqueTypes.map(t => {
+                              const isActiveType = activeFilters.type.includes(t);
+                              return `
+                                <div onclick="toggleFilterParam('type', '${t}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                  <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded text-white text-[8px] font-bold transition-all ${isActiveType ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
+                                    ${isActiveType ? '✔' : ''}
+                                  </span>
+                                  <span class="text-on-surface/90 font-medium truncate">${t}</span>
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                          <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedTypesCount > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
+                        </div>
+                      </div>
+                    `;
+                }
+            }
+
+            // Append top level Apply and Reset action buttons right next to the dropdowns
+            if (topFiltersHtml) {
+                topFiltersHtml += `
+                  <div class="flex gap-2 select-none mt-2 md:mt-0">
+                    <button onclick="applyFilters(true); closeAllCustomDropdowns();" class="py-3 px-5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 transition-all duration-300 rounded-xl uppercase font-bold border-none cursor-pointer active:scale-95 whitespace-nowrap shadow-md">
+                      ПРИМЕНИТЬ
+                    </button>
+                    <button onclick="resetParams(); closeAllCustomDropdowns();" class="py-3 px-5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-300 rounded-xl uppercase font-bold bg-white/[0.02] cursor-pointer active:scale-95 whitespace-nowrap">
+                      СБРОСИТЬ
+                    </button>
+                  </div>
+                `;
+            }
+        }
+        topBarContainer.innerHTML = topFiltersHtml;
+    }
+    
+    // Restore the open dropdown if one was active to prevent parameter checkboxes from closing dropdowns on re-rendering
+    if (openDropdownId) {
+        const el = document.getElementById(openDropdownId);
+        if (el) el.classList.remove('hidden');
+    }
+    
+    // Sync sorting dropdown choice circle/checkbox UI
+    updateSortDropdownUI();
     
     // Initialize custom selects for sorting and filters
     if (window.initCustomSelects) {
         setTimeout(() => window.initCustomSelects(), 10);
     }
+    
+    // Update mobile filter toggle buttons smoothly
+    updateMobileFilterButtons();
+}
+
+function updateMobileFilterButtons() {
+    const wrapper = document.getElementById('mobileFilterButtonsWrapper');
+    const catBtn = document.getElementById('categoriesToggleBtn');
+    const catLabel = document.getElementById('categoriesToggleBtnLabel');
+    const paramBtn = document.getElementById('filterToggleBtn');
+    if (!wrapper || !catBtn || !catLabel || !paramBtn) return;
+
+    const subcatSelected = activeFilters.category.length > 0;
+    
+    // Determine if there are active parameters for this category
+    let hasParams = false;
+    if (subcatSelected) {
+        const activeCat = activeFilters.category[0];
+        const cf = categoryFiltersCache[activeCat];
+        if (cf) {
+            const hasVids = cf.vids && cf.vids.length > 0;
+            const hasWidths = cf.widths && cf.widths.length > 0;
+            const hasLengths = cf.lengths && cf.lengths.length > 0;
+            const hasTypes = cf.types && cf.types.length > 0;
+            hasParams = hasVids || hasWidths || hasLengths || hasTypes;
+        }
+    }
+
+    if (subcatSelected && hasParams) {
+        // Both subcategory selected and parameters exist -> show parameters button, half width categories button
+        catLabel.textContent = 'КАТЕГОРИИ';
+        catBtn.classList.add('split-width');
+        paramBtn.classList.add('show-btn');
+        wrapper.classList.add('split-gap');
+    } else {
+        // No subcategory selected, or no parameters exist -> hide parameters button, full width categories button
+        catLabel.textContent = subcatSelected ? 'КАТЕГОРИИ' : 'ВЫБЕРИТЕ КАТЕГОРИЮ';
+        catBtn.classList.remove('split-width');
+        paramBtn.classList.remove('show-btn');
+        wrapper.classList.remove('split-gap');
+    }
+}
+
+let openDropdownId = null;
+
+function toggleCustomDropdown(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isOpen = !el.classList.contains('hidden');
+    closeAllCustomDropdowns();
+    if (!isOpen) {
+        el.classList.remove('hidden');
+        openDropdownId = id;
+    } else {
+        openDropdownId = null;
+    }
+}
+
+function closeAllCustomDropdowns() {
+    const dropdowns = ['sizeDropdown', 'lengthDropdown', 'sortDropdown', 'typeDropdown', 'l3Dropdown'];
+    dropdowns.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    openDropdownId = null;
+}
+
+// Global click outside listener for topbar custom parameter dropdowns & sorting dropdown
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#sizeDropdownContainer') && 
+        !e.target.closest('#lengthDropdownContainer') && 
+        !e.target.closest('#typeDropdownContainer') && 
+        !e.target.closest('#l3DropdownContainer') && 
+        !e.target.closest('#sortDropdownContainer')) {
+        closeAllCustomDropdowns();
+    }
+});
+
+function selectCustomSort(val) {
+    currentSort = val;
+    currentPage = 1;
+    updateSortDropdownUI();
+    closeAllCustomDropdowns();
+    fetchProducts();
+}
+
+function updateSortDropdownUI() {
+    const labels = {
+        'default': 'СОРТИРОВКА: ПО УМОЛЧАНИЮ',
+        'price_asc': 'СОРТИРОВКА: СНАЧАЛА ДЕШЕВЛЕ',
+        'price_desc': 'СОРТИРОВКА: СНАЧАЛА ДОРОЖЕ',
+        'name_asc': 'СОРТИРОВКА: ПО НАЗВАНИЮ (А-Я)',
+        'name_desc': 'СОРТИРОВКА: ПО НАЗВАНИЮ (Я-А)'
+    };
+    const labelEl = document.getElementById('sortDropdownLabel');
+    if (labelEl) {
+        labelEl.textContent = labels[currentSort] || labels['default'];
+    }
+    
+    // Update active circle inside custom list
+    const options = ['default', 'price_asc', 'price_desc', 'name_asc', 'name_desc'];
+    options.forEach(opt => {
+        const el = document.getElementById(`sort-opt-${opt}`);
+        if (el) {
+            if (currentSort === opt) {
+                el.className = 'w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-[#ca7093] border-[#ca7093]';
+                el.innerHTML = '✔';
+            } else {
+                el.className = 'w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30';
+                el.innerHTML = '';
+            }
+        }
+    });
+}
+
+function applyFilters(scrollToTop = false, closeSidebar = true) {
+    currentPage = 1;
+    fetchProducts();
+    if (scrollToTop) {
+        window.scrollToTopGlobal();
+    }
+    if (closeSidebar) {
+        const sidebar = document.getElementById('catalogSidebar');
+        if (sidebar && sidebar.classList.contains('translate-x-0') && window.innerWidth < 768) {
+            toggleFilters();
+        }
+    }
+    closeParamsModal();
+}
+
+function toggleFilterParam(key, value, catName) {
+    if (key === 'vid') {
+        let isVid = false;
+        let isWidth = false;
+        
+        if (catName && categoryFiltersCache[catName]) {
+            const cf = categoryFiltersCache[catName];
+            if (cf.vids && cf.vids.includes(value)) isVid = true;
+            if (cf.widths && cf.widths.includes(value)) isWidth = true;
+        } else {
+            isVid = true;
+        }
+        
+        if (isVid) {
+            const idx = activeFilters.vid.indexOf(value);
+            if (idx > -1) activeFilters.vid.splice(idx, 1);
+            else activeFilters.vid.push(value);
+        }
+        if (isWidth) {
+            const idx = activeFilters.width.indexOf(value);
+            if (idx > -1) activeFilters.width.splice(idx, 1);
+            else activeFilters.width.push(value);
+        }
+    } else if (key === 'length') {
+        const idx = activeFilters.length.indexOf(value);
+        if (idx > -1) {
+            activeFilters.length.splice(idx, 1);
+        } else {
+            activeFilters.length.push(value);
+        }
+    } else if (key === 'type') {
+        const idx = activeFilters.type.indexOf(value);
+        if (idx > -1) {
+            activeFilters.type.splice(idx, 1);
+        } else {
+            activeFilters.type.push(value);
+        }
+    } else if (key === 'l3') {
+        const idx = activeFilters.l3.indexOf(value);
+        if (idx > -1) {
+            activeFilters.l3.splice(idx, 1);
+        } else {
+            activeFilters.l3.push(value);
+        }
+    }
+    renderFilters(); // Instantly re-render checkboxes in UI
 }
 
 function toggleSection(section) {
@@ -630,59 +1369,85 @@ function toggleSection(section) {
             if (cIdx > -1) activeFilters.category.splice(cIdx, 1);
         });
     } else {
+        // Accordion behavior: close other sections
+        openSections.clear();
+        activeFilters.parentCategory = [];
+        
         activeFilters.parentCategory.push(section);
         openSections.add(section);
     }
+    
+    // Clear subcategory and parameters when changing parent category to avoid empty card listings
+    activeFilters.category = [];
+    activeFilters.vid = [];
+    activeFilters.length = [];
+    activeFilters.width = [];
+    activeFilters.type = [];
+    
     renderFilters();
-    applyFilters(false); // Don't scroll top if in drawer
-}
-
-function applyFilters(shouldScroll = true) {
-    currentPage = 1;
-    fetchProducts();
-    if (shouldScroll) window.scrollToTopGlobal();
+    applyFilters(false, false); // Don't scroll top if in drawer, don't close sidebar
 }
 
 function setFilterSize(value, catName) {
     if (!value) {
-        activeFilters.vid = null;
-        activeFilters.width = null;
+        activeFilters.vid = [];
+        activeFilters.width = [];
     } else {
         const cf = categoryFiltersCache[catName];
         if (cf) {
             const isVid = cf.vids.includes(value);
             const isWidth = cf.widths.includes(value);
-            activeFilters.vid = isVid ? value : null;
-            activeFilters.width = isWidth ? value : null;
+            activeFilters.vid = isVid ? [value] : [];
+            activeFilters.width = isWidth ? [value] : [];
         }
     }
     renderFilters();
-    applyFilters(false);
+    applyFilters(false, false); // Don't close sidebar
 }
 
 function setFilter(key, value) {
     if (key === 'category') {
         const idx = activeFilters.category.indexOf(value);
+        let shouldCloseSidebar = false;
         if (idx > -1) {
-            activeFilters.category.splice(idx, 1);
+            // Deselect subcategory
+            activeFilters.category = [];
         } else {
-            activeFilters.category.push(value);
+            // Select new subcategory and deselect others
+            activeFilters.category = [value];
             loadCategoryFilters(value);
+            shouldCloseSidebar = true; // Close sidebar only when selecting a subcategory
+            
+            // Resolve correct parent category if user selected under popular categories
+            let realParentCat = '';
+            for (const [p, cats] of Object.entries(filterData.categories)) {
+                if (p === 'Популярные категории') continue;
+                if (cats.some(c => c.name === value)) {
+                    realParentCat = p;
+                    break;
+                }
+            }
+            if (realParentCat) {
+                activeFilters.parentCategory = [realParentCat];
+                openSections.clear();
+                openSections.add(realParentCat);
+            }
         }
-        activeFilters.vid = null;
-        activeFilters.length = null;
-        activeFilters.width = null;
+        activeFilters.vid = [];
+        activeFilters.length = [];
+        activeFilters.width = [];
+        activeFilters.type = [];
         renderFilters();
-        applyFilters(false);
+        applyFilters(false, shouldCloseSidebar);
     } else {
-        activeFilters[key] = value || null;
+        activeFilters[key] = value ? [value] : [];
         renderFilters();
-        applyFilters(false);
+        applyFilters(false, false);
     }
 }
 
 function resetFilters() {
-  activeFilters = { parentCategory: [], category: [], vid: null, length: null, width: null };
+  activeFilters = { parentCategory: [], category: [], vid: [], length: [], width: [], type: [], l3: [] };
   searchQuery = '';
   document.getElementById('searchInput').value = '';
   currentSort = 'default';
@@ -702,16 +1467,25 @@ function resetFilters() {
   }
 }
 
+function resetParams() {
+  activeFilters.vid = [];
+  activeFilters.length = [];
+  activeFilters.width = [];
+  activeFilters.type = [];
+  currentPage = 1;
+  renderFilters();
+  applyFilters(true);
+  closeAllCustomDropdowns();
+}
+
 function renderProducts(products) {
   const grid = document.getElementById('productGrid');
-  grid.innerHTML = products.map((p, i) => `
-    <div class="card-enter border border-outline-variant/10 p-4 md:p-6 pink-glow bg-surface-container-lowest flex flex-col md:flex-row items-center gap-6 group transition-all duration-500 cursor-pointer no-underline text-inherit relative" style="animation-delay:${i * 20}ms">
-      <a href="/product?id=${p.id}" class="absolute inset-0 z-0"></a>
-      
-      <div class="flex-1 min-w-0 z-10 pointer-events-none">
-        <div class="flex items-center gap-3 mb-1">
-          <span class="bg-primary/10 text-primary text-[10px] font-label-caps px-2 py-0.5 border border-primary/20">${p.category.toUpperCase()}</span>
-          ${p.variantCount > 1 ? `<span class="bg-white/5 text-on-surface-variant text-[9px] font-label-caps px-2 py-0.5 border border-white/5">${p.variantCount} ВАРИАНТОВ</span>` : ''}
+  grid.innerHTML = products.map((p, i) => {
+    return `
+    <div class="group relative overflow-hidden border border-outline-variant/10 bg-surface-container-lowest hover:border-primary/20 hover:bg-white/[0.02] transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between p-5 gap-6 rounded-2xl cursor-pointer card-enter shadow-lg shadow-black/5" style="animation-delay:${i * 20}ms" onclick="window.location.href='/product?id=${p.id}'">
+      <div class="flex-1 min-w-0 pointer-events-none">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[9px] font-label-caps uppercase tracking-widest text-primary/80">${p.category}</span>
         </div>
         <h4 class="font-headline-md text-lg md:text-xl font-semibold text-on-surface group-hover:text-primary transition-colors truncate">${p.name}</h4>
         <div class="flex flex-wrap gap-4 mt-2">
@@ -727,36 +1501,37 @@ function renderProducts(products) {
         </div>
       </div>
 
-      <div class="w-full md:w-auto flex flex-row md:flex-col items-end justify-between md:justify-center gap-4 md:text-right z-10 pointer-events-none">
+      <div class="w-full md:w-auto flex flex-row md:flex-col items-end justify-between md:justify-center gap-4 md:text-right z-10 pointer-events-none ${(p.price_ton || 0) <= 0 ? 'hidden md:flex' : 'flex'}">
         <div class="whitespace-nowrap">
             <p class="font-label-caps text-[9px] text-on-surface-variant mb-0.5 uppercase tracking-widest">${p.price_ton ? 'ЦЕНА ЗА ТОННУ' : 'ЦЕНА'}</p>
-            <p class="text-primary text-xl md:text-2xl font-bold tracking-tight leading-none">${p.priceTon} ₽</p>
+            <p class="text-primary text-xl md:text-2xl font-bold tracking-tight leading-none">${p.price_ton > 0 ? p.priceTon + ' ₽' : 'По запросу'}</p>
         </div>
         <div class="md:border-t md:border-outline-variant/10 md:pt-2 whitespace-nowrap">
-            <p class="font-label-caps text-[9px] text-on-surface-variant mb-0.5 uppercase tracking-widest">${p.unitLabel}</p>
-            <p class="text-on-surface font-semibold text-sm leading-none">${p.priceUnit} ₽</p>
+            <p class="font-label-caps text-[9px] text-on-surface-variant mb-0.5 uppercase tracking-widest">${p.unitLabel || 'ЕД.'}</p>
+            <p class="text-on-surface font-semibold text-sm leading-none">${p.price_unit > 0 ? p.priceUnit + ' ₽' : 'По запросу'}</p>
         </div>
       </div>
 
-      <div class="w-full md:w-72 flex items-center gap-2 z-10">
+      <div class="w-full md:w-72 flex items-center gap-2 z-10" onclick="event.stopPropagation()">
         <div class="qty-selector-container flex-1 flex items-center bg-surface-container border border-outline-variant/10 overflow-hidden h-11">
             <input type="text" id="qty-${p.id}" value="1.00" inputmode="decimal" onblur="window.validateCatalogQtyInput(this, ${!!p.price_ton})" onchange="window.validateCatalogQtyInput(this, ${!!p.price_ton})" class="w-16 bg-transparent border-none text-left pl-3 font-bold text-on-surface outline-none text-sm h-full"/>
             <span class="text-[9px] font-label-caps text-on-surface-variant uppercase tracking-widest flex-1 opacity-60">${p.price_ton ? 'Т' : 'ЕД.'}</span>
             <div class="flex flex-col h-full w-10 border-l border-white/5 bg-white/5">
-                <button onclick="event.stopPropagation(); changeQty('${p.id}', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors border-b border-white/5 group">
+                <button onclick="changeQty('${p.id}', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors border-b border-white/5 group">
                     <span class="material-symbols-outlined text-primary text-[18px] group-hover:scale-125 transition-transform">expand_less</span>
                 </button>
-                <button onclick="event.stopPropagation(); changeQty('${p.id}', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors group">
+                <button onclick="changeQty('${p.id}', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors group">
                     <span class="material-symbols-outlined text-primary text-[18px] group-hover:scale-125 transition-transform">expand_more</span>
                 </button>
             </div>
         </div>
-        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="catalog-cart-btn w-12 h-11 bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow">
+        <button onclick="addToCart('${p.id}')" class="catalog-cart-btn w-12 h-11 bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow rounded-xl border border-primary cursor-pointer active:scale-95">
             <span class="material-symbols-outlined">shopping_cart</span>
         </button>
       </div>
     </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function renderPagination(nav) {
@@ -786,6 +1561,12 @@ function renderPagination(nav) {
         </button>
     `;
     div.innerHTML = html;
+}
+
+function applySort(val) {
+    currentSort = val;
+    currentPage = 1;
+    fetchProducts();
 }
 
 function changePage(p) {
@@ -819,6 +1600,33 @@ window.changeQty = function(id, delta) {
     val = Math.max(0, val + (delta * step));
     if (unitText === 'Т') val = Math.min(1000, val);
     input.value = val.toFixed(2);
+    
+    const mobInput = document.getElementById('qty-mob-' + id);
+    if (mobInput) mobInput.value = val.toFixed(2);
+};
+
+window.changeQtyMob = function(id, delta) {
+    const input = document.getElementById('qty-mob-' + id);
+    if (!input) return;
+    let val = parseFloat(input.value.replace(',', '.')) || 1;
+    const unitText = input.nextElementSibling.textContent;
+    const step = unitText === 'Т' ? 0.1 : 1;
+    
+    if (unitText === 'Т' && delta > 0 && val >= 1000) {
+        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+        return;
+    }
+    
+    val = Math.max(0, val + (delta * step));
+    if (unitText === 'Т') val = Math.min(1000, val);
+    input.value = val.toFixed(2);
+    
+    const deskInput = document.getElementById('qty-' + id);
+    if (deskInput) deskInput.value = val.toFixed(2);
+};
+
+window.addToCartMob = function(id) {
+    addToCart(id);
 };
 
 document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -829,31 +1637,145 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 
 async function init() {
     const urlParams = new URLSearchParams(window.location.search);
-    const pcatParam = urlParams.get('pcat');
-    if (pcatParam) {
-        const decoded = decodeURIComponent(pcatParam);
-        activeFilters.parentCategory = decoded.includes(',') ? decoded.split(',') : [decoded];
-        activeFilters.parentCategory.forEach(p => openSections.add(p));
+    
+    // Restore from localStorage first
+    try {
+        const savedFilters = localStorage.getItem('catalog_active_filters');
+        if (savedFilters) {
+            activeFilters = JSON.parse(savedFilters);
+            // Ensure all keys exist
+            if (!activeFilters.parentCategory) activeFilters.parentCategory = [];
+            if (!activeFilters.category) activeFilters.category = [];
+            if (!activeFilters.vid) activeFilters.vid = [];
+            if (!activeFilters.length) activeFilters.length = [];
+            if (!activeFilters.width) activeFilters.width = [];
+            if (!activeFilters.type) activeFilters.type = [];
+            if (!activeFilters.l3) activeFilters.l3 = [];
+            
+            // Re-fill openSections based on active filters
+            activeFilters.parentCategory.forEach(p => openSections.add(p));
+        }
+        
+        const savedSearch = localStorage.getItem('catalog_search_query');
+        if (savedSearch !== null) {
+            searchQuery = savedSearch;
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = searchQuery;
+        }
+        
+        const savedSort = localStorage.getItem('catalog_current_sort');
+        if (savedSort !== null) {
+            currentSort = savedSort;
+        }
+        
+        const savedPage = localStorage.getItem('catalog_current_page');
+        if (savedPage !== null) {
+            currentPage = parseInt(savedPage, 10) || 1;
+        }
+    } catch (e) {
+        console.error('Failed to restore filters from localStorage', e);
     }
     
+    // We load filters first so we can map old/alternative categories to the actual ones from the database!
+    await loadFilters();
+    
+    const pcatParam = urlParams.get('pcat');
     const catParam = urlParams.get('cat');
-    if (catParam) {
-        const decoded = decodeURIComponent(catParam);
-        activeFilters.category = decoded.includes(',') ? decoded.split(',') : [decoded];
-        for (const cat of activeFilters.category) await loadCategoryFilters(cat);
+    
+    const normalizeCyrillic = (str) => {
+        if (!str) return '';
+        return str.toLowerCase().replace(/ё/g, 'е').trim();
+    };
+    
+    if (pcatParam || catParam) {
+        let pcat = pcatParam ? decodeURIComponent(pcatParam) : '';
+        let cat = catParam ? decodeURIComponent(catParam) : '';
+        
+        const normPcat = normalizeCyrillic(pcat);
+        const normCat = normalizeCyrillic(cat);
+        
+        let resolvedPcat = '';
+        let resolvedCat = '';
+        
+        // Search in database categories
+        for (const [pKey, subList] of Object.entries(filterData.categories)) {
+            const normPKey = normalizeCyrillic(pKey);
+            
+            // Check if this subcategory matches
+            const foundCat = subList.find(c => normalizeCyrillic(c.name) === normCat || (normCat && normalizeCyrillic(c.name).includes(normCat)));
+            if (foundCat) {
+                resolvedCat = foundCat.name;
+                resolvedPcat = pKey;
+                break;
+            }
+            
+            // If parent matches and no specific subcategory is matched yet
+            if (normPcat && (normPKey.includes(normPcat) || normPcat.includes(normPKey))) {
+                resolvedPcat = pKey;
+            }
+            
+            // Synonym checks
+            if (normPcat.includes('труб') && normPKey.includes('черн') && normCat.includes('труб')) {
+                resolvedPcat = pKey;
+            }
+            if (normPcat.includes('лист') && normPKey.includes('черн') && normCat.includes('лист')) {
+                resolvedPcat = pKey;
+            }
+            if ((normPcat.includes('кровл') || normPcat.includes('фасад')) && normPKey.includes('кровельн')) {
+                resolvedPcat = pKey;
+            }
+        }
+        
+        // Special mapping for common parents if category was given but parent wasn't resolved yet
+        if (!resolvedPcat && cat) {
+            for (const [pKey, subList] of Object.entries(filterData.categories)) {
+                if (subList.some(c => normalizeCyrillic(c.name) === normCat)) {
+                    resolvedPcat = pKey;
+                    resolvedCat = subList.find(c => normalizeCyrillic(c.name) === normCat).name;
+                    break;
+                }
+            }
+        }
+        
+        // If the URL category is different from what was currently selected, we reset parameters!
+        if (resolvedCat && (!activeFilters.category || !activeFilters.category.includes(resolvedCat))) {
+            activeFilters.vid = [];
+            activeFilters.width = [];
+            activeFilters.length = [];
+            activeFilters.type = [];
+            currentPage = 1;
+        }
+        
+        if (resolvedPcat) {
+            activeFilters.parentCategory = [resolvedPcat];
+            openSections.add(resolvedPcat);
+        }
+        
+        if (resolvedCat) {
+            activeFilters.category = [resolvedCat];
+            await loadCategoryFilters(resolvedCat);
+        } else if (cat) {
+            activeFilters.category = [cat];
+            await loadCategoryFilters(cat);
+        }
     }
     
     const searchParam = urlParams.get('search');
     if (searchParam) {
         searchQuery = decodeURIComponent(searchParam).toLowerCase();
-        document.getElementById('searchInput').value = searchQuery;
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = searchQuery;
     }
 
-    await loadFilters();
     fetchProducts();
 }
 
 init();
+
+/* ---------- Catalog Overlay Functions ---------- */
+function openCatalogOverlay() { window.location.href = '/catalog-select'; }
+
+
 
 function updateCartBadge() {
   if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();

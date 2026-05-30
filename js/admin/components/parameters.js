@@ -4,50 +4,69 @@
  */
 
 import { renderBulkToolbar, showConfirmPromptModal } from './bulk-toolbar.js';
+import { showExportFormatModal } from '../export-engine.js';
 
 export async function renderParametersView(container, state) {
     container.innerHTML = `
         <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h3 class="text-2xl font-bold font-['Space Grotesk'] tracking-tight text-[#e7e2dd]">Управление каталогом</h3>
-                    <p class="text-sm text-[#d7c1c7] mt-1">Полноценная CRM для редактирования базы данных</p>
+                    <h3 class="text-lg md:text-xl font-bold font-['Space Grotesk'] tracking-tight text-on-surface">Управление каталогом</h3>
+                    <p class="text-xs text-on-surface-variant mt-0.5">Справочник параметров товаров</p>
                 </div>
-                <div class="flex gap-2">
-                    <button id="refresh-params-btn" class="flex items-center justify-center gap-2 px-4 py-4 bg-white/5 text-[#ffb0cc] rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-[#ffb0cc]/10 transition-all">
+                <div class="flex flex-wrap gap-2 items-center">
+                    <button id="refresh-params-btn" class="flex items-center justify-center gap-2 px-4 py-3 md:py-3.5 bg-surface-container-low text-primary border border-outline/10 rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-primary/10 transition-all">
                         <span class="material-symbols-outlined text-sm">refresh</span>
                     </button>
-                    <button id="import-params-btn" class="flex items-center justify-center gap-2 px-4 py-4 bg-[#151311] border border-white/10 text-white rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-white/5 transition-all">
-                        <span class="material-symbols-outlined text-base">upload_file</span>
-                        Из эксель
-                    </button>
-                    <button id="export-params-btn" class="flex items-center justify-center gap-2 px-4 py-4 bg-[#151311] border border-white/10 text-white rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-white/5 transition-all">
+                    <button id="export-params-btn" class="flex items-center justify-center gap-2 px-4 py-3 md:py-3.5 bg-surface-container-low border border-outline/10 text-on-surface rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-surface-container-high transition-all">
                         <span class="material-symbols-outlined text-base">download</span>
-                        В эксель
+                        <span class="hidden sm:inline">В эксель</span>
                     </button>
-                    <button id="add-param-btn" class="flex items-center justify-center gap-2 px-6 py-4 bg-[#ffb0cc] text-[#0f0e0c] rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-white transition-all shadow-xl shadow-[#ffb0cc]/10">
+                    <button id="import-params-btn" class="flex items-center justify-center gap-2 px-4 py-3 md:py-3.5 bg-surface-container-low border border-outline/10 text-on-surface rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-surface-container-high transition-all">
+                        <span class="material-symbols-outlined text-base">upload_file</span>
+                        <span class="hidden sm:inline">Из эксель</span>
+                    </button>
+                    <button id="add-param-btn" class="flex items-center justify-center w-11 h-11 md:w-12 md:h-12 bg-primary text-on-primary rounded-2xl font-bold hover:brightness-110 transition-all shadow-xl shadow-primary/10 shrink-0" title="Добавить параметр">
                         <span class="material-symbols-outlined text-base">add</span>
-                        Добавить параметр
                     </button>
                 </div>
             </div>
 
-            <!-- Tabs -->
-            <div class="flex gap-1 bg-[#151311] p-1 rounded-2xl border border-white/5 w-fit">
-                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-[#d7c1c7] hover:text-[#ffb0cc]" data-tab="products">Товары</button>
-                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-[#d7c1c7] hover:text-[#ffb0cc]" data-tab="l1">Категории L1</button>
-                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-[#d7c1c7] hover:text-[#ffb0cc]" data-tab="l2">Категории L2</button>
-                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-[#ffb0cc] bg-white/5" data-tab="parameters">Параметры</button>
+            <!-- Tabs: Desktop row | Mobile arrow-navigator -->
+            <!-- Desktop tabs -->
+            <div class="hidden md:flex gap-1 bg-surface-container-low p-1 rounded-2xl border border-outline/10 w-fit">
+                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-on-surface-variant hover:text-primary" data-tab="products">Товары</button>
+                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-on-surface-variant hover:text-primary" data-tab="l1">Категории L1</button>
+                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-on-surface-variant hover:text-primary" data-tab="l2">Категории L2</button>
+                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-primary bg-primary/10" data-tab="parameters">Параметры</button>
+            </div>
+            <!-- Mobile tab navigator (arrow-switcher) -->
+            <div class="flex md:hidden items-center justify-between gap-3 bg-surface-container-low p-3 rounded-2xl border border-outline/10">
+                <button id="params-tab-prev-btn" class="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-container border border-outline/10 text-on-surface-variant hover:text-primary hover:border-primary/30 transition-all active:scale-90">
+                    <span class="material-symbols-outlined text-xl">chevron_left</span>
+                </button>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                    <span class="font-bold uppercase text-[11px] tracking-widest text-primary">Параметры</span>
+                    <div class="flex gap-1 mt-1">
+                        <span class="w-1.5 h-1.5 rounded-full transition-all bg-outline/30"></span>
+                        <span class="w-1.5 h-1.5 rounded-full transition-all bg-outline/30"></span>
+                        <span class="w-1.5 h-1.5 rounded-full transition-all bg-outline/30"></span>
+                        <span class="w-1.5 h-1.5 rounded-full transition-all bg-primary scale-125"></span>
+                    </div>
+                </div>
+                <button id="params-tab-next-btn" class="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-container border border-outline/10 text-on-surface-variant hover:text-primary hover:border-primary/30 transition-all active:scale-90">
+                    <span class="material-symbols-outlined text-xl">chevron_right</span>
+                </button>
             </div>
 
             <!-- Bulk Toolbar Container -->
             <div id="params-bulk-toolbar-container"></div>
 
             <!-- Search -->
-            <div class="liquid-glass p-6 rounded-[2.5rem] border-outline/5 shadow-2xl">
+            <div class="liquid-glass p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border-outline/5 shadow-2xl">
                 <div class="relative group">
-                    <span class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-primary opacity-50 text-xl group-focus-within:opacity-100 transition-opacity">search</span>
-                    <input type="text" id="params-search" placeholder="Поиск по названию параметра или описанию..." autocomplete="off" class="w-full bg-surface-container-low/30 border border-outline/10 rounded-2xl pl-14 pr-6 py-4 text-sm font-medium focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/30">
+                    <span class="material-symbols-outlined absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-primary opacity-50 text-lg md:text-xl group-focus-within:opacity-100 transition-opacity">search</span>
+                    <input type="text" id="params-search" placeholder="Поиск по названию параметра..." autocomplete="off" class="w-full bg-surface-container-low border border-outline/10 rounded-xl md:rounded-2xl pl-12 md:pl-14 pr-4 md:pr-6 py-3 md:py-4 text-sm font-medium focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/30">
                 </div>
             </div>
 
@@ -310,7 +329,8 @@ export async function renderParametersView(container, state) {
 
         tableContainer.innerHTML = `
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <!-- Desktop table -->
+                <table class="w-full hidden md:table">
                     <thead>
                         <tr class="border-b border-outline/10">
                             <th class="py-5 px-6 w-10 header-select-cell cursor-pointer">
@@ -319,19 +339,19 @@ export async function renderParametersView(container, state) {
                             <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Название параметра</th>
                             <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Ед. изм. / Тип</th>
                             <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Категории</th>
-                            <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Описание</th>
-                            <th class="text-right px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Действия</th>
+                            <th class="w-24"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredParams.map((p, i) => `
-                            <tr class="border-b border-outline/5 hover:bg-primary/3 transition-colors group cursor-pointer param-row" data-id="${p.id}">
+                        ${filteredParams.map((p) => `
+                            <tr class="border-b border-outline/5 hover:bg-primary/[0.03] transition-colors group cursor-pointer param-row" data-id="${p.id}">
                                 <td class="px-6 py-4 param-select-cell" data-id="${p.id}">
                                     <input type="checkbox" class="param-checkbox w-6 h-6 rounded border-outline/30 bg-transparent text-primary cursor-pointer" data-id="${p.id}">
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4 param-name-cell cursor-pointer" data-id="${p.id}">
                                     <div class="font-bold text-sm text-on-surface group-hover:text-primary transition-colors flex items-center gap-2">
-                                        ${escapeHtml(p.name)}
+                                        <span class="param-name-text">${escapeHtml(p.name)}</span>
+                                        <span class="material-symbols-outlined param-edit-icon text-[14px] opacity-0 group-hover:opacity-40 transition-opacity">edit</span>
                                         ${p.required ? '<span class="text-red-400 text-[10px] font-bold" title="Обязательный">*</span>' : ''}
                                     </div>
                                 </td>
@@ -353,7 +373,6 @@ export async function renderParametersView(container, state) {
                                         ).join('') || '<span class="text-on-surface-variant opacity-30 text-xs">—</span>'}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-xs text-on-surface-variant opacity-60 max-w-[200px] truncate">${escapeHtml(p.description || '—')}</td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button class="edit-param-btn p-2 rounded-xl hover:bg-primary/10 hover:text-primary text-on-surface-variant transition-all" data-id="${p.id}" title="Редактировать">
@@ -368,19 +387,102 @@ export async function renderParametersView(container, state) {
                         `).join('')}
                     </tbody>
                 </table>
+                <!-- Mobile cards -->
+                <div class="md:hidden flex flex-col">
+                    <div class="flex items-center gap-3 px-4 py-3 border-b border-outline/10">
+                        <input type="checkbox" id="select-all-params-mobile" class="param-select-all-mobile w-5 h-5 rounded border-outline/30 bg-transparent text-primary cursor-pointer">
+                        <span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold font-label-caps">Выбрать все</span>
+                    </div>
+                    <div class="flex flex-col divide-y divide-outline/5">
+                    ${filteredParams.map((p) => `
+                        <div class="param-row p-4 hover:bg-primary/[0.03] transition-colors cursor-pointer" data-id="${p.id}">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-start gap-3 flex-1 min-w-0">
+                                    <input type="checkbox" class="param-checkbox w-5 h-5 rounded border-outline/30 bg-transparent text-primary cursor-pointer mt-0.5 shrink-0" data-id="${p.id}">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="param-name-cell font-bold text-sm text-on-surface flex items-center gap-1.5 flex-wrap" data-id="${p.id}">
+                                            <span class="param-name-text">${escapeHtml(p.name)}</span>
+                                            ${p.required ? '<span class="text-red-400 text-[10px] font-bold">*</span>' : ''}
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                            <div class="quick-unit-select cursor-pointer" data-id="${p.id}">
+                                                ${p.unit ? 
+                                                    `<span class="px-2 py-0.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold font-label-caps uppercase tracking-widest inline-block select-none">${escapeHtml(p.unit)}</span>` : 
+                                                    `<span class="px-2 py-0.5 rounded-lg bg-surface-variant/30 border border-outline/10 text-on-surface-variant/40 text-[10px] font-bold font-label-caps uppercase tracking-widest inline-block select-none">—</span>`
+                                                }
+                                            </div>
+                                            <span class="text-[9px] text-on-surface-variant opacity-60 uppercase font-bold tracking-widest">${p.type === 'number' ? 'Число' : (p.type === 'select' ? 'Список' : (p.type === 'boolean' ? 'Лог.' : 'Строка'))}</span>
+                                        </div>
+                                        <div class="quick-category-select flex flex-wrap gap-1 mt-2 cursor-pointer" data-id="${p.id}">
+                                            ${(p.category_hint || '').split(',').filter(s => s.trim()).map(cat =>
+                                                `<span class="px-2 py-0.5 rounded-lg bg-surface-variant text-on-surface-variant text-[9px] font-label-caps uppercase tracking-widest">${escapeHtml(cat.trim())}</span>`
+                                            ).join('') || ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <button class="edit-param-btn p-2.5 rounded-xl hover:bg-primary/10 hover:text-primary text-on-surface-variant transition-all min-w-[40px] min-h-[40px] flex items-center justify-center" data-id="${p.id}" title="Редактировать">
+                                        <span class="material-symbols-outlined text-base">edit</span>
+                                    </button>
+                                    <button class="delete-param-btn p-2.5 rounded-xl hover:bg-error/10 hover:text-error text-on-surface-variant transition-all min-w-[40px] min-h-[40px] flex items-center justify-center" data-id="${p.id}" title="Удалить">
+                                        <span class="material-symbols-outlined text-base">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                    </div>
+                </div>
             </div>
             <div class="px-6 py-4 border-t border-outline/5 text-[10px] text-on-surface-variant opacity-50 font-label-caps uppercase tracking-widest">
                 Показано ${filteredParams.length} из ${allParams.length} параметров
             </div>
         `;
 
+        let lastChecked = null;
+        const handleSelectClick = (clickedId, event) => {
+            const clickedCb = event.target?.closest?.('.param-checkbox')
+                || tableContainer.querySelector(`.param-checkbox[data-id="${clickedId}"]`);
+            if (!clickedCb) return;
+
+            const isRangeSelect = event.shiftKey || event.ctrlKey;
+            const targetState = clickedCb.checked;
+
+            if (isRangeSelect && lastChecked) {
+                // Scope range to the same layout (desktop table vs mobile cards)
+                const scope = clickedCb.closest('table') || clickedCb.closest('.md\\:hidden') || tableContainer;
+                const cbArray = Array.from(scope.querySelectorAll('.param-checkbox'));
+                const start = cbArray.findIndex(c => String(c.dataset.id) === String(clickedId));
+                const end = cbArray.findIndex(c => String(c.dataset.id) === String(lastChecked.dataset.id));
+
+                if (start !== -1 && end !== -1) {
+                    const min = Math.min(start, end);
+                    const max = Math.max(start, end);
+
+                    for (let i = min; i <= max; i++) {
+                        const targetCb = cbArray[i];
+                        if (targetCb.checked !== targetState) {
+                            targetCb.checked = targetState;
+                            targetCb.dispatchEvent(new Event('change'));
+                        }
+                    }
+                }
+            }
+            
+            lastChecked = clickedCb;
+        };
+
         // Bind row actions
         tableContainer.querySelectorAll('.param-row').forEach(row => {
             row.onclick = (e) => {
-                if (e.target.closest('.edit-param-btn') || e.target.closest('.delete-param-btn') || e.target.closest('.quick-unit-select') || e.target.closest('.quick-category-select')) return;
-                const id = parseInt(row.dataset.id);
-                const param = allParams.find(p => p.id === id);
-                if (param) openParamModal(param);
+                if (e.target.closest('.edit-param-btn') || e.target.closest('.delete-param-btn') || e.target.closest('.quick-unit-select') || e.target.closest('.quick-category-select') || e.target.closest('.param-name-cell') || e.target.closest('input[type="checkbox"]')) return;
+                
+                const cb = row.querySelector('.param-checkbox');
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    handleSelectClick(cb.dataset.id, e);
+                    cb.dispatchEvent(new Event('change'));
+                }
             };
         });
 
@@ -395,24 +497,71 @@ export async function renderParametersView(container, state) {
                 
                 const rect = el.getBoundingClientRect();
                 const dropdown = document.createElement('div');
-                dropdown.className = 'inline-unit-dropdown custom-dropdown-menu fixed rounded-2xl p-2 z-[10000] min-w-[140px] shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200';
+                dropdown.className = 'inline-unit-dropdown custom-dropdown-menu fixed rounded-2xl p-2 z-[10000] min-w-[140px] flex flex-col shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200';
                 dropdown.style.left = `${rect.left}px`;
                 dropdown.style.top = `${rect.bottom + 4}px`;
 
                 const units = ['мм', 'см', 'м', 'кг', 'т', 'шт', 'м²', 'пог. м', 'Без ед. изм.'];
-                dropdown.innerHTML = units.map(u => {
-                    const isCurrent = (param.unit || 'Без ед. изм.') === u || (!param.unit && u === 'Без ед. изм.');
-                    return `
-                        <button class="custom-dropdown-item w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest ${isCurrent ? 'text-primary' : 'text-on-surface-variant'} transition-all flex items-center justify-between" data-unit="${u === 'Без ед. изм.' ? '' : u}">
-                            <span>${u}</span>
-                            ${isCurrent ? '<span class="material-symbols-outlined text-[14px]">check</span>' : ''}
+                dropdown.innerHTML = `
+                    <div class="flex items-center justify-between px-3 py-1.5 border-b border-outline/10 mb-1 select-none shrink-0">
+                        <span class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-wider font-label-caps">Ед. изм.</span>
+                        <button class="dropdown-close-btn w-6 h-6 rounded-full hover:bg-surface-variant flex items-center justify-center transition-colors text-on-surface-variant">
+                            <span class="material-symbols-outlined text-sm">close</span>
                         </button>
-                    `;
-                }).join('');
+                    </div>
+                    <div class="space-y-0.5 max-h-[220px] overflow-y-auto custom-scrollbar">
+                        ${units.map(u => {
+                            const isCurrent = (param.unit || 'Без ед. изм.') === u || (!param.unit && u === 'Без ед. изм.');
+                            return `
+                                <button class="custom-dropdown-item w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest ${isCurrent ? 'text-primary' : 'text-on-surface-variant'} transition-all flex items-center justify-between" data-unit="${u === 'Без ед. изм.' ? '' : u}">
+                                    <span>${u}</span>
+                                    ${isCurrent ? '<span class="material-symbols-outlined text-[14px]">check</span>' : ''}
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
 
                 document.body.appendChild(dropdown);
 
-                dropdown.querySelectorAll('button').forEach(btn => {
+                const cleanup = () => {
+                    dropdown.remove();
+                    document.removeEventListener('click', closeDropdown, true);
+                    window.removeEventListener('scroll', handleScroll, true);
+                    window.removeEventListener('resize', handleResize);
+                    document.removeEventListener('keydown', handleKeyDown, true);
+                };
+
+                const closeDropdown = (ev) => {
+                    if (dropdown.contains(ev.target) || ev.target === el || el.contains(ev.target)) {
+                        return;
+                    }
+                    cleanup();
+                };
+
+                const handleScroll = (ev) => {
+                    if (dropdown.contains(ev.target)) {
+                        return;
+                    }
+                    cleanup();
+                };
+
+                const handleResize = () => {
+                    cleanup();
+                };
+
+                const handleKeyDown = (ev) => {
+                    if (ev.key === 'Escape') {
+                        cleanup();
+                    }
+                };
+
+                dropdown.querySelector('.dropdown-close-btn').onclick = (ev) => {
+                    ev.stopPropagation();
+                    cleanup();
+                };
+
+                dropdown.querySelectorAll('.custom-dropdown-item').forEach(btn => {
                     btn.onclick = async (ev) => {
                         ev.stopPropagation();
                         const newUnit = btn.dataset.unit;
@@ -427,7 +576,7 @@ export async function renderParametersView(container, state) {
                         try {
                             await apiFetch(`/api/admin/parameters/${param.id}`, { method: 'PUT', body: JSON.stringify(payload) });
                             window.showToast?.(`Единица измерения изменена на ${newUnit || 'пусто'}`, 'success', 'Параметры');
-                            dropdown.remove();
+                            cleanup();
                             await loadParams();
                         } catch (err) {
                             alert('Ошибка: ' + err.message);
@@ -435,13 +584,13 @@ export async function renderParametersView(container, state) {
                     };
                 });
 
-                const closeDropdown = (ev) => {
-                    if (!dropdown.contains(ev.target) && ev.target !== el && !el.contains(ev.target)) {
-                        dropdown.remove();
-                        document.removeEventListener('click', closeDropdown);
-                    }
-                };
-                setTimeout(() => document.addEventListener('click', closeDropdown), 50);
+                // Attach event listeners using capture phase to catch clicks even if propagation is stopped
+                setTimeout(() => {
+                    document.addEventListener('click', closeDropdown, true);
+                    window.addEventListener('scroll', handleScroll, true);
+                    window.addEventListener('resize', handleResize);
+                    document.addEventListener('keydown', handleKeyDown, true);
+                }, 50);
             };
         });
 
@@ -483,6 +632,8 @@ export async function renderParametersView(container, state) {
         
         // Bind checkboxes
         const selectAll = tableContainer.querySelector('#select-all-params');
+        const selectAllMobile = tableContainer.querySelector('#select-all-params-mobile');
+        const selectAllEls = [selectAll, selectAllMobile].filter(Boolean);
         const checkboxes = tableContainer.querySelectorAll('.param-checkbox');
         
         tableContainer.querySelectorAll('.param-select-cell, .header-select-cell').forEach(cell => {
@@ -491,27 +642,173 @@ export async function renderParametersView(container, state) {
                 const cb = cell.querySelector('input[type="checkbox"]');
                 if (cb && e.target !== cb) {
                     cb.checked = !cb.checked;
+                    if (cb.classList.contains('param-checkbox')) {
+                        handleSelectClick(cb.dataset.id, e);
+                    }
                     cb.dispatchEvent(new Event('change'));
                 }
             });
         });
 
-        selectAll?.addEventListener('change', () => {
-            checkboxes.forEach(cb => cb.checked = selectAll.checked);
-            selectedParamIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => parseInt(cb.dataset.id));
+        const updateSelectionState = () => {
+            checkboxes.forEach(cb => {
+                const id = parseInt(cb.dataset.id);
+                if (cb.checked) {
+                    if (!selectedParamIds.includes(id)) selectedParamIds.push(id);
+                } else {
+                    selectedParamIds = selectedParamIds.filter(val => val !== id);
+                }
+            });
+
+            if (selectAllEls.length) {
+                const uniqueIds = new Set(Array.from(checkboxes).map(cb => cb.dataset.id));
+                const allChecked = uniqueIds.size > 0 && selectedParamIds.length === uniqueIds.size;
+                const someChecked = selectedParamIds.length > 0;
+                selectAllEls.forEach(sa => {
+                    sa.checked = allChecked;
+                    sa.indeterminate = someChecked && !allChecked;
+                });
+            }
+
+            tableContainer.querySelectorAll('.param-row').forEach(row => {
+                const id = parseInt(row.dataset.id);
+                if (selectedParamIds.includes(id)) {
+                    row.classList.add('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                    row.classList.remove('hover:bg-primary/3');
+                } else {
+                    row.classList.remove('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                    row.classList.add('hover:bg-primary/3');
+                }
+            });
+
             updateToolbar();
+        };
+
+        selectAllEls.forEach(sa => {
+            sa.addEventListener('change', () => {
+                checkboxes.forEach(cb => cb.checked = sa.checked);
+                updateSelectionState();
+            });
         });
 
         checkboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                selectedParamIds = Array.from(checkboxes).filter(c => c.checked).map(c => parseInt(c.dataset.id));
-                if (selectAll) {
-                    const allChecked = Array.from(checkboxes).every(c => c.checked);
-                    selectAll.checked = allChecked;
-                    selectAll.indeterminate = selectedParamIds.length > 0 && !allChecked;
-                }
-                updateToolbar();
+            cb.addEventListener('click', (e) => {
+                handleSelectClick(cb.dataset.id, e);
             });
+            cb.addEventListener('change', () => {
+                // Sync duplicate checkboxes (desktop table + mobile card share same data-id)
+                const id = cb.dataset.id;
+                tableContainer.querySelectorAll(`.param-checkbox[data-id="${id}"]`).forEach(c => {
+                    if (c !== cb) c.checked = cb.checked;
+                });
+                updateSelectionState();
+            });
+        });
+
+        checkboxes.forEach(cb => {
+            const id = parseInt(cb.dataset.id);
+            cb.checked = selectedParamIds.includes(id);
+        });
+
+        if (selectAllEls.length) {
+            const uniqueIds = new Set(Array.from(checkboxes).map(cb => cb.dataset.id));
+            const checkedUnique = new Set(Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.dataset.id));
+            const allChecked = uniqueIds.size > 0 && checkedUnique.size === uniqueIds.size;
+            selectAllEls.forEach(sa => {
+                sa.checked = allChecked;
+                sa.indeterminate = checkedUnique.size > 0 && !allChecked;
+            });
+        }
+
+        tableContainer.querySelectorAll('.param-row').forEach(row => {
+            const id = parseInt(row.dataset.id);
+            if (selectedParamIds.includes(id)) {
+                row.classList.add('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                row.classList.remove('hover:bg-primary/3');
+            } else {
+                row.classList.remove('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                row.classList.add('hover:bg-primary/3');
+            }
+        });
+
+        // Inline Renaming binding
+        tableContainer.querySelectorAll('.param-name-cell').forEach(cell => {
+            cell.onclick = (e) => {
+                e.stopPropagation();
+
+                // Only start edit if clicked on the text or the edit icon
+                if (!e.target.closest('.param-name-text') && !e.target.closest('.param-edit-icon')) {
+                    // Clicked on empty space of the cell -> toggle row checkbox/highlight instead!
+                    const row = cell.closest('.param-row');
+                    if (row) {
+                        const cb = row.querySelector('.param-checkbox');
+                        if (cb) {
+                            cb.checked = !cb.checked;
+                            cb.dispatchEvent(new Event('change'));
+                        }
+                    }
+                    return;
+                }
+
+                if (cell.querySelector('input')) return; // already editing
+
+                const id = parseInt(cell.dataset.id);
+                const param = allParams.find(p => p.id === id);
+                if (!param) return;
+
+                const oldName = param.name;
+                const spanText = cell.querySelector('.param-name-text');
+                const editIcon = cell.querySelector('.material-symbols-outlined');
+                if (editIcon) editIcon.style.display = 'none';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'bg-surface-container-lowest border border-primary/50 text-sm px-2 py-1 rounded-xl outline-none text-on-surface font-bold w-full animate-in fade-in zoom-in-95 duration-150';
+                input.value = oldName;
+
+                spanText.innerHTML = '';
+                spanText.appendChild(input);
+                input.focus();
+                input.select();
+
+                const finishEdit = async (isSave) => {
+                    if (input.parentNode === null) return;
+                    const newName = input.value.trim();
+
+                    // Restore layout first
+                    spanText.innerHTML = escapeHtml(oldName);
+                    if (editIcon) editIcon.style.display = '';
+
+                    if (!isSave || !newName || newName === oldName) return;
+
+                    const payload = {
+                        name: newName,
+                        unit: param.unit,
+                        category_hint: param.category_hint,
+                        description: param.description,
+                        sort_order: param.sort_order
+                    };
+
+                    try {
+                        await apiFetch(`/api/admin/parameters/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+                        window.showToast?.(`Параметр переименован в «${newName}»`, 'success', 'Параметры');
+                        await loadParams();
+                    } catch (err) {
+                        alert('Ошибка при переименовании: ' + err.message);
+                    }
+                };
+
+                input.onblur = () => finishEdit(true);
+                input.onkeydown = (ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        finishEdit(true);
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        finishEdit(false);
+                    }
+                };
+            };
         });
     };
 
@@ -528,6 +825,12 @@ export async function renderParametersView(container, state) {
             },
             onUpdateUnit: () => {
                 showUnitPromptModal(bulkUpdateParamsUnit);
+            },
+            onAddCategory: (l1, l2) => {
+                bulkAddParamsCategory(l1, l2);
+            },
+            onRemoveCategory: (l1, l2) => {
+                bulkRemoveParamsCategory(l1, l2);
             },
             onDeleteItems: async () => {
                 try {
@@ -546,7 +849,7 @@ export async function renderParametersView(container, state) {
                 renderTable();
                 updateToolbar();
             }
-        });
+        }, state.products);
 
         // Hide unwanted buttons and show unit button
         setTimeout(() => {
@@ -554,14 +857,446 @@ export async function renderParametersView(container, state) {
             const btnPrice = tbContainer.querySelector('#bulk-update-price');
             const btnStatus = tbContainer.querySelector('#bulk-toggle-status');
             const btnUnit = tbContainer.querySelector('#bulk-update-unit');
+            const btnAddCat = tbContainer.querySelector('#bulk-add-category');
+            const btnRemoveCat = tbContainer.querySelector('#bulk-remove-category');
             if (btnCategory) btnCategory.style.display = 'none';
             if (btnPrice) btnPrice.style.display = 'none';
             if (btnStatus) btnStatus.style.display = 'none';
             if (btnUnit) btnUnit.style.display = 'flex';
+            if (btnAddCat) btnAddCat.style.display = 'flex';
+            if (btnRemoveCat) btnRemoveCat.style.display = 'flex';
         }, 10);
     };
 
+    const bulkAddParamsCategory = () => {
+        openBulkCategoryParamModal(selectedParamIds, allParams, state, true);
+    };
+
+    const bulkRemoveParamsCategory = () => {
+        openBulkCategoryParamModal(selectedParamIds, allParams, state, false);
+    };
+
+    const openBulkCategoryParamModal = (selectedIds, allParams, state, isAdd) => {
+        let modalWrapper = document.getElementById('param-category-modal-wrapper');
+        if (modalWrapper) modalWrapper.remove();
+
+        modalWrapper = document.createElement('div');
+        modalWrapper.id = 'param-category-modal-wrapper';
+        modalWrapper.className = 'fixed inset-0 z-[9000] flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300';
+        document.body.appendChild(modalWrapper);
+
+        const allL1Categories = [...new Set((state.products || []).map(p => p.parent_category).filter(Boolean))].sort();
+        const allL2Categories = [...new Set((state.products || []).map(p => p.category).filter(Boolean))].sort();
+
+        // Calculate counts
+        const paramCounts = selectedIds.length;
+        const categoryCounts = {};
+        selectedIds.forEach(id => {
+            const param = allParams.find(p => p.id === id);
+            if (param) {
+                const cats = (param.category_hint || '').split(',').map(s => s.trim()).filter(Boolean);
+                cats.forEach(c => {
+                    categoryCounts[c] = (categoryCounts[c] || 0) + 1;
+                });
+            }
+        });
+
+        // Initialize selection set
+        const selectedCategories = new Set();
+        const indeterminateCategories = new Set();
+
+        if (isAdd) {
+            // For Bulk Add, initially check categories that exist in all parameters, and set indeterminate for partials
+            Object.entries(categoryCounts).forEach(([cat, count]) => {
+                if (count === paramCounts) {
+                    selectedCategories.add(cat);
+                } else if (count > 0) {
+                    indeterminateCategories.add(cat);
+                }
+            });
+        }
+
+        modalWrapper.innerHTML = `
+            <div id="param-cat-modal-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <div id="param-cat-modal-content" class="relative w-full max-w-md max-h-[90vh] bg-surface-container border border-outline/10 rounded-3xl shadow-2xl flex flex-col transform scale-95 transition-transform duration-300">
+                <div class="p-4 sm:p-6 border-b border-outline/10 flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold uppercase tracking-tight text-on-surface font-label-caps">
+                            ${isAdd ? 'Массовое добавление категорий' : 'Массовое удаление категорий'}
+                        </h3>
+                        <div class="text-[10px] text-primary uppercase font-label-caps tracking-widest mt-1">
+                            Выбрано параметров: ${selectedIds.length}
+                        </div>
+                    </div>
+                    <button id="close-param-cat-modal" class="w-10 h-10 rounded-full hover:bg-surface-variant flex items-center justify-center transition-colors text-on-surface-variant">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="p-4 sm:p-6 space-y-3 sm:space-y-4 flex-1 flex flex-col min-h-0">
+                    <!-- Level select -->
+                    <div class="space-y-2 shrink-0">
+                        <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
+                            Уровень категорий:
+                        </label>
+                        <div class="flex gap-1 bg-surface-container-lowest p-1 rounded-2xl border border-outline/10 w-full select-none">
+                            <button type="button" class="param-cat-level-btn flex-1 py-2 sm:py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-center" data-level="l1">Категории L1 (Группы)</button>
+                            <button type="button" class="param-cat-level-btn flex-1 py-2 sm:py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-center" data-level="l2">Категории L2 (Подкатегории)</button>
+                        </div>
+                        <input type="hidden" id="param-cat-level-select" />
+                    </div>
+
+                    <!-- Category selection area -->
+                    <div id="param-cat-selection-area" class="space-y-3 sm:space-y-4 flex-1 flex flex-col min-h-0"></div>
+                </div>
+
+                <div class="p-4 sm:p-6 border-t border-outline/10 flex justify-end gap-3 bg-surface-container rounded-b-3xl shrink-0">
+                    <button id="cancel-param-cat" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl border border-outline/20 hover:bg-surface-variant transition-all text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label-caps">
+                        Отмена
+                    </button>
+                    <button id="save-param-cat" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-primary text-on-primary hover:bg-white hover:text-black transition-all text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 font-label-caps">
+                        ${isAdd ? 'Добавить' : 'Удалить'}
+                    </button>
+                </div>
+            </div>
+        `;
+
+        const close = () => {
+            modalWrapper.classList.add('opacity-0');
+            modalWrapper.querySelector('#param-cat-modal-content').classList.add('scale-95');
+            if (window.unlockScrollGlobal) window.unlockScrollGlobal();
+            setTimeout(() => modalWrapper.remove(), 300);
+        };
+
+        const selectionArea = modalWrapper.querySelector('#param-cat-selection-area');
+        const levelSelect = modalWrapper.querySelector('#param-cat-level-select');
+
+        // Automatically determine initial level:
+        let initialLevel = 'l1';
+        if (!isAdd) {
+            const hasL2Matches = Object.keys(categoryCounts).some(cat => allL2Categories.includes(cat) && !allL1Categories.includes(cat));
+            if (hasL2Matches) {
+                initialLevel = 'l2';
+            }
+        }
+        levelSelect.value = initialLevel;
+
+        const renderCatSelection = (level) => {
+            const fullList = level === 'l1' ? allL1Categories : allL2Categories;
+            const list = isAdd ? fullList : fullList.filter(cat => (categoryCounts[cat] || 0) > 0);
+
+            const searchPlaceholder = level === 'l1' ? 'Поиск категории...' : 'Поиск подкатегории...';
+            const gridLabel = level === 'l1' 
+                ? (isAdd ? 'Выберите из существующих категорий L1 для добавления:' : 'Выберите из существующих категорий L1 для удаления:') 
+                : (isAdd ? 'Выберите из существующих подкатегорий L2 для добавления:' : 'Выберите из существующих подкатегорий L2 для удаления:');
+            const customInputLabel = level === 'l1' ? 'Или введите свою категорию L1:' : 'Или введите свою подкатегорию L2:';
+            const customInputPlaceholder = level === 'l1' ? 'напр. Прокат листовой' : 'напр. Арматура гладкая';
+
+            if (!isAdd && list.length === 0) {
+                selectionArea.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 text-center text-on-surface-variant opacity-60">
+                        <span class="material-symbols-outlined text-4xl mb-2 text-primary">info</span>
+                        <p class="text-xs font-bold uppercase tracking-wider font-label-caps">Нет категорий</p>
+                        <p class="text-[10px] opacity-70 mt-1">Выбранные параметры не привязаны ни к одной категории этого уровня</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const hasConflicts = list.some(cat => {
+                const count = categoryCounts[cat] || 0;
+                return count > 0 && count < paramCounts;
+            });
+
+            const warningBanner = hasConflicts ? `
+                <div id="param-cat-warning" class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl flex flex-col sm:flex-row items-start gap-2 text-xs text-amber-400 shrink-0 select-none cursor-pointer hover:bg-amber-500/15 transition-all duration-200 animate-in fade-in slide-in-from-top-1">
+                    <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 font-bold uppercase tracking-wider text-[9px] sm:text-[10px]">
+                        <span class="material-symbols-outlined text-base shrink-0">warning</span>
+                        <span class="sm:hidden text-amber-400/90">Внимание (нажмите для деталей)</span>
+                    </div>
+                    <div id="param-cat-warning-text" class="hidden sm:block leading-normal font-medium mt-0.5 sm:mt-0">
+                        ${isAdd ? 
+                            'Некоторые категории привязаны только к части параметров. Отмечены как "Частично". Добавление сделает привязку полной для всех.' : 
+                            'Некоторые категории привязаны только к части параметров. Отмечены как "Частично". Удаление отвяжет их у всех.'
+                        }
+                    </div>
+                </div>
+            ` : '';
+
+            selectionArea.innerHTML = `
+                ${warningBanner}
+                <div class="space-y-2.5 sm:space-y-3 flex-1 flex flex-col min-h-0">
+                    <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
+                        ${gridLabel}
+                    </label>
+                    <div class="relative group shrink-0">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50 text-sm group-focus-within:opacity-100 transition-opacity">search</span>
+                        <input type="text" id="category-search" placeholder="${searchPlaceholder}" autocomplete="off" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl pl-10 pr-4 py-2 sm:py-2.5 text-xs focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/30">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 sm:gap-3 flex-1 min-h-[100px] sm:min-h-[120px] overflow-y-auto custom-scrollbar pr-1">
+                        ${list.map(cat => {
+                            const count = categoryCounts[cat] || 0;
+                            let presenceBadge = '';
+                            let isChecked = false;
+                            let isIndet = false;
+
+                            if (isAdd) {
+                                if (count === paramCounts) {
+                                    isChecked = true;
+                                    presenceBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded-lg bg-green-500/10 text-green-400 font-bold uppercase tracking-wider font-label-caps shrink-0 select-none">У всех</span>`;
+                                } else if (count > 0) {
+                                    isIndet = true;
+                                    presenceBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 font-bold uppercase tracking-wider font-label-caps shrink-0 select-none">Частично (${count}/${paramCounts})</span>`;
+                                }
+                            } else {
+                                if (count === paramCounts) {
+                                    presenceBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded-lg bg-red-500/10 text-red-400 font-bold uppercase tracking-wider font-label-caps shrink-0 select-none">У всех</span>`;
+                                } else if (count > 0) {
+                                    presenceBadge = `<span class="text-[9px] px-1.5 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 font-bold uppercase tracking-wider font-label-caps shrink-0 select-none">Частично (${count}/${paramCounts})</span>`;
+                                }
+                            }
+
+                            return `
+                                <label class="category-item flex items-center justify-between p-2.5 rounded-lg sm:p-3 sm:rounded-xl bg-surface-container-lowest border border-outline/10 hover:bg-primary/5 hover:border-primary/20 transition-all cursor-pointer group" data-name="${escapeHtml(cat.toLowerCase())}">
+                                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-1.5">
+                                        <input type="checkbox" class="category-checkbox w-5 h-5 rounded border-outline/30 text-primary cursor-pointer peer" value="${escapeHtml(cat)}" ${isChecked ? 'checked' : ''} data-indet="${isIndet}">
+                                        <span class="text-xs font-bold text-on-surface-variant peer-checked:text-primary transition-colors truncate">${escapeHtml(cat)}</span>
+                                    </div>
+                                    ${presenceBadge}
+                                </label>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                ${isAdd ? `
+                <div class="space-y-2 border-t border-outline/10 pt-3 sm:pt-4 shrink-0">
+                    <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
+                        ${customInputLabel}
+                    </label>
+                    <input type="text" id="new-custom-category" placeholder="${customInputPlaceholder}" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl px-3 sm:px-4 py-2 sm:py-3 focus:border-primary outline-none transition-all text-sm text-on-surface">
+                </div>
+                ` : ''}
+            `;
+
+            // Bind checkboxes & set indeterminate state in DOM
+            selectionArea.querySelectorAll('.category-checkbox').forEach(cb => {
+                if (cb.dataset.indet === 'true') {
+                    cb.indeterminate = true;
+                }
+
+                cb.onchange = () => {
+                    const val = cb.value;
+                    if (cb.checked) {
+                        selectedCategories.add(val);
+                        indeterminateCategories.delete(val);
+                    } else {
+                        selectedCategories.delete(val);
+                        indeterminateCategories.delete(val);
+                    }
+                };
+            });
+
+            // Bind search
+            const searchInput = selectionArea.querySelector('#category-search');
+            if (searchInput) {
+                searchInput.oninput = () => {
+                    const q = searchInput.value.toLowerCase().trim();
+                    selectionArea.querySelectorAll('.category-item').forEach(item => {
+                        const name = item.dataset.name || '';
+                        item.style.display = name.includes(q) ? 'flex' : 'none';
+                    });
+                };
+            }
+
+            // Bind warning toggle on mobile
+            const warningEl = selectionArea.querySelector('#param-cat-warning');
+            if (warningEl) {
+                warningEl.onclick = () => {
+                    const textEl = warningEl.querySelector('#param-cat-warning-text');
+                    if (textEl) {
+                        textEl.classList.toggle('hidden');
+                    }
+                };
+            }
+        };
+
+        const updateLevelTabs = (level) => {
+            modalWrapper.querySelectorAll('.param-cat-level-btn').forEach(btn => {
+                if (btn.dataset.level === level) {
+                    btn.classList.add('text-primary', 'bg-primary/10');
+                    btn.classList.remove('text-on-surface-variant', 'hover:text-primary');
+                } else {
+                    btn.classList.remove('text-primary', 'bg-primary/10');
+                    btn.classList.add('text-on-surface-variant', 'hover:text-primary');
+                }
+            });
+        };
+
+        levelSelect.onchange = () => {
+            updateLevelTabs(levelSelect.value);
+            renderCatSelection(levelSelect.value);
+        };
+
+        // Initialize tabs styling
+        updateLevelTabs(initialLevel);
+
+        // Bind tabs click event
+        modalWrapper.querySelectorAll('.param-cat-level-btn').forEach(btn => {
+            btn.onclick = () => {
+                const newLevel = btn.dataset.level;
+                if (levelSelect.value !== newLevel) {
+                    levelSelect.value = newLevel;
+                    levelSelect.dispatchEvent(new Event('change'));
+                }
+            };
+        });
+
+        renderCatSelection(initialLevel);
+
+        const save = async () => {
+            const customInput = modalWrapper.querySelector('#new-custom-category');
+            const customVal = customInput ? customInput.value.trim() : '';
+            const level = levelSelect.value;
+
+            const executeBulkUpdate = async (resolvedCustomVal) => {
+                const saveBtn = modalWrapper.querySelector('#save-param-cat');
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Сохранение...';
+
+                try {
+                    const promises = selectedIds.map(async (id) => {
+                        const param = allParams.find(p => p.id === id);
+                        if (param) {
+                            let cats = (param.category_hint || '').split(',').map(s => s.trim()).filter(Boolean);
+                            
+                            if (isAdd) {
+                                // Add all checked categories
+                                selectedCategories.forEach(cat => {
+                                    if (!cats.includes(cat)) cats.push(cat);
+                                });
+                                // Add custom category
+                                if (resolvedCustomVal && !cats.includes(resolvedCustomVal)) {
+                                    cats.push(resolvedCustomVal);
+                                }
+                            } else {
+                                // Remove all checked categories
+                                selectedCategories.forEach(cat => {
+                                    cats = cats.filter(c => c !== cat);
+                                });
+                            }
+
+                            const payload = {
+                                name: param.name,
+                                unit: param.unit,
+                                category_hint: cats.join(', '),
+                                description: param.description,
+                                sort_order: param.sort_order
+                            };
+                            return apiFetch(`/api/admin/parameters/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+                        }
+                    });
+
+                    await Promise.all(promises);
+                    window.showToast?.(
+                        isAdd ? `Категории добавлены для ${selectedIds.length} параметров` : `Категории удалены для ${selectedIds.length} параметров`,
+                        'success',
+                        'Параметры'
+                    );
+                    close();
+                    selectedParamIds = [];
+                    await loadParams();
+                } catch (err) {
+                    alert('Ошибка массового обновления: ' + err.message);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = isAdd ? 'Добавить' : 'Удалить';
+                }
+            };
+
+            if (isAdd && customVal) {
+                const list = level === 'l1' ? allL1Categories : allL2Categories;
+                const exists = list.includes(customVal);
+                if (!exists) {
+                    if (level === 'l1') {
+                        try {
+                            const placeholder = {
+                                id: 'cat_l1_' + Date.now(),
+                                name: '📁 ' + customVal,
+                                parent_category: customVal,
+                                category: '',
+                                price_ton: 0,
+                                vstatus: 'active',
+                                description: 'Системная категория L1'
+                            };
+                            await state.createProduct(placeholder);
+                        } catch (e) {
+                            console.error('Failed to create L1 placeholder:', e);
+                        }
+                        await executeBulkUpdate(customVal);
+                    } else {
+                        // L2
+                        promptForCategoryParent(customVal, state, async (parentL1) => {
+                            // Ensure parent exists
+                            if (!allL1Categories.includes(parentL1)) {
+                                try {
+                                    const l1Placeholder = {
+                                        id: 'cat_l1_' + Date.now(),
+                                        name: '📁 ' + parentL1,
+                                        parent_category: parentL1,
+                                        category: '',
+                                        price_ton: 0,
+                                        vstatus: 'active',
+                                        description: 'Системная категория L1'
+                                    };
+                                    await state.createProduct(l1Placeholder);
+                                } catch (e) {
+                                    console.error('Failed to create L1 placeholder:', e);
+                                }
+                            }
+                            // Create L2
+                            try {
+                                const placeholder = {
+                                    id: 'cat_l2_' + Date.now(),
+                                    name: '📁 ' + customVal,
+                                    parent_category: parentL1,
+                                    category: customVal,
+                                    price_ton: 0,
+                                    vstatus: 'active',
+                                    description: 'Системная подкатегория L2'
+                                };
+                                await state.createProduct(placeholder);
+                            } catch (e) {
+                                console.error('Failed to create L2 placeholder:', e);
+                            }
+                            await executeBulkUpdate(customVal);
+                        });
+                    }
+                } else {
+                    await executeBulkUpdate(customVal);
+                }
+            } else {
+                await executeBulkUpdate(null);
+            }
+        };
+
+        modalWrapper.querySelector('#param-cat-modal-backdrop').onclick = close;
+        modalWrapper.querySelector('#close-param-cat-modal').onclick = close;
+        modalWrapper.querySelector('#cancel-param-cat').onclick = close;
+        modalWrapper.querySelector('#save-param-cat').onclick = save;
+
+        if (window.lockScrollGlobal) window.lockScrollGlobal();
+
+        requestAnimationFrame(() => {
+            modalWrapper.classList.remove('opacity-0');
+            modalWrapper.querySelector('#param-cat-modal-content').classList.remove('scale-95');
+        });
+    };
+
     const exportParamsToExcel = (data) => {
+        // Мультиформатный экспорт (XML / CSV / Excel / PDF) с фирменной айдентикой
+        showExportFormatModal(data, 'parameters', {});
+    };
+    const _legacyExportParamsCSV = (data) => {
         const headers = "ID (id);Название (name);Ед. изм. (unit);Тип (type);Обязательно (required);Список (options);Категории (category_hint);Описание (description)\n";
         let csv = headers;
         
@@ -785,6 +1520,100 @@ export async function renderParametersView(container, state) {
         setTimeout(() => modalWrapper.querySelector('#param-name-input')?.focus(), 350);
     };
 
+    function promptForCategoryParent(customVal, state, onConfirm) {
+        let modalWrapper = document.getElementById('category-parent-prompt-modal');
+        if (modalWrapper) modalWrapper.remove();
+
+        modalWrapper = document.createElement('div');
+        modalWrapper.id = 'category-parent-prompt-modal';
+        modalWrapper.className = 'fixed inset-0 z-[10000] flex items-center justify-center p-4 opacity-0 transition-opacity duration-300 pointer-events-none';
+        modalWrapper.style.pointerEvents = 'auto';
+
+        const allL1Categories = [...new Set((state.products || []).map(p => p.parent_category).filter(Boolean))].sort();
+
+        modalWrapper.innerHTML = `
+            <div id="cat-parent-prompt-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"></div>
+            <div id="cat-parent-prompt-container" class="relative w-full max-w-md bg-surface-container border border-outline/20 rounded-[2rem] p-6 shadow-2xl flex flex-col transform scale-95 transition-transform duration-300 text-on-surface">
+                <div class="flex items-center justify-between pb-4 border-b border-outline/10 mb-4">
+                    <h3 class="text-xs uppercase tracking-widest text-primary font-bold font-label-caps flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base">category</span>
+                        Укажите родительскую категорию
+                    </h3>
+                    <button id="cat-parent-prompt-close" class="w-8 h-8 rounded-full hover:bg-surface-variant flex items-center justify-center text-on-surface-variant transition-colors">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <p class="text-xs text-on-surface-variant opacity-80 leading-relaxed">
+                        Вы вводите новую подкатегорию L2 <strong class="text-primary">«${escapeHtml(customVal)}»</strong>. Пожалуйста, укажите для неё родительскую категорию L1:
+                    </p>
+                    
+                    <div class="space-y-2">
+                        <label class="text-[10px] uppercase opacity-65 font-label-caps tracking-widest">Родительская категория (L1)</label>
+                        <div class="relative">
+                            <select id="cat-parent-select" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl px-4 py-3 pr-10 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface appearance-none cursor-pointer">
+                                <option value="">Выберите категорию L1...</option>
+                                ${allL1Categories.map(cat => `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`).join('')}
+                            </select>
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-base">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-1">
+                        <label class="text-[10px] uppercase opacity-65 font-label-caps tracking-widest">Или введите новую категорию L1:</label>
+                        <input type="text" id="cat-parent-custom" placeholder="напр. Фасонный прокат" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all text-sm text-on-surface">
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 pt-4">
+                        <button id="cat-parent-prompt-cancel" class="px-5 py-3 rounded-xl border border-outline/20 hover:bg-surface-variant transition-all text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label-caps">
+                            Отмена
+                        </button>
+                        <button id="cat-parent-prompt-confirm" class="px-5 py-3 rounded-xl bg-primary text-on-primary hover:bg-white hover:text-black transition-all text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 font-label-caps">
+                            Подтвердить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modalWrapper);
+        if (window.lockScrollGlobal) window.lockScrollGlobal();
+
+        const container = modalWrapper.querySelector('#cat-parent-prompt-container');
+        const select = modalWrapper.querySelector('#cat-parent-select');
+        const customInput = modalWrapper.querySelector('#cat-parent-custom');
+
+        const close = () => {
+            modalWrapper.classList.add('opacity-0');
+            container.classList.add('scale-95');
+            if (window.unlockScrollGlobal) window.unlockScrollGlobal();
+            setTimeout(() => modalWrapper.remove(), 300);
+        };
+
+        const confirm = () => {
+            const selectVal = select.value;
+            const customParentVal = customInput.value.trim();
+            const parentL1 = customParentVal || selectVal;
+            if (!parentL1) {
+                alert('Необходимо выбрать или ввести родительскую категорию L1');
+                return;
+            }
+            onConfirm(parentL1);
+            close();
+        };
+
+        modalWrapper.querySelector('#cat-parent-prompt-backdrop').onclick = close;
+        modalWrapper.querySelector('#cat-parent-prompt-close').onclick = close;
+        modalWrapper.querySelector('#cat-parent-prompt-cancel').onclick = close;
+        modalWrapper.querySelector('#cat-parent-prompt-confirm').onclick = confirm;
+
+        requestAnimationFrame(() => {
+            modalWrapper.classList.remove('opacity-0');
+            container.classList.remove('scale-95');
+        });
+    }
+
     const openCategoryParamModal = (param) => {
         let modalWrapper = document.getElementById('param-category-modal-wrapper');
         if (modalWrapper) modalWrapper.remove();
@@ -795,14 +1624,16 @@ export async function renderParametersView(container, state) {
         document.body.appendChild(modalWrapper);
 
         const allL1Categories = [...new Set((state.products || []).map(p => p.parent_category).filter(Boolean))].sort();
+        const allL2Categories = [...new Set((state.products || []).map(p => p.category).filter(Boolean))].sort();
         const activeCategories = (param.category_hint || '').split(',').map(s => s.trim()).filter(Boolean);
+        const selectedCategories = new Set(activeCategories);
 
         modalWrapper.innerHTML = `
             <div id="param-cat-modal-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-            <div id="param-cat-modal-content" class="relative w-full max-w-md bg-surface-container border border-outline/10 rounded-3xl shadow-2xl flex flex-col transform scale-95 transition-transform duration-300">
-                <div class="p-6 border-b border-outline/10 flex items-center justify-between shrink-0">
+            <div id="param-cat-modal-content" class="relative w-full max-w-md max-h-[90vh] bg-surface-container border border-outline/10 rounded-3xl shadow-2xl flex flex-col transform scale-95 transition-transform duration-300">
+                <div class="p-4 sm:p-6 border-b border-outline/10 flex items-center justify-between shrink-0">
                     <div>
-                        <h3 class="font-headline-md text-lg font-bold uppercase tracking-tight text-on-surface">
+                        <h3 class="font-headline-md text-base sm:text-lg font-bold uppercase tracking-tight text-on-surface">
                             Категории параметра
                         </h3>
                         <div class="text-[10px] text-primary uppercase font-label-caps tracking-widest mt-1">
@@ -814,37 +1645,28 @@ export async function renderParametersView(container, state) {
                     </button>
                 </div>
                 
-                <div class="p-6 space-y-6 overflow-y-auto custom-scrollbar max-h-[60vh]">
-                    <div class="space-y-3">
+                <div class="p-4 sm:p-6 space-y-3 sm:space-y-4 flex-1 flex flex-col min-h-0">
+                    <!-- Level select -->
+                    <div class="space-y-2 shrink-0">
                         <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
-                            Выберите из существующих категорий L1:
+                            Уровень категорий:
                         </label>
-                        <div class="grid grid-cols-2 gap-3">
-                            ${allL1Categories.map(cat => {
-                                const isChecked = activeCategories.includes(cat);
-                                return `
-                                    <label class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-lowest border border-outline/10 hover:bg-primary/5 hover:border-primary/20 transition-all cursor-pointer group">
-                                        <input type="checkbox" class="category-checkbox w-5 h-5 rounded border-outline/30 text-primary cursor-pointer peer" value="${escapeHtml(cat)}" ${isChecked ? 'checked' : ''}>
-                                        <span class="text-xs font-bold text-on-surface-variant peer-checked:text-primary transition-colors">${escapeHtml(cat)}</span>
-                                    </label>
-                                `;
-                            }).join('')}
+                        <div class="flex gap-1 bg-surface-container-lowest p-1 rounded-2xl border border-outline/10 w-full select-none">
+                            <button type="button" class="param-cat-level-btn flex-1 py-2 sm:py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-center" data-level="l1">Категории L1 (Группы)</button>
+                            <button type="button" class="param-cat-level-btn flex-1 py-2 sm:py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-center" data-level="l2">Категории L2 (Подкатегории)</button>
                         </div>
+                        <input type="hidden" id="param-cat-level-select" />
                     </div>
 
-                    <div class="space-y-2 border-t border-outline/10 pt-4">
-                        <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
-                            Или введите свою категорию L1:
-                        </label>
-                        <input type="text" id="new-custom-category" placeholder="напр. Прокат листовой" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all text-sm text-on-surface">
-                    </div>
+                    <!-- Category selection area -->
+                    <div id="param-cat-selection-area" class="space-y-3 sm:space-y-4 flex-1 flex flex-col min-h-0"></div>
                 </div>
 
-                <div class="p-6 border-t border-outline/10 flex justify-end gap-3 bg-surface-container rounded-b-3xl">
-                    <button id="cancel-param-cat" class="px-5 py-3 rounded-xl border border-outline/20 hover:bg-surface-variant transition-all text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label-caps">
+                <div class="p-4 sm:p-6 border-t border-outline/10 flex justify-end gap-3 bg-surface-container rounded-b-3xl shrink-0">
+                    <button id="cancel-param-cat" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl border border-outline/20 hover:bg-surface-variant transition-all text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label-caps">
                         Отмена
                     </button>
-                    <button id="save-param-cat" class="px-5 py-3 rounded-xl bg-primary text-on-primary hover:bg-white hover:text-black transition-all text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 font-label-caps">
+                    <button id="save-param-cat" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-primary text-on-primary hover:bg-white hover:text-black transition-all text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/10 font-label-caps">
                         Сохранить
                     </button>
                 </div>
@@ -858,38 +1680,242 @@ export async function renderParametersView(container, state) {
             setTimeout(() => modalWrapper.remove(), 300);
         };
 
-        const save = async () => {
-            const checkboxes = modalWrapper.querySelectorAll('.category-checkbox');
-            const selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-            
-            const customVal = modalWrapper.querySelector('#new-custom-category').value.trim();
-            if (customVal && !selected.includes(customVal)) {
-                selected.push(customVal);
+        const selectionArea = modalWrapper.querySelector('#param-cat-selection-area');
+        const levelSelect = modalWrapper.querySelector('#param-cat-level-select');
+
+        // Automatically determine initial level:
+        // if some active categories match L2 but not L1, default to L2. Otherwise default to L1.
+        let initialLevel = 'l1';
+        const hasL2Matches = activeCategories.some(cat => allL2Categories.includes(cat) && !allL1Categories.includes(cat));
+        if (hasL2Matches) {
+            initialLevel = 'l2';
+        }
+        levelSelect.value = initialLevel;
+
+        const renderCatSelection = (level) => {
+            if (level === 'l1') {
+                selectionArea.innerHTML = `
+                    <div class="space-y-2.5 sm:space-y-3 flex-1 flex flex-col min-h-0">
+                        <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
+                            Выберите из существующих категорий L1:
+                        </label>
+                        <div class="relative group shrink-0">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50 text-sm group-focus-within:opacity-100 transition-opacity">search</span>
+                            <input type="text" id="category-search" placeholder="Поиск категории..." autocomplete="off" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl pl-10 pr-4 py-2 sm:py-2.5 text-xs focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/30">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3 flex-1 min-h-[100px] sm:min-h-[120px] overflow-y-auto custom-scrollbar pr-1">
+                            ${allL1Categories.map(cat => {
+                                const isChecked = selectedCategories.has(cat);
+                                return `
+                                    <label class="category-item flex items-center gap-2.5 sm:gap-3 p-2.5 rounded-lg sm:p-3 sm:rounded-xl bg-surface-container-lowest border border-outline/10 hover:bg-primary/5 hover:border-primary/20 transition-all cursor-pointer group" data-name="${escapeHtml(cat.toLowerCase())}">
+                                        <input type="checkbox" class="category-checkbox w-5 h-5 rounded border-outline/30 text-primary cursor-pointer peer" value="${escapeHtml(cat)}" ${isChecked ? 'checked' : ''}>
+                                        <span class="text-xs font-bold text-on-surface-variant peer-checked:text-primary transition-colors">${escapeHtml(cat)}</span>
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 border-t border-outline/10 pt-3 sm:pt-4 shrink-0">
+                        <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
+                            Или введите свою категорию L1:
+                        </label>
+                        <input type="text" id="new-custom-category" placeholder="напр. Прокат листовой" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl px-3 sm:px-4 py-2 sm:py-3 focus:border-primary outline-none transition-all text-sm text-on-surface">
+                    </div>
+                `;
+            } else {
+                selectionArea.innerHTML = `
+                    <div class="space-y-2.5 sm:space-y-3 flex-1 flex flex-col min-h-0">
+                        <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
+                            Выберите из существующих подкатегорий L2:
+                        </label>
+                        <div class="relative group shrink-0">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary opacity-50 text-sm group-focus-within:opacity-100 transition-opacity">search</span>
+                            <input type="text" id="category-search" placeholder="Поиск подкатегории..." autocomplete="off" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl pl-10 pr-4 py-2 sm:py-2.5 text-xs focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/30">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 sm:gap-3 flex-1 min-h-[100px] sm:min-h-[120px] overflow-y-auto custom-scrollbar pr-1">
+                            ${allL2Categories.map(cat => {
+                                const isChecked = selectedCategories.has(cat);
+                                return `
+                                    <label class="category-item flex items-center gap-2.5 sm:gap-3 p-2.5 rounded-lg sm:p-3 sm:rounded-xl bg-surface-container-lowest border border-outline/10 hover:bg-primary/5 hover:border-primary/20 transition-all cursor-pointer group" data-name="${escapeHtml(cat.toLowerCase())}">
+                                        <input type="checkbox" class="category-checkbox w-5 h-5 rounded border-outline/30 text-primary cursor-pointer peer" value="${escapeHtml(cat)}" ${isChecked ? 'checked' : ''}>
+                                        <span class="text-xs font-bold text-on-surface-variant peer-checked:text-primary transition-colors">${escapeHtml(cat)}</span>
+                                    </label>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 border-t border-outline/10 pt-3 sm:pt-4 shrink-0">
+                        <label class="text-[10px] uppercase opacity-60 text-on-surface font-label-caps tracking-widest">
+                            Или введите свою подкатегорию L2:
+                        </label>
+                        <input type="text" id="new-custom-category" placeholder="напр. Арматура гладкая" class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl px-3 sm:px-4 py-2 sm:py-3 focus:border-primary outline-none transition-all text-sm text-on-surface">
+                    </div>
+                `;
             }
 
-            const category_hint = selected.join(', ');
+            // Bind search input logic
+            const searchInput = selectionArea.querySelector('#category-search');
+            if (searchInput) {
+                searchInput.oninput = () => {
+                    const q = searchInput.value.toLowerCase().trim();
+                    selectionArea.querySelectorAll('.category-item').forEach(item => {
+                        const name = item.dataset.name || '';
+                        if (name.includes(q)) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                };
+            }
 
-            const payload = {
-                name: param.name,
-                unit: param.unit,
-                category_hint,
-                description: param.description,
-                sort_order: param.sort_order
+            // Bind checkbox changes
+            selectionArea.querySelectorAll('.category-checkbox').forEach(cb => {
+                cb.onchange = () => {
+                    if (cb.checked) {
+                        selectedCategories.add(cb.value);
+                    } else {
+                        selectedCategories.delete(cb.value);
+                    }
+                };
+            });
+        };
+
+        const updateLevelTabs = (level) => {
+            modalWrapper.querySelectorAll('.param-cat-level-btn').forEach(btn => {
+                if (btn.dataset.level === level) {
+                    btn.classList.add('text-primary', 'bg-primary/10');
+                    btn.classList.remove('text-on-surface-variant', 'hover:text-primary');
+                } else {
+                    btn.classList.remove('text-primary', 'bg-primary/10');
+                    btn.classList.add('text-on-surface-variant', 'hover:text-primary');
+                }
+            });
+        };
+
+        levelSelect.onchange = () => {
+            updateLevelTabs(levelSelect.value);
+            renderCatSelection(levelSelect.value);
+        };
+
+        // Initialize tabs styling
+        updateLevelTabs(initialLevel);
+
+        // Bind tabs click event
+        modalWrapper.querySelectorAll('.param-cat-level-btn').forEach(btn => {
+            btn.onclick = () => {
+                const newLevel = btn.dataset.level;
+                if (levelSelect.value !== newLevel) {
+                    levelSelect.value = newLevel;
+                    levelSelect.dispatchEvent(new Event('change'));
+                }
+            };
+        });
+
+        // Render initial level
+        renderCatSelection(initialLevel);
+
+        const save = async () => {
+            const customInput = modalWrapper.querySelector('#new-custom-category');
+            const customVal = customInput ? customInput.value.trim() : '';
+            const level = levelSelect.value;
+
+            const proceedSave = async (resolvedCustomVal) => {
+                if (resolvedCustomVal && !selectedCategories.has(resolvedCustomVal)) {
+                    selectedCategories.add(resolvedCustomVal);
+                }
+
+                const category_hint = Array.from(selectedCategories).join(', ');
+
+                const payload = {
+                    name: param.name,
+                    unit: param.unit,
+                    category_hint,
+                    description: param.description,
+                    sort_order: param.sort_order
+                };
+
+                const saveBtn = modalWrapper.querySelector('#save-param-cat');
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Сохранение...';
+
+                try {
+                    await apiFetch(`/api/admin/parameters/${param.id}`, { method: 'PUT', body: JSON.stringify(payload) });
+                    window.showToast?.(`Категории для «${param.name}» обновлены`, 'success', 'Параметры');
+                    close();
+                    await loadParams();
+                } catch (err) {
+                    alert('Ошибка: ' + err.message);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Сохранить';
+                }
             };
 
-            const saveBtn = modalWrapper.querySelector('#save-param-cat');
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Сохранение...';
-
-            try {
-                await apiFetch(`/api/admin/parameters/${param.id}`, { method: 'PUT', body: JSON.stringify(payload) });
-                window.showToast?.(`Категории для «${param.name}» обновлены`, 'success', 'Параметры');
-                close();
-                await loadParams();
-            } catch (err) {
-                alert('Ошибка: ' + err.message);
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Сохранить';
+            if (customVal) {
+                const list = level === 'l1' ? allL1Categories : allL2Categories;
+                const exists = list.includes(customVal);
+                if (!exists) {
+                    if (level === 'l1') {
+                        try {
+                            const placeholder = {
+                                id: 'cat_l1_' + Date.now(),
+                                name: '📁 ' + customVal,
+                                parent_category: customVal,
+                                category: '',
+                                price_ton: 0,
+                                vstatus: 'active',
+                                description: 'Системная категория L1'
+                            };
+                            await state.createProduct(placeholder);
+                        } catch (e) {
+                            console.error('Failed to create L1 placeholder:', e);
+                        }
+                        await proceedSave(customVal);
+                    } else {
+                        // L2
+                        promptForCategoryParent(customVal, state, async (parentL1) => {
+                            // Ensure parent L1 exists
+                            if (!allL1Categories.includes(parentL1)) {
+                                try {
+                                    const l1Placeholder = {
+                                        id: 'cat_l1_' + Date.now(),
+                                        name: '📁 ' + parentL1,
+                                        parent_category: parentL1,
+                                        category: '',
+                                        price_ton: 0,
+                                        vstatus: 'active',
+                                        description: 'Системная категория L1'
+                                    };
+                                    await state.createProduct(l1Placeholder);
+                                } catch (e) {
+                                    console.error('Failed to create L1 placeholder:', e);
+                                }
+                            }
+                            // Create L2
+                            try {
+                                const placeholder = {
+                                    id: 'cat_l2_' + Date.now(),
+                                    name: '📁 ' + customVal,
+                                    parent_category: parentL1,
+                                    category: customVal,
+                                    price_ton: 0,
+                                    vstatus: 'active',
+                                    description: 'Системная подкатегория L2'
+                                };
+                                await state.createProduct(placeholder);
+                            } catch (e) {
+                                console.error('Failed to create L2 placeholder:', e);
+                            }
+                            await proceedSave(customVal);
+                        });
+                    }
+                } else {
+                    await proceedSave(customVal);
+                }
+            } else {
+                await proceedSave(null);
             }
         };
 
@@ -1059,15 +2085,8 @@ export async function renderParametersView(container, state) {
                 return;
             }
 
-            showConfirmPromptModal({
-                title: 'Экспорт в Excel',
-                icon: 'download',
-                text: 'Вы уверены, что хотите выгрузить параметры в Excel?',
-                confirmText: 'Выгрузить',
-                confirmClass: 'bg-[#1e7145] text-white hover:brightness-110 shadow-[#1e7145]/20'
-            }, () => {
-                exportParamsToExcel(toExport);
-            });
+            // Открываем модалку выбора формата (XML / CSV / Excel / PDF)
+            exportParamsToExcel(toExport);
         };
     }
 
@@ -1085,7 +2104,36 @@ export async function renderParametersView(container, state) {
         };
     });
 
+    // Mobile arrow navigation for Parameters view
+    const tabOrder = ['products', 'l1', 'l2', 'parameters'];
+    const paramsPrevBtn = document.getElementById('params-tab-prev-btn');
+    const paramsNextBtn = document.getElementById('params-tab-next-btn');
+    const navigateToTab = (tab) => {
+        if (tab === 'products') window.location.hash = 'products_nomenclature';
+        else if (tab === 'parameters') window.location.hash = 'products_parameters';
+        else window.location.hash = 'products_' + tab;
+    };
+    if (paramsPrevBtn) {
+        paramsPrevBtn.onclick = () => {
+            const idx = tabOrder.indexOf('parameters');
+            navigateToTab(tabOrder[(idx - 1 + tabOrder.length) % tabOrder.length]);
+        };
+    }
+    if (paramsNextBtn) {
+        paramsNextBtn.onclick = () => {
+            const idx = tabOrder.indexOf('parameters');
+            navigateToTab(tabOrder[(idx + 1) % tabOrder.length]);
+        };
+    }
+
     // ─── Initial load ─────────────────────────────────────────────────────────
+    if (!state.products || state.products.length === 0) {
+        try {
+            await state.fetchProducts();
+        } catch (err) {
+            console.error('Failed to load products for categories:', err);
+        }
+    }
     await loadParams();
 }
 

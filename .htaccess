@@ -1,0 +1,34 @@
+RewriteEngine On
+RewriteBase /
+
+# --- NODE JS API PROXY ---
+<IfModule mod_proxy.c>
+    RewriteRule ^api/(.*)$ http://127.0.0.1:3000/api/$1 [P,L]
+</IfModule>
+<IfModule !mod_proxy.c>
+    RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+</IfModule>
+
+# --- NEWS SUB-PAGES ---
+RewriteRule ^news/trends-2026/?$ news_trends_2026.html [L,QSA]
+RewriteRule ^news/sheets-2026/?$ news_sheets_2026.html [L,QSA]
+RewriteRule ^news/market-adaptation/?$ news_market_adaptation.html [L,QSA]
+
+# --- GENERAL PAGES WITH/WITHOUT TRAILING SLASH ---
+RewriteRule ^news/?$ news.html [L,QSA]
+RewriteRule ^cart/?$ cart.html [L,QSA]
+RewriteRule ^cabinet/?$ cabinet.html [L,QSA]
+RewriteRule ^admin/?$ admin.html [L,QSA]
+RewriteRule ^calculator/?$ calculator.html [L,QSA]
+RewriteRule ^certificates/?$ certificates.html [L,QSA]
+RewriteRule ^catalog/?$ catalog.html [L,QSA]
+RewriteRule ^services/?$ services.html [L,QSA]
+RewriteRule ^about/?$ about.html [L,QSA]
+RewriteRule ^contacts/?$ contacts.html [L,QSA]
+
+# --- AUTOMATIC FALLBACK FOR ANY OTHER PAGE ---
+# If /page or /page/ is requested and page.html exists, serve it
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^([^/]+)/?$ $1.html [L,QSA]
