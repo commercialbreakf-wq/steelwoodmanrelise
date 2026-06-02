@@ -31,7 +31,21 @@ export async function renderSupportView(container, state, initialTab = 'chats') 
         const topicKey = type + '_' + id;
         let readTimes = {};
         try { readTimes = JSON.parse(localStorage.getItem('metal_chat_read_times') || '{}'); } catch(e){}
-        readTimes[topicKey] = Date.now();
+
+        // Anchor the read time to the latest message timestamp (not just Date.now()).
+        // Client message timestamps come from the client's clock, so relying solely on
+        // the admin's Date.now() makes already-read messages resurface as unread after a
+        // topics/cookie refresh whenever the client's clock runs ahead. Using the newest
+        // message time guarantees every currently-visible message counts as read.
+        let latestMsgTime = 0;
+        const topic = (topics || []).find(t => t.type === type && String(t.id) === String(id));
+        if (topic && Array.isArray(topic.messages)) {
+            topic.messages.forEach(m => {
+                const ts = new Date(m.timestamp).getTime();
+                if (!isNaN(ts) && ts > latestMsgTime) latestMsgTime = ts;
+            });
+        }
+        readTimes[topicKey] = Math.max(Date.now(), latestMsgTime);
         localStorage.setItem('metal_chat_read_times', JSON.stringify(readTimes));
         
         // Also update the global chat badge if it exists, so everything is perfectly in sync
@@ -419,8 +433,8 @@ export async function renderSupportView(container, state, initialTab = 'chats') 
             finalHtml += `
                 <div class="mb-4 space-y-1">
                     <div class="px-4 py-3 flex items-center justify-between border-b border-outline/10 bg-primary/5 rounded-2xl mb-2">
-                        <span class="text-[10px] font-black tracking-widest text-[#ca7093] uppercase font-['Space_Grotesk']">НЕПРОЧИТАННЫЕ</span>
-                        <span class="bg-[#ca7093] text-white text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center">${unreadHTML.length}</span>
+                        <span class="text-[10px] font-black tracking-widest text-[#964551] uppercase font-['Space_Grotesk']">НЕПРОЧИТАННЫЕ</span>
+                        <span class="bg-[#964551] text-white text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center">${unreadHTML.length}</span>
                     </div>
                     ${unreadHTML.join('')}
                 </div>
@@ -455,8 +469,8 @@ export async function renderSupportView(container, state, initialTab = 'chats') 
                 markTopicAsRead(type, id);
                 
                 // For desktop highlight
-                listContainer.querySelectorAll('.chat-item').forEach(i => i.classList.remove('bg-[#ca7093]/10', 'border-[#ca7093]'));
-                item.classList.add('bg-[#ca7093]/10', 'border-[#ca7093]');
+                listContainer.querySelectorAll('.chat-item').forEach(i => i.classList.remove('bg-[#964551]/10', 'border-[#964551]'));
+                item.classList.add('bg-[#964551]/10', 'border-[#964551]');
                 
                 // Update workspace visibility for mobile
                 const sidebar = document.getElementById('support-sidebar');
@@ -487,11 +501,11 @@ export async function renderSupportView(container, state, initialTab = 'chats') 
         const time = formatChatTime(timestamp);
         const isActive = activeTopic && String(activeTopic.id) === String(topic.id) && activeTopic.type === topic.type;
         
-        const badgeHtml = unreadCount > 0 ? `<span class="bg-[#ca7093] text-white text-[11px] font-black px-2 py-0.5 rounded-full ml-2 shrink-0">${unreadCount}</span>` : '';
+        const badgeHtml = unreadCount > 0 ? `<span class="bg-[#964551] text-white text-[11px] font-black px-2 py-0.5 rounded-full ml-2 shrink-0">${unreadCount}</span>` : '';
         
         let activeClass = 'border-transparent text-on-surface hover:bg-surface-variant';
-        if (isActive) activeClass = 'bg-[#ca7093]/10 border-[#ca7093] text-primary';
-        else if (unreadCount > 0) activeClass = 'unread-chat-item bg-[#ca7093]/10 border-transparent text-on-surface';
+        if (isActive) activeClass = 'bg-[#964551]/10 border-[#964551] text-primary';
+        else if (unreadCount > 0) activeClass = 'unread-chat-item bg-[#964551]/10 border-transparent text-on-surface';
 
         return `
             <div class="chat-item p-4 rounded-2xl cursor-pointer transition-all border ${activeClass} group relative" data-id="${topic.id}" data-type="${topic.type}">
@@ -509,8 +523,8 @@ export async function renderSupportView(container, state, initialTab = 'chats') 
                     ${badgeHtml}
                 </div>
                 <div class="text-[10px] text-on-surface-variant opacity-60 truncate flex items-center gap-1.5">
-                    ${unreadCount > 0 ? '<span class="w-1.5 h-1.5 rounded-full bg-[#ca7093] shrink-0 animate-pulse"></span>' : ''}
-                    <span class="${unreadCount > 0 ? 'text-[#ca7093] font-bold' : ''}">${lastMsg ? lastMsg.text : 'Нет сообщений'}</span>
+                    ${unreadCount > 0 ? '<span class="w-1.5 h-1.5 rounded-full bg-[#964551] shrink-0 animate-pulse"></span>' : ''}
+                    <span class="${unreadCount > 0 ? 'text-[#964551] font-bold' : ''}">${lastMsg ? lastMsg.text : 'Нет сообщений'}</span>
                 </div>
             </div>
         `;
@@ -665,7 +679,7 @@ export async function renderSupportView(container, state, initialTab = 'chats') 
                                     : '';
                                 msgContainer.scrollTop = msgContainer.scrollHeight;
                                 msgContainer.style.transition = 'background 0.3s';
-                                msgContainer.style.background = 'rgba(202, 112, 147, 0.05)';
+                                msgContainer.style.background = 'rgba(150, 69, 81, 0.05)';
                                 setTimeout(() => { msgContainer.style.background = ''; }, 600);
                             }
                             renderChatList();

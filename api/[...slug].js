@@ -345,6 +345,8 @@ function precomputeProductFields(products) {
     const p = products[i];
     p._priceTonFmt = p.price_ton ? p.price_ton.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '';
     p._priceUnitFmt = p.price_unit ? p.price_unit.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '';
+    p._priceMeterFmt = p.price_meter ? p.price_meter.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '';
+    p._priceWhipFmt = p.price_whip ? p.price_whip.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '';
     p._nameLower = (p.name || '').toLowerCase();
     p._categoryLower = normalizeCyrillic(p.category);
     p._parentCategoryLower = normalizeCyrillic(p.parent_category);
@@ -722,7 +724,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/api/health', (req, res) => {
+const router = express.Router();
+
+router.get('/health', (req, res) => {
   const mask = (val) => val ? `${val.substring(0, 10)}... (len: ${val.length})` : 'missing/empty';
   res.json({ 
     status: 'ok', 
@@ -740,11 +744,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.get('/api/test-root', (req, res) => {
+router.get('/test-root', (req, res) => {
   res.json({ status: 'ok', root: 'works' });
 });
 
-app.get('/api/force-warm', async (req, res) => {
+router.get('/force-warm', async (req, res) => {
   try {
     await warmProducts();
     res.json({
@@ -758,8 +762,6 @@ app.get('/api/force-warm', async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-
-const router = express.Router();
 
 // Helper to strip any precomputed/temporary client properties (starting with '_') before database write
 function sanitizeProductForDb(product) {
@@ -776,6 +778,8 @@ function sanitizeProductForDb(product) {
     'l3',
     'price_ton',
     'price_unit',
+    'price_meter',
+    'price_whip',
     'unit_label',
     'weight',
     'image',
@@ -1508,7 +1512,8 @@ router.get('/products', async (req, res) => {
 
   if (category) {
     const cats = category.split(',').map(c => normalizeCyrillic(c));
-    baseList = baseList.filter(p => p.category && cats.some(c => normalizeCyrillic(p.category).includes(c) || c.includes(normalizeCyrillic(p.category))));
+    // Strict equality — "Арматура" must NOT match "Композитная арматура"
+    baseList = baseList.filter(p => p.category && cats.includes(normalizeCyrillic(p.category)));
   }
   
   if (parent_category) {
@@ -1547,23 +1552,33 @@ router.get('/products', async (req, res) => {
   // L3 (третий уровень: напр. «Арматура 12 мм», «Арматура А500») —
   // дополнительный параметр фильтрации поверх L2-категории.
   if (l3Params.length > 0) {
-    baseList = baseList.filter(p => p.l3 && l3Params.some(x => normalizeCyrillic(p.l3) === x || normalizeCyrillic(p.l3).includes(x)));
+    baseList = baseList.filter(p => p.l3 && l3Params.includes(normalizeCyrillic(p.l3)));
   }
+
+  const normalizeValueExact = (val) => {
+    if (val === null || val === undefined) return '';
+    return val.toString()
+      .toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/,/g, '.')
+      .replace(/(?:мм|м|mm|m)$/, '')
+      .trim();
+  };
 
   const filterSize = (p) => {
     if (vidsParams.length === 0 && widthsParams.length === 0) return true;
-    const matchVid = vidsParams.length > 0 && p.vid && vidsParams.some(v => p.vid.toLowerCase().includes(v));
-    const matchWidth = widthsParams.length > 0 && p.width && widthsParams.some(w => p.width.toString().toLowerCase().includes(w));
+    const matchVid = vidsParams.length > 0 && p.vid && vidsParams.some(v => normalizeValueExact(p.vid) === normalizeValueExact(v));
+    const matchWidth = widthsParams.length > 0 && p.width && widthsParams.some(w => normalizeValueExact(p.width) === normalizeValueExact(w));
     if (vid && width) return matchVid || matchWidth;
     if (vid) return matchVid;
     return matchWidth;
   };
   
-  const filterLength = (p) => lengthsParams.length === 0 || (p.length && lengthsParams.some(l => p.length.toString().toLowerCase().includes(l)));
+  const filterLength = (p) => lengthsParams.length === 0 || (p.length && lengthsParams.some(l => normalizeValueExact(p.length) === normalizeValueExact(l)));
   
   const filterType = (p) => typesParams.length === 0 || 
-    (p.type && typesParams.some(t => p.type.toLowerCase().includes(t))) || 
-    (p.steel && typesParams.some(t => p.steel.toLowerCase().includes(t)));
+    (p.type && typesParams.some(t => normalizeValueExact(p.type) === normalizeValueExact(t))) || 
+    (p.steel && typesParams.some(t => normalizeValueExact(p.steel) === normalizeValueExact(t)));
 
   const listForSizeCounts = baseList.filter(p => filterLength(p) && filterType(p));
   const listForLengthCounts = baseList.filter(p => filterSize(p) && filterType(p));
@@ -1637,6 +1652,8 @@ router.get('/products', async (req, res) => {
       priceTon: row.price_ton ? row.price_ton.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
       priceTonNum: row.price_ton,
       priceUnit: row.price_unit ? row.price_unit.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
+      priceMeter: row.price_meter ? row.price_meter.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
+      priceWhip: row.price_whip ? row.price_whip.toLocaleString('ru-RU', { minimumFractionDigits: 2 }) : '',
       unitLabel: row.unit_label,
       perTon: row.weight,
       desc: row.description,
@@ -1687,13 +1704,53 @@ router.get('/products/:id', async (req, res) => {
 
   const cleanId = id.trim().toLowerCase().replace(/\/$/, '').replace(/^-|-$/g, '');
 
-  const p = allProductsInMemory.find(x => 
+  let p = allProductsInMemory.find(x => 
     x.id.toString() === id || 
     x.id.toString().toLowerCase() === cleanId || 
     (x.name && x.name.toLowerCase() === cleanId) ||
     (x.name && slugify(x.name) === cleanId) ||
     (x.id && slugify(x.id.toString()) === cleanId)
   );
+
+  // Robust fuzzy matching fallback to avoid 404s for old or alternative URL/ID formats
+  if (!p) {
+    const queryParts = cleanId.split('-');
+    let bestMatch = null;
+    let maxScore = 0;
+    
+    for (let i = 0; i < allProductsInMemory.length; i++) {
+      const candidate = allProductsInMemory[i];
+      const nameParts = slugify(candidate.name || '').split('-');
+      const idParts = slugify(candidate.id.toString()).split('-');
+      const combinedParts = new Set([...nameParts, ...idParts]);
+      
+      // Calculate how many parts of the cleanId query exist in the candidate parts
+      let score = 0;
+      for (const qPart of queryParts) {
+        if (combinedParts.has(qPart)) {
+          score++;
+        }
+      }
+      
+      // Add extra points for exact suffix match if the cleanId ends with a digit
+      const lastQueryPart = queryParts[queryParts.length - 1];
+      if (/^\d+$/.test(lastQueryPart) && candidate.id.toString().endsWith(`-${lastQueryPart}`)) {
+        score += 2; // bonus points for exact ID index suffix match
+      }
+      
+      if (score > maxScore) {
+        maxScore = score;
+        bestMatch = candidate;
+      }
+    }
+    
+    // We accept a match if it has a high enough score (at least 3 parts, or 50% of the query parts)
+    const requiredScore = Math.max(3, Math.floor(queryParts.length * 0.5));
+    if (bestMatch && maxScore >= requiredScore) {
+      console.log(`[API] Fuzzy matched CleanID "${cleanId}" to Product ID "${bestMatch.id}" with score ${maxScore}`);
+      p = bestMatch;
+    }
+  }
 
   if (!p) {
     return res.status(404).json({ 
@@ -1706,6 +1763,22 @@ router.get('/products/:id', async (req, res) => {
     ...p,
     specs: typeof p.specs === 'string' ? JSON.parse(p.specs) : (p.specs || [])
   });
+});
+
+// API: Public parameters catalog list
+router.get('/parameters', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('product_parameters')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('name', { ascending: true });
+    if (error) throw error;
+    res.json(data || []);
+  } catch (e) {
+    console.error('[API] Error fetching public parameters:', e.message);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // API: Category filters
@@ -1726,7 +1799,7 @@ router.get('/category-filters', async (req, res) => {
   const matched = allProductsInMemory.filter(p => 
     p.vstatus !== 'archived' && 
     p.category && 
-    (normalizeCyrillic(p.category) === categoryNorm || normalizeCyrillic(p.category).startsWith(categoryNorm) || categoryNorm.startsWith(normalizeCyrillic(p.category)))
+    normalizeCyrillic(p.category) === categoryNorm
   );
 
   const extractSize = (name) => {
@@ -1734,12 +1807,21 @@ router.get('/category-filters', async (req, res) => {
     return m ? m[1].replace(/х/g, 'x') : null;
   };
 
-  let widths = [...new Set(matched.map(r => r.width))].filter(w => w && w !== 'Стандарт');
+  // Sanitizer: vid/width must look like a dimension (number / number with unit / NxN profile),
+  // never a steel grade or l3 subgroup like "Низколегированный".
+  const looksLikeDimension = (v) => {
+    if (!v) return false;
+    const s = v.toString().trim();
+    // Pure number, decimal, NxM, NxMxK, optional "мм"/"м"
+    return /^\d+(?:[.,]\d+)?(?:\s*[xх]\s*\d+(?:[.,]\d+)?){0,2}\s*(?:мм|m|m|m\.|m,|m;|см)?$/i.test(s);
+  };
+
+  let widths = [...new Set(matched.map(r => r.width))].filter(w => w && w !== 'Стандарт' && looksLikeDimension(w));
   if (widths.length === 0) {
     widths = [...new Set(matched.map(r => extractSize(r.name)))].filter(Boolean);
   }
   
-  let vids = [...new Set(matched.map(r => r.vid))].filter(Boolean);
+  let vids = [...new Set(matched.map(r => r.vid))].filter(v => v && looksLikeDimension(v));
   if (vids.length === 0 && (categoryNorm.includes('труба') || categoryNorm.includes('арматура'))) {
       // If vids is empty, let's use the widths as vids because the frontend combines them
       vids = widths;

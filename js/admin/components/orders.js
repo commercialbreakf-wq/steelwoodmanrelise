@@ -14,30 +14,33 @@ function updateBulkOrdersToolbar(state) {
     }
 
     toolbar.innerHTML = `
-        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-surface-container-low/90 backdrop-blur-md border border-primary/20 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-6 animate-in slide-in-from-bottom-8 duration-500">
-            <div class="flex items-center gap-3 pr-6 border-r border-outline/10">
-                <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs">
-                    ${selectedOrderIds.size}
+        <div class="admin-bulk-bar fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1rem)] sm:w-auto max-w-[600px] bg-surface-container-low/95 backdrop-blur-md border border-primary/20 px-3 py-3 md:px-6 md:py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:items-center gap-3 md:gap-6 animate-in slide-in-from-bottom-8 duration-500">
+            <div class="flex items-center justify-between md:justify-start gap-3 md:pr-6 md:border-r border-outline/10 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0">
+                        ${selectedOrderIds.size}
+                    </div>
+                    <div class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant font-label-caps">Выбрано</div>
                 </div>
-                <div class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant font-label-caps">Выбрано</div>
+                <button id="bulk-order-close-mobile" class="md:hidden p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant">
+                    <span class="material-symbols-outlined text-base">close</span>
+                </button>
             </div>
             
-            <div class="flex items-center gap-4">
-                <div class="relative flex items-center gap-2">
-                    <button type="button" id="bulk-order-status-btn" class="flex items-center gap-2 bg-surface-container border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary outline-none cursor-pointer hover:bg-on-surface/5 transition-all shadow-md">
-                        <span class="material-symbols-outlined text-primary text-sm">donut_large</span>
-                        <span>Изменить статус...</span>
-                        <span class="material-symbols-outlined text-sm opacity-50 ml-1">expand_more</span>
-                    </button>
-                </div>
+            <div class="flex items-center gap-2 md:gap-4 overflow-x-auto custom-scrollbar md:overflow-visible -mx-1 px-1 md:mx-0 md:px-0">
+                <button type="button" id="bulk-order-status-btn" class="flex items-center gap-2 bg-surface-container border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary outline-none cursor-pointer hover:bg-on-surface/5 transition-all shadow-md shrink-0">
+                    <span class="material-symbols-outlined text-primary text-sm">donut_large</span>
+                    <span>Статус...</span>
+                    <span class="material-symbols-outlined text-sm opacity-50 ml-1">expand_more</span>
+                </button>
                 
-                <button type="button" id="bulk-order-delete-btn" class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 border border-error/20 rounded-xl transition-all text-xs font-bold uppercase tracking-widest text-error">
+                <button type="button" id="bulk-order-delete-btn" class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 border border-error/20 rounded-xl transition-all text-xs font-bold uppercase tracking-widest text-error shrink-0">
                     <span class="material-symbols-outlined text-base">delete</span>
                     Удалить
                 </button>
             </div>
             
-            <button id="bulk-order-close-btn" class="ml-4 p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant" title="Снять выделение">
+            <button id="bulk-order-close-btn" class="hidden md:flex md:ml-4 p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant shrink-0" title="Снять выделение">
                 <span class="material-symbols-outlined text-base">close</span>
             </button>
         </div>
@@ -95,6 +98,8 @@ function updateBulkOrdersToolbar(state) {
         const selectAll = document.getElementById('orders-select-all');
         if (selectAll) selectAll.className = "w-6 h-6 rounded border flex items-center justify-center transition-all cursor-pointer border-white/20 bg-black/40 text-transparent";
     };
+    const closeBtnMobile = toolbar.querySelector('#bulk-order-close-mobile');
+    if (closeBtnMobile) closeBtnMobile.onclick = () => closeBtn.onclick();
 }
 
 /**
@@ -427,6 +432,31 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
                         </tr>
                     `}).join('')}
                 </tbody>
+                <!-- Spreadsheet footer aggregates -->
+                <tfoot class="border-t-2 border-primary/20 bg-surface-container-low/50 text-xs font-bold text-on-surface select-none">
+                    <tr class="divide-x divide-outline/5">
+                        <td class="py-4 px-4"></td>
+                        <td class="py-4 px-6 text-[10px] uppercase font-bold text-on-surface-variant opacity-60">Итого:</td>
+                        <td class="py-4 px-6"></td>
+                        <td class="py-4 px-6">
+                            <div class="text-[10px] text-on-surface-variant font-medium">КОЛИЧЕСТВО: <span id="order-stats-count" class="font-bold text-on-surface">0</span></div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="text-[10px] text-on-surface-variant font-medium">СУММА: <span id="order-stats-sum" class="font-bold text-primary">0 ₽</span></div>
+                            <div class="text-[10px] text-on-surface-variant font-medium mt-1">СРЕДНИЙ ЧЕК: <span id="order-stats-avg" class="font-bold text-primary">0 ₽</span></div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="text-[10px] text-on-surface-variant font-medium">МИН: <span id="order-stats-min" class="font-bold text-on-surface">0 ₽</span></div>
+                            <div class="text-[10px] text-on-surface-variant font-medium mt-1">МАКС: <span id="order-stats-max" class="font-bold text-on-surface">0 ₽</span></div>
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            <div class="flex items-center justify-end gap-1 px-1 py-0.5 bg-surface-container border border-outline/10 rounded-xl w-max ml-auto shadow-inner">
+                                <button type="button" id="order-stats-all-btn" class="order-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                                <button type="button" id="order-stats-sel-btn" class="order-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         <div class="grid grid-cols-1 gap-4 md:hidden p-4">
@@ -498,8 +528,145 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
                 </div>
                 `;
             }).join('')}
+            
+            <!-- Mobile stats view -->
+            <div class="mt-4 p-5 bg-surface-container rounded-3xl border border-outline/10 space-y-4 select-none">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60 font-bold">Статистика:</span>
+                    <div class="flex items-center gap-1 bg-surface-container-low border border-outline/10 rounded-xl p-1 shadow-inner">
+                        <button type="button" id="order-stats-all-btn-mobile" class="order-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                        <button type="button" id="order-stats-sel-btn-mobile" class="order-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-[10px] uppercase font-bold text-on-surface-variant">
+                    <div>Заказов: <span id="order-stats-count-mobile" class="text-on-surface">0</span></div>
+                    <div>Сумма: <span id="order-stats-sum-mobile" class="text-primary">0 ₽</span></div>
+                    <div>Средний чек: <span id="order-stats-avg-mobile" class="text-primary">0 ₽</span></div>
+                    <div>Мин / Макс: <span id="order-stats-range-mobile" class="text-on-surface">0 / 0 ₽</span></div>
+                </div>
+            </div>
         </div>
     `;
+
+    // Highlight updater, statistics updater, and range select
+    const updateOrderRowHighlights = () => {
+        container.querySelectorAll('.order-row').forEach(row => {
+            const id = Number(row.dataset.id);
+            const isSelected = selectedOrderIds.has(id);
+            if (isSelected) {
+                row.classList.add('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+            } else {
+                row.classList.remove('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+            }
+        });
+    };
+    updateOrderRowHighlights();
+
+    let statsMode = 'all';
+    const updateOrderStatistics = () => {
+        const statsAllBtn = container.querySelector('#order-stats-all-btn');
+        const statsSelBtn = container.querySelector('#order-stats-sel-btn');
+        const statsAllBtnMobile = container.querySelector('#order-stats-all-btn-mobile');
+        const statsSelBtnMobile = container.querySelector('#order-stats-sel-btn-mobile');
+
+        if (statsSelBtn) statsSelBtn.textContent = `Выбр. (${selectedOrderIds.size})`;
+        if (statsSelBtnMobile) statsSelBtnMobile.textContent = `Выбр. (${selectedOrderIds.size})`;
+
+        let targets = [];
+        if (statsMode === 'all') {
+            targets = [...orders];
+        } else {
+            targets = orders.filter(o => selectedOrderIds.has(o.id));
+        }
+
+        const count = targets.length;
+        const values = targets.map(o => Number(o.total || 0));
+        const sum = values.reduce((acc, v) => acc + v, 0);
+        const avg = count > 0 ? Math.round(sum / count) : 0;
+        const min = values.length > 0 ? Math.min(...values) : 0;
+        const max = values.length > 0 ? Math.max(...values) : 0;
+
+        const elCount = container.querySelector('#order-stats-count');
+        const elSum = container.querySelector('#order-stats-sum');
+        const elAvg = container.querySelector('#order-stats-avg');
+        const elMin = container.querySelector('#order-stats-min');
+        const elMax = container.querySelector('#order-stats-max');
+        if (elCount) elCount.textContent = count;
+        if (elSum) elSum.textContent = sum.toLocaleString() + ' ₽';
+        if (elAvg) elAvg.textContent = avg.toLocaleString() + ' ₽';
+        if (elMin) elMin.textContent = min.toLocaleString() + ' ₽';
+        if (elMax) elMax.textContent = max.toLocaleString() + ' ₽';
+
+        const elCountMobile = container.querySelector('#order-stats-count-mobile');
+        const elSumMobile = container.querySelector('#order-stats-sum-mobile');
+        const elAvgMobile = container.querySelector('#order-stats-avg-mobile');
+        const elRangeMobile = container.querySelector('#order-stats-range-mobile');
+        if (elCountMobile) elCountMobile.textContent = count;
+        if (elSumMobile) elSumMobile.textContent = sum.toLocaleString() + ' ₽';
+        if (elAvgMobile) elAvgMobile.textContent = avg.toLocaleString() + ' ₽';
+        if (elRangeMobile) elRangeMobile.textContent = `${min.toLocaleString()} / ${max.toLocaleString()} ₽`;
+
+        const activeClass = 'order-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary shadow-sm';
+        const inactiveClass = 'order-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant hover:text-primary';
+        
+        if (statsAllBtn) statsAllBtn.className = statsMode === 'all' ? activeClass : inactiveClass;
+        if (statsSelBtn) statsSelBtn.className = statsMode === 'selected' ? activeClass : inactiveClass;
+        if (statsAllBtnMobile) statsAllBtnMobile.className = statsMode === 'all' ? activeClass : inactiveClass;
+        if (statsSelBtnMobile) statsSelBtnMobile.className = statsMode === 'selected' ? activeClass : inactiveClass;
+    };
+    updateOrderStatistics();
+
+    container.querySelectorAll('#order-stats-all-btn, #order-stats-all-btn-mobile').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            statsMode = 'all';
+            updateOrderStatistics();
+        };
+    });
+    container.querySelectorAll('#order-stats-sel-btn, #order-stats-sel-btn-mobile').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            statsMode = 'selected';
+            updateOrderStatistics();
+        };
+    });
+
+    let lastChecked = null;
+    const handleOrderSelectClick = (clickedId, event) => {
+        const clickedCell = event.target?.closest?.('.order-select-cell')
+            || container.querySelector(`.order-select-cell[data-id="${clickedId}"]`);
+        if (!clickedCell) return;
+
+        const isRangeSelect = event.shiftKey || event.ctrlKey;
+        const targetState = selectedOrderIds.has(clickedId);
+
+        if (isRangeSelect && lastChecked) {
+            const scope = clickedCell.closest('table') || clickedCell.closest('.md\\:hidden') || container;
+            const cells = Array.from(scope.querySelectorAll('.order-select-cell'));
+            const start = cells.findIndex(c => Number(c.dataset.id) === clickedId);
+            const end = cells.findIndex(c => Number(c.dataset.id) === Number(lastChecked.dataset.id));
+
+            if (start !== -1 && end !== -1) {
+                const min = Math.min(start, end);
+                const max = Math.max(start, end);
+
+                for (let i = min; i <= max; i++) {
+                    const targetCell = cells[i];
+                    const targetId = Number(targetCell.dataset.id);
+                    const block = targetCell.querySelector('.order-select-block');
+                    if (targetState) {
+                        selectedOrderIds.add(targetId);
+                        if (block) block.className = "order-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto bg-primary/20 border-primary/50 text-primary";
+                    } else {
+                        selectedOrderIds.delete(targetId);
+                        if (block) block.className = "order-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-lowest text-transparent group-hover:border-outline/40";
+                    }
+                }
+            }
+        }
+        
+        lastChecked = clickedCell;
+    };
 
     // Handle row selections
     container.querySelectorAll('.order-select-cell').forEach(cell => {
@@ -517,7 +684,10 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
                 block.className = "order-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-lowest text-transparent group-hover:border-outline/40";
             }
             
+            handleOrderSelectClick(id, e);
             updateBulkOrdersToolbar(state);
+            updateOrderRowHighlights();
+            updateOrderStatistics();
 
             // Update master check
             const selectAll = container.querySelector('#orders-select-all');
@@ -551,6 +721,8 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
             
             selectAll.className = `w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto ${willBeChecked ? 'bg-primary/20 border-primary/50 text-primary' : 'border-outline/20 bg-surface-container-lowest text-transparent'}`;
             updateBulkOrdersToolbar(state);
+            updateOrderRowHighlights();
+            updateOrderStatistics();
         };
     }
 
@@ -565,7 +737,37 @@ function renderOrdersTable(container, orders, state, sortOptions = {}) {
     container.querySelectorAll('.order-row').forEach(row => {
         row.addEventListener('click', (e) => {
             if (e.target.closest('.order-select-cell') || e.target.closest('button')) return;
-            openOrderDrawer(row.dataset.id, state);
+            
+            const isRangeSelect = e.shiftKey || e.ctrlKey;
+            if (isRangeSelect) {
+                e.stopPropagation();
+                e.preventDefault();
+                const id = Number(row.dataset.id);
+                const block = row.querySelector('.order-select-block');
+                const isChecked = !selectedOrderIds.has(id);
+                
+                if (isChecked) {
+                    selectedOrderIds.add(id);
+                    if (block) block.className = "order-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto bg-primary/20 border-primary/50 text-primary";
+                } else {
+                    selectedOrderIds.delete(id);
+                    if (block) block.className = "order-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-lowest text-transparent group-hover:border-outline/40";
+                }
+                
+                handleOrderSelectClick(id, e);
+                updateBulkOrdersToolbar(state);
+                updateOrderRowHighlights();
+                updateOrderStatistics();
+
+                const selectAllVal = container.querySelector('#orders-select-all');
+                if (selectAllVal) {
+                    const allVisibleCells = container.querySelectorAll('.order-select-cell');
+                    const allChecked = Array.from(allVisibleCells).every(c => selectedOrderIds.has(Number(c.dataset.id)));
+                    selectAllVal.className = `w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto ${allChecked ? 'bg-primary/20 border-primary/50 text-primary' : 'border-outline/20 bg-surface-container-lowest text-transparent'}`;
+                }
+            } else {
+                openOrderDrawer(row.dataset.id, state);
+            }
         });
     });
 
@@ -647,12 +849,12 @@ async function openOrderDrawer(orderId, state) {
             return `
                 <div class="flex flex-col items-end mb-4 animate-in fade-in duration-300">
                     <div class="flex items-end gap-2 max-w-[85%] md:max-w-[75%]">
-                        <div class="px-5 py-3 rounded-3xl text-sm bg-[#ca7093] text-[#0f0e0c] rounded-br-none shadow-md font-medium leading-relaxed">
+                        <div class="px-5 py-3 rounded-3xl text-sm bg-[#964551] text-[#0f0e0c] rounded-br-none shadow-md font-medium leading-relaxed">
                             ${m.text.replace(/\n/g, '<br>')}
                         </div>
                     </div>
                     <div class="text-[10px] text-on-surface-variant opacity-70 font-mono mt-1.5 flex items-center gap-1 mr-1">
-                        <span class="material-symbols-outlined text-[12px] text-[#ca7093]">done_all</span>
+                        <span class="material-symbols-outlined text-[12px] text-[#964551]">done_all</span>
                         Вы (Менеджер) • ${dateStr} ${timeStr}
                     </div>
                 </div>
@@ -665,7 +867,7 @@ async function openOrderDrawer(orderId, state) {
                             ${m.text.replace(/\n/g, '<br>')}
                         </div>
                     </div>
-                    <div class="text-[10px] text-[#ca7093] font-mono mt-1.5 flex items-center gap-1 ml-1 font-bold">
+                    <div class="text-[10px] text-[#964551] font-mono mt-1.5 flex items-center gap-1 ml-1 font-bold">
                         <span class="material-symbols-outlined text-[12px]">person</span>
                         Клиент • ${dateStr} ${timeStr}
                     </div>
@@ -820,7 +1022,7 @@ async function openOrderDrawer(orderId, state) {
                             chatBox.innerHTML = renderMessages();
                             chatBox.scrollTop = chatBox.scrollHeight;
                             chatBox.style.transition = 'background 0.3s';
-                            chatBox.style.background = 'rgba(202, 112, 147,0.05)';
+                            chatBox.style.background = 'rgba(150, 69, 81,0.05)';
                             setTimeout(() => { chatBox.style.background = ''; }, 600);
                         }
                     }

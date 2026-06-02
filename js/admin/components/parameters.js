@@ -34,10 +34,11 @@ export async function renderParametersView(container, state) {
 
             <!-- Tabs: Desktop row | Mobile arrow-navigator -->
             <!-- Desktop tabs -->
-            <div class="hidden md:flex gap-1 bg-surface-container-low p-1 rounded-2xl border border-outline/10 w-fit">
+            <div class="hidden md:flex gap-1 bg-surface-container-low p-1 rounded-2xl border border-outline/10 w-full md:w-fit overflow-x-auto scrollbar-none max-w-full">
                 <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-on-surface-variant hover:text-primary" data-tab="products">Товары</button>
                 <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-on-surface-variant hover:text-primary" data-tab="l1">Категории L1</button>
                 <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-on-surface-variant hover:text-primary" data-tab="l2">Категории L2</button>
+                <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-on-surface-variant hover:text-primary" data-tab="l3">L3 (табы)</button>
                 <button class="product-tab px-6 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-all text-primary bg-primary/10" data-tab="parameters">Параметры</button>
             </div>
             <!-- Mobile tab navigator (arrow-switcher) -->
@@ -48,6 +49,7 @@ export async function renderParametersView(container, state) {
                 <div class="flex flex-col items-center gap-1 flex-1">
                     <span class="font-bold uppercase text-[11px] tracking-widest text-primary">Параметры</span>
                     <div class="flex gap-1 mt-1">
+                        <span class="w-1.5 h-1.5 rounded-full transition-all bg-outline/30"></span>
                         <span class="w-1.5 h-1.5 rounded-full transition-all bg-outline/30"></span>
                         <span class="w-1.5 h-1.5 rounded-full transition-all bg-outline/30"></span>
                         <span class="w-1.5 h-1.5 rounded-full transition-all bg-outline/30"></span>
@@ -63,10 +65,10 @@ export async function renderParametersView(container, state) {
             <div id="params-bulk-toolbar-container"></div>
 
             <!-- Search -->
-            <div class="liquid-glass p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] border-outline/5 shadow-2xl">
-                <div class="relative group">
-                    <span class="material-symbols-outlined absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-primary opacity-50 text-lg md:text-xl group-focus-within:opacity-100 transition-opacity">search</span>
-                    <input type="text" id="params-search" placeholder="Поиск по названию параметра..." autocomplete="off" class="w-full bg-surface-container-low border border-outline/10 rounded-xl md:rounded-2xl pl-12 md:pl-14 pr-4 md:pr-6 py-3 md:py-4 text-sm font-medium focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/30">
+            <div class="flex gap-2 items-center">
+                <div class="relative flex-1">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60 text-lg">search</span>
+                    <input type="text" id="params-search" placeholder="Поиск по названию параметра..." autocomplete="off" class="w-full bg-surface-container-low border border-outline/10 rounded-xl pl-12 pr-4 py-3 text-sm font-medium focus:border-primary outline-none transition-all text-on-surface placeholder:text-on-surface-variant/40">
                 </div>
             </div>
 
@@ -74,7 +76,7 @@ export async function renderParametersView(container, state) {
             <div id="params-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
 
             <!-- Table container -->
-            <div class="liquid-glass rounded-[2.5rem] overflow-hidden min-h-[400px] border-outline/5 shadow-2xl relative" id="params-table-container">
+            <div class="glass rounded-3xl overflow-hidden min-h-[400px]" id="params-table-container">
                 <div class="flex flex-col items-center justify-center h-[400px] gap-6 opacity-40">
                     <div class="w-12 h-12 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
                     <div class="font-label-caps text-[10px] uppercase tracking-[0.3em]">Загрузка параметров...</div>
@@ -96,7 +98,12 @@ export async function renderParametersView(container, state) {
     // ─── API helpers ─────────────────────────────────────────────────────────
     const apiFetch = async (url, opts = {}) => {
         const token = localStorage.getItem('metal_token');
-        const res = await fetch(url, {
+        let targetUrl = url;
+        if (!opts.method || opts.method.toUpperCase() === 'GET') {
+            const hasQuery = url.includes('?');
+            targetUrl = `${url}${hasQuery ? '&' : '?'}t=${Date.now()}`;
+        }
+        const res = await fetch(targetUrl, {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             ...opts
         });
@@ -110,7 +117,7 @@ export async function renderParametersView(container, state) {
     const loadParams = async () => {
         tableContainer.innerHTML = `
             <div class="flex items-center justify-center h-[400px]">
-                <div class="w-8 h-8 border-2 border-[#ca7093]/20 border-t-[#ca7093] rounded-full animate-spin"></div>
+                <div class="w-8 h-8 border-2 border-[#964551]/20 border-t-[#964551] rounded-full animate-spin"></div>
             </div>
         `;
         try {
@@ -186,19 +193,19 @@ export async function renderParametersView(container, state) {
                     <div class="flex items-center justify-between pb-6 mb-6">
                         <div>
                             <h3 class="text-xl font-['Space Grotesk'] tracking-tight text-[#e7e2dd] font-bold uppercase">ИМПОРТ ПАРАМЕТРОВ</h3>
-                            <div class="text-[10px] text-[#ca7093] uppercase font-['Space Grotesk'] tracking-widest mt-1 font-bold">ПОДДЕРЖИВАЕТСЯ ФОРМАТ CSV</div>
+                            <div class="text-[10px] text-[#964551] uppercase font-['Space Grotesk'] tracking-widest mt-1 font-bold">ПОДДЕРЖИВАЕТСЯ ФОРМАТ CSV</div>
                         </div>
                         <button id="import-params-close" class="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center text-[#d7c1c7] transition-colors">
                             <span class="material-symbols-outlined text-xl">close</span>
                         </button>
                     </div>
                     
-                    <div class="bg-[#1a1816] border border-[#ffb0cc]/20 rounded-2xl p-6 mb-6">
+                    <div class="bg-[#1a1816] border border-[#964551]/20 rounded-2xl p-6 mb-6">
                         <div class="text-sm text-[#d7c1c7] mb-4">
                             Для массового импорта параметров используйте файл формата CSV. Колонки должны содержать:
                         </div>
                         <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div class="bg-[#141210] p-3 rounded-xl border border-white/5"><b class="text-[#e7e2dd]">name</b> — Название <span class="text-[#ffb0cc]">*</span></div>
+                            <div class="bg-[#141210] p-3 rounded-xl border border-white/5"><b class="text-[#e7e2dd]">name</b> — Название <span class="text-[#964551]">*</span></div>
                             <div class="bg-[#141210] p-3 rounded-xl border border-white/5"><b class="text-[#e7e2dd]">unit</b> — Ед. изм.</div>
                             <div class="bg-[#141210] p-3 rounded-xl border border-white/5"><b class="text-[#e7e2dd]">type</b> — string, number, boolean, select</div>
                             <div class="bg-[#141210] p-3 rounded-xl border border-white/5"><b class="text-[#e7e2dd]">required</b> — true/false или Да/Нет</div>
@@ -206,14 +213,14 @@ export async function renderParametersView(container, state) {
                             <div class="bg-[#141210] p-3 rounded-xl border border-white/5"><b class="text-[#e7e2dd]">category_hint</b> — Категории</div>
                         </div>
                         <div class="mt-4">
-                            <button id="download-params-template-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#ffb0cc]/40 text-[#ffb0cc] hover:bg-[#ffb0cc] hover:text-[#0f0e0c] transition-all text-[10px] font-bold uppercase tracking-widest">
+                            <button id="download-params-template-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#964551]/40 text-[#964551] hover:bg-[#964551] hover:text-[#0f0e0c] transition-all text-[10px] font-bold uppercase tracking-widest">
                                 <span class="material-symbols-outlined text-sm">download</span> СКАЧАТЬ ШАБЛОН
                             </button>
                         </div>
                     </div>
                     
-                    <div id="import-params-select-btn" class="border-2 border-dashed border-[#ffb0cc]/30 rounded-[2rem] p-10 flex flex-col items-center justify-center cursor-pointer hover:border-[#ffb0cc] hover:bg-[#ffb0cc]/5 transition-all group">
-                        <div class="w-16 h-16 rounded-2xl border border-[#ffb0cc]/30 flex items-center justify-center text-[#ffb0cc] mb-4 group-hover:scale-110 transition-transform">
+                    <div id="import-params-select-btn" class="border-2 border-dashed border-[#964551]/30 rounded-[2rem] p-10 flex flex-col items-center justify-center cursor-pointer hover:border-[#964551] hover:bg-[#964551]/5 transition-all group">
+                        <div class="w-16 h-16 rounded-2xl border border-[#964551]/30 flex items-center justify-center text-[#964551] mb-4 group-hover:scale-110 transition-transform">
                             <span class="material-symbols-outlined text-3xl">upload_file</span>
                         </div>
                         <h4 class="text-[#e7e2dd] font-bold text-lg mb-1">Перетащите CSV сюда</h4>
@@ -339,6 +346,7 @@ export async function renderParametersView(container, state) {
                             <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Название параметра</th>
                             <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Ед. изм. / Тип</th>
                             <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Категории</th>
+                            <th class="text-left px-6 py-5 text-[10px] font-label-caps uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Использование</th>
                             <th class="w-24"></th>
                         </tr>
                     </thead>
@@ -374,6 +382,16 @@ export async function renderParametersView(container, state) {
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
+                                    <div class="flex flex-wrap gap-1.5 select-none">
+                                        ${p.is_search_filter !== false ? 
+                                            `<span class="px-2.5 py-1 rounded-xl bg-primary/10 border border-primary/20 text-primary text-[9px] font-bold font-label-caps uppercase tracking-widest inline-flex items-center gap-1 shadow-sm"><span class="material-symbols-outlined text-[10px]">search</span>Поиск</span>` : ''
+                                        }
+                                        ${p.is_characteristic !== false ? 
+                                            `<span class="px-2.5 py-1 rounded-xl bg-surface-variant/40 border border-outline/10 text-on-surface-variant text-[9px] font-bold font-label-caps uppercase tracking-widest inline-flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">info</span>Характ.</span>` : ''
+                                        }
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
                                     <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button class="edit-param-btn p-2 rounded-xl hover:bg-primary/10 hover:text-primary text-on-surface-variant transition-all" data-id="${p.id}" title="Редактировать">
                                             <span class="material-symbols-outlined text-base">edit</span>
@@ -386,6 +404,27 @@ export async function renderParametersView(container, state) {
                             </tr>
                         `).join('')}
                     </tbody>
+                    <!-- Spreadsheet footer aggregates -->
+                    <tfoot class="border-t-2 border-primary/20 bg-surface-container-low/50 text-xs font-bold text-on-surface select-none">
+                        <tr class="divide-x divide-outline/5">
+                            <td class="py-4 px-6"></td>
+                            <td class="py-4 px-6 text-[10px] uppercase font-bold text-on-surface-variant opacity-60">Итого:</td>
+                            <td class="py-4 px-6">
+                                <div class="text-[10px] text-on-surface-variant font-medium">ВСЕГО: <span id="param-stats-total" class="font-bold text-primary">0</span></div>
+                                <div class="text-[10px] text-on-surface-variant font-medium mt-1">ОБЯЗАТЕЛЬНЫХ: <span id="param-stats-req" class="font-bold text-primary">0</span></div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="text-[10px] text-on-surface-variant font-medium">ТИПЫ:</div>
+                                <div class="text-[9px] text-on-surface-variant font-medium mt-0.5 opacity-80" id="param-stats-types">Числа: 0 • Строки: 0 • Списки: 0</div>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex items-center justify-end gap-1 px-1 py-0.5 bg-surface-container border border-outline/10 rounded-xl w-max ml-auto shadow-inner">
+                                    <button type="button" id="param-stats-all-btn" class="param-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                                    <button type="button" id="param-stats-sel-btn" class="param-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
                 <!-- Mobile cards -->
                 <div class="md:hidden flex flex-col">
@@ -418,6 +457,14 @@ export async function renderParametersView(container, state) {
                                                 `<span class="px-2 py-0.5 rounded-lg bg-surface-variant text-on-surface-variant text-[9px] font-label-caps uppercase tracking-widest">${escapeHtml(cat.trim())}</span>`
                                             ).join('') || ''}
                                         </div>
+                                        <div class="flex items-center gap-1.5 mt-2 flex-wrap select-none">
+                                            ${p.is_search_filter !== false ? 
+                                                `<span class="px-2 py-0.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold font-label-caps uppercase tracking-widest inline-flex items-center gap-0.5"><span class="material-symbols-outlined text-[9px]">search</span>Поиск</span>` : ''
+                                            }
+                                            ${p.is_characteristic !== false ? 
+                                                `<span class="px-2 py-0.5 rounded-lg bg-surface-variant/40 border border-outline/10 text-on-surface-variant text-[8px] font-bold font-label-caps uppercase tracking-widest inline-flex items-center gap-0.5"><span class="material-symbols-outlined text-[9px]">info</span>Характ.</span>` : ''
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1 shrink-0">
@@ -431,6 +478,21 @@ export async function renderParametersView(container, state) {
                             </div>
                         </div>
                     `).join('')}
+                    </div>
+                    <!-- Mobile stats view -->
+                    <div class="mt-4 p-5 bg-surface-container rounded-3xl border border-outline/10 space-y-4 select-none">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60 font-bold">Статистика:</span>
+                            <div class="flex items-center gap-1 bg-surface-container-low border border-outline/10 rounded-xl p-1 shadow-inner">
+                                <button type="button" id="param-stats-all-btn-mobile" class="param-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                                <button type="button" id="param-stats-sel-btn-mobile" class="param-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-[10px] uppercase font-bold text-on-surface-variant">
+                            <div>Всего: <span id="param-stats-total-mobile" class="text-on-surface">0</span></div>
+                            <div>Обязательных: <span id="param-stats-req-mobile" class="text-primary">0</span></div>
+                            <div class="col-span-2">Типы: <span id="param-stats-types-mobile" class="text-on-surface font-mono">0</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -650,6 +712,61 @@ export async function renderParametersView(container, state) {
             });
         });
 
+        let statsMode = 'all';
+        const updateParamStatistics = () => {
+            const statsAllBtn = tableContainer.querySelector('#param-stats-all-btn');
+            const statsSelBtn = tableContainer.querySelector('#param-stats-sel-btn');
+            const statsAllBtnMobile = tableContainer.querySelector('#param-stats-all-btn-mobile');
+            const statsSelBtnMobile = tableContainer.querySelector('#param-stats-sel-btn-mobile');
+
+            if (statsSelBtn) statsSelBtn.textContent = `Выбр. (${selectedParamIds.length})`;
+            if (statsSelBtnMobile) statsSelBtnMobile.textContent = `Выбр. (${selectedParamIds.length})`;
+
+            let targets = [];
+            if (statsMode === 'all') {
+                targets = [...filteredParams];
+            } else {
+                const checkedIds = new Set(selectedParamIds);
+                targets = filteredParams.filter(p => checkedIds.has(p.id));
+            }
+
+            const totalCount = targets.length;
+            const reqCount = targets.filter(p => p.required).length;
+            
+            const typeCounts = { number: 0, string: 0, select: 0, boolean: 0 };
+            targets.forEach(p => {
+                const t = p.type || 'string';
+                if (typeCounts[t] !== undefined) typeCounts[t]++;
+                else typeCounts.string++;
+            });
+
+            const elTotal = tableContainer.querySelector('#param-stats-total');
+            const elReq = tableContainer.querySelector('#param-stats-req');
+            const elTypes = tableContainer.querySelector('#param-stats-types');
+            if (elTotal) elTotal.textContent = totalCount;
+            if (elReq) elReq.textContent = reqCount;
+            if (elTypes) {
+                elTypes.textContent = `Числа: ${typeCounts.number} • Строки: ${typeCounts.string} • Списки: ${typeCounts.select} • Лог: ${typeCounts.boolean}`;
+            }
+
+            const elTotalMobile = tableContainer.querySelector('#param-stats-total-mobile');
+            const elReqMobile = tableContainer.querySelector('#param-stats-req-mobile');
+            const elTypesMobile = tableContainer.querySelector('#param-stats-types-mobile');
+            if (elTotalMobile) elTotalMobile.textContent = totalCount;
+            if (elReqMobile) elReqMobile.textContent = reqCount;
+            if (elTypesMobile) {
+                elTypesMobile.textContent = `#:${typeCounts.number} • A-Z:${typeCounts.string} • ☰:${typeCounts.select} • ✓/✗:${typeCounts.boolean}`;
+            }
+
+            const activeClass = 'param-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary shadow-sm';
+            const inactiveClass = 'param-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant hover:text-primary';
+            
+            if (statsAllBtn) statsAllBtn.className = statsMode === 'all' ? activeClass : inactiveClass;
+            if (statsSelBtn) statsSelBtn.className = statsMode === 'selected' ? activeClass : inactiveClass;
+            if (statsAllBtnMobile) statsAllBtnMobile.className = statsMode === 'all' ? activeClass : inactiveClass;
+            if (statsSelBtnMobile) statsSelBtnMobile.className = statsMode === 'selected' ? activeClass : inactiveClass;
+        };
+
         const updateSelectionState = () => {
             checkboxes.forEach(cb => {
                 const id = parseInt(cb.dataset.id);
@@ -673,15 +790,16 @@ export async function renderParametersView(container, state) {
             tableContainer.querySelectorAll('.param-row').forEach(row => {
                 const id = parseInt(row.dataset.id);
                 if (selectedParamIds.includes(id)) {
-                    row.classList.add('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                    row.classList.add('bg-[#964551]/10', 'hover:bg-[#964551]/15');
                     row.classList.remove('hover:bg-primary/3');
                 } else {
-                    row.classList.remove('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                    row.classList.remove('bg-[#964551]/10', 'hover:bg-[#964551]/15');
                     row.classList.add('hover:bg-primary/3');
                 }
             });
 
             updateToolbar();
+            updateParamStatistics();
         };
 
         selectAllEls.forEach(sa => {
@@ -723,13 +841,31 @@ export async function renderParametersView(container, state) {
         tableContainer.querySelectorAll('.param-row').forEach(row => {
             const id = parseInt(row.dataset.id);
             if (selectedParamIds.includes(id)) {
-                row.classList.add('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                row.classList.add('bg-[#964551]/10', 'hover:bg-[#964551]/15');
                 row.classList.remove('hover:bg-primary/3');
             } else {
-                row.classList.remove('bg-[#ca7093]/10', 'hover:bg-[#ca7093]/15');
+                row.classList.remove('bg-[#964551]/10', 'hover:bg-[#964551]/15');
                 row.classList.add('hover:bg-primary/3');
             }
         });
+
+        // Hook stats button clicks
+        tableContainer.querySelectorAll('#param-stats-all-btn, #param-stats-all-btn-mobile').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                statsMode = 'all';
+                updateParamStatistics();
+            };
+        });
+        tableContainer.querySelectorAll('#param-stats-sel-btn, #param-stats-sel-btn-mobile').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                statsMode = 'selected';
+                updateParamStatistics();
+            };
+        });
+
+        updateParamStatistics();
 
         // Inline Renaming binding
         tableContainer.querySelectorAll('.param-name-cell').forEach(cell => {
@@ -1408,6 +1544,32 @@ export async function renderParametersView(container, state) {
                             </label>
                         </div>
                     </div>
+
+                    <div class="grid grid-cols-2 gap-4 bg-[#1a1816]/40 p-4 rounded-2xl border border-outline/5">
+                        <!-- Is Search Filter -->
+                        <div class="space-y-2 flex flex-col justify-center">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <div class="relative flex items-center justify-center">
+                                    <input type="checkbox" id="param-search-filter-input" class="peer sr-only" ${!isEdit || param.is_search_filter !== false ? 'checked' : ''}>
+                                    <div class="w-10 h-6 bg-surface-variant rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer-checked:bg-primary transition-colors duration-300"></div>
+                                    <div class="absolute left-1 top-1 w-4 h-4 bg-surface rounded-full transition-transform duration-300 peer-checked:translate-x-4 shadow-sm"></div>
+                                </div>
+                                <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Поиск (фильтр)</span>
+                            </label>
+                        </div>
+                        
+                        <!-- Is Characteristic -->
+                        <div class="space-y-2 flex flex-col justify-center">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <div class="relative flex items-center justify-center">
+                                    <input type="checkbox" id="param-characteristic-input" class="peer sr-only" ${!isEdit || param.is_characteristic !== false ? 'checked' : ''}>
+                                    <div class="w-10 h-6 bg-surface-variant rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer-checked:bg-primary transition-colors duration-300"></div>
+                                    <div class="absolute left-1 top-1 w-4 h-4 bg-surface rounded-full transition-transform duration-300 peer-checked:translate-x-4 shadow-sm"></div>
+                                </div>
+                                <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Характеристика</span>
+                            </label>
+                        </div>
+                    </div>
                     
                     <!-- Options (only for select type) -->
                     <div class="space-y-2 ${isEdit && param.type === 'select' ? '' : 'hidden'}" id="param-options-container">
@@ -1494,6 +1656,8 @@ export async function renderParametersView(container, state) {
                 category_hint: modalWrapper.querySelector('#param-category-input').value.trim(),
                 description: modalWrapper.querySelector('#param-desc-input').value.trim(),
                 sort_order: parseInt(modalWrapper.querySelector('#param-sort-input').value) || 0,
+                is_search_filter: modalWrapper.querySelector('#param-search-filter-input').checked,
+                is_characteristic: modalWrapper.querySelector('#param-characteristic-input').checked
             };
 
             saveBtn.disabled = true;
@@ -1625,6 +1789,7 @@ export async function renderParametersView(container, state) {
 
         const allL1Categories = [...new Set((state.products || []).map(p => p.parent_category).filter(Boolean))].sort();
         const allL2Categories = [...new Set((state.products || []).map(p => p.category).filter(Boolean))].sort();
+        const allL3Categories = [...new Set((state.products || []).map(p => (p.l3 || '').toString().trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
         const activeCategories = (param.category_hint || '').split(',').map(s => s.trim()).filter(Boolean);
         const selectedCategories = new Set(activeCategories);
 
@@ -2105,7 +2270,7 @@ export async function renderParametersView(container, state) {
     });
 
     // Mobile arrow navigation for Parameters view
-    const tabOrder = ['products', 'l1', 'l2', 'parameters'];
+    const tabOrder = ['products', 'l1', 'l2', 'l3', 'parameters'];
     const paramsPrevBtn = document.getElementById('params-tab-prev-btn');
     const paramsNextBtn = document.getElementById('params-tab-next-btn');
     const navigateToTab = (tab) => {
@@ -2159,7 +2324,7 @@ export async function fetchAllParameters() {
 
     try {
         const token = localStorage.getItem('metal_token');
-        const res = await fetch('/api/admin/parameters', {
+        const res = await fetch(`/api/admin/parameters?t=${Date.now()}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) return [];

@@ -35,19 +35,19 @@ async function run() {
   }
 
   console.log('Uploading new products to Supabase...');
-  const chunkSize = 50;
+  const chunkSize = 200;
   for (let i = 0; i < products.length; i += chunkSize) {
     const chunk = products.slice(i, i + chunkSize).map(p => ({
       id: p.id,
       name: p.name,
       category: p.category,
       parent_category: p.parentCategory || p.parent_category,
-      price_ton: p.priceTonNum || p.price_ton,
-      price_unit: p.priceUnitNum || p.price_unit,
+      price_ton: p.priceTonNum || p.price_ton || 0,
+      price_unit: p.priceUnitNum || p.price_unit || 0,
       unit_label: p.unitLabel || p.unit_label,
       weight: p.weight,
       description: p.description,
-      image: p.img || p.image || '/images/products/profile_tubes_premium_1778423900429.png',
+      image: p.image || p.img || '/images/products/profile_tubes_premium_1778423900429.png',
       specs: typeof p.specs === 'string' ? p.specs : JSON.stringify(p.specs),
       vid: p.vid || '',
       length: p.length || '',

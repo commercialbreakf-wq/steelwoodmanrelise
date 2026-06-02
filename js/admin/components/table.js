@@ -2,7 +2,7 @@
  * Renders the product table
  * @param {HTMLElement} container 
  * @param {Array} products 
- * @param {Object} options - { onRowClick, onSelectionChange, onDelete }
+ * @param {Object} options - { onRowClick, onSelectionChange, onDelete, visibleColumns }
  */
 export function renderProductTable(container, products, options = {}) {
     if (!container) return;
@@ -67,22 +67,22 @@ export function renderProductTable(container, products, options = {}) {
                         <th class="py-4 px-6 w-10 header-select-cell cursor-pointer">
                             <input type="checkbox" id="select-all-products" class="w-6 h-6 rounded border-outline/30 bg-transparent text-primary focus:ring-primary/20 cursor-pointer">
                         </th>
-                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="name">
+                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="name" data-col="name">
                             Товар ${currentSortKey === 'name' ? `<span class="sort-icon material-symbols-outlined text-[10px] align-middle">${currentSortOrder === 'asc' ? 'expand_less' : 'expand_more'}</span>` : ''}
                         </th>
-                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="parent_category">
+                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="parent_category" data-col="parent_category">
                             Категория (L1) ${currentSortKey === 'parent_category' ? `<span class="sort-icon material-symbols-outlined text-[10px] align-middle">${currentSortOrder === 'asc' ? 'expand_less' : 'expand_more'}</span>` : ''}
                         </th>
-                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="category">
+                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="category" data-col="category">
                             Подкатегория (L2) ${currentSortKey === 'category' ? `<span class="sort-icon material-symbols-outlined text-[10px] align-middle">${currentSortOrder === 'asc' ? 'expand_less' : 'expand_more'}</span>` : ''}
                         </th>
-                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="vstatus">
+                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="vstatus" data-col="vstatus">
                             Наличие ${currentSortKey === 'vstatus' ? `<span class="sort-icon material-symbols-outlined text-[10px] align-middle">${currentSortOrder === 'asc' ? 'expand_less' : 'expand_more'}</span>` : ''}
                         </th>
-                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="price_ton">
+                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="price_ton" data-col="price">
                             Цена (тонна) ${currentSortKey === 'price_ton' ? `<span class="sort-icon material-symbols-outlined text-[10px] align-middle">${currentSortOrder === 'asc' ? 'expand_less' : 'expand_more'}</span>` : ''}
                         </th>
-                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="created_at">
+                        <th class="py-4 px-6 font-bold cursor-pointer hover:text-on-surface transition-colors" data-sort="created_at" data-col="created_at">
                             Создан ${currentSortKey === 'created_at' ? `<span class="sort-icon material-symbols-outlined text-[10px] align-middle">${currentSortOrder === 'asc' ? 'expand_less' : 'expand_more'}</span>` : ''}
                         </th>
                         <th class="py-4 px-6 font-bold text-right">Действия</th>
@@ -100,30 +100,33 @@ export function renderProductTable(container, products, options = {}) {
                             <td class="py-4 px-6 product-select-cell" data-id="${product.id}">
                                 <input type="checkbox" class="product-checkbox w-6 h-6 rounded border-outline/30 bg-transparent text-primary focus:ring-primary/20 cursor-pointer" data-id="${product.id}">
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-6" data-col="name">
                                 <div class="font-bold text-sm uppercase transition-colors group-hover:text-primary ${product.vstatus === 'archived' ? 'text-red-500 dark:text-red-400' : 'text-on-surface'}">${product.name}</div>
                                 <div class="text-[10px] opacity-30 font-mono mt-0.5 text-on-surface-variant">ID: ${product.id}</div>
                             </td>
-                            <td class="py-4 px-6 product-l1-cell" data-id="${product.id}">
+                            <td class="py-4 px-6 product-l1-cell" data-id="${product.id}" data-col="parent_category">
                                 <span class="product-l1-badge cursor-pointer px-2 py-1 rounded-md bg-surface-container border border-outline/10 hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all text-[10px] text-on-surface-variant uppercase tracking-wider font-label-caps inline-block select-none">
                                     ${product.parent_category || 'Без категории'}
                                 </span>
                             </td>
-                            <td class="py-4 px-6 product-l2-cell" data-id="${product.id}">
+                            <td class="py-4 px-6 product-l2-cell" data-id="${product.id}" data-col="category">
                                 <span class="product-l2-badge cursor-pointer hover:text-primary hover:underline transition-all text-xs text-on-surface-variant opacity-60 italic inline-block select-none">
                                     ${product.category || 'Без подкатегории'}
                                 </span>
                             </td>
-                            <td class="py-4 px-6 product-status-cell" data-id="${product.id}">
+                            <td class="py-4 px-6 product-status-cell" data-id="${product.id}" data-col="vstatus">
                                 <span class="cursor-pointer px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider font-label-caps transition-all hover:scale-105 inline-block ${product.vstatus === 'archived' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'}">
                                     ${product.vstatus === 'archived' ? 'Нет в наличии' : 'В наличии'}
                                 </span>
                             </td>
-                            <td class="py-4 px-6">
-                                <div class="text-primary font-bold font-display-xl text-sm">${Number(product.price_ton || 0).toLocaleString()} ₽</div>
+                            <td class="py-4 px-6 product-price-cell group/price relative cursor-pointer" data-id="${product.id}" data-col="price">
+                                <div class="flex items-center gap-1.5">
+                                    <div class="text-primary font-bold font-display-xl text-sm price-display-value">${Number(product.price_ton || 0).toLocaleString()} ₽</div>
+                                    <span class="material-symbols-outlined text-[14px] text-primary opacity-0 group-hover/price:opacity-60 transition-opacity select-none" title="Редактировать цену">edit</span>
+                                </div>
                                 <div class="text-[10px] opacity-30 uppercase font-label-caps text-on-surface-variant">${product.unit_label || 'тонна'}</div>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-6" data-col="created_at">
                                 <div class="text-[10px] text-on-surface-variant opacity-60 font-mono">${product.created_at ? new Date(product.created_at).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'2-digit'}) : '—'}</div>
                                 <div class="text-[9px] text-on-surface-variant opacity-40 mt-0.5">${product.created_at ? new Date(product.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : ''}</div>
                             </td>
@@ -144,6 +147,30 @@ export function renderProductTable(container, products, options = {}) {
                         `;
                     }).join('')}
                 </tbody>
+                <!-- Spreadsheet footer aggregates -->
+                <tfoot class="border-t-2 border-primary/20 bg-surface-container-low/50 text-xs font-bold text-on-surface select-none">
+                    <tr class="divide-x divide-outline/5">
+                        <td class="py-4 px-6"></td>
+                        <td class="py-4 px-6 text-[10px] uppercase font-bold text-on-surface-variant opacity-60" data-col="name">Итого:</td>
+                        <td class="py-4 px-6" data-col="parent_category"></td>
+                        <td class="py-4 px-6" data-col="category"></td>
+                        <td class="py-4 px-6" data-col="vstatus"></td>
+                        <td class="py-4 px-6" data-col="price">
+                            <div class="text-[10px] text-on-surface-variant font-medium">СУММА: <span id="stats-sum-price" class="font-bold text-primary">0 ₽</span></div>
+                            <div class="text-[10px] text-on-surface-variant font-medium mt-1">СРЕДНЯЯ: <span id="stats-avg-price" class="font-bold text-primary">0 ₽</span></div>
+                        </td>
+                        <td class="py-4 px-6" data-col="created_at">
+                            <div class="text-[10px] text-on-surface-variant font-medium">МИН: <span id="stats-min-price" class="font-bold text-on-surface">0 ₽</span></div>
+                            <div class="text-[10px] text-on-surface-variant font-medium mt-1">МАКС: <span id="stats-max-price" class="font-bold text-on-surface">0 ₽</span></div>
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            <div class="flex items-center justify-end gap-1 px-1 py-0.5 bg-surface-container border border-outline/10 rounded-xl w-max ml-auto shadow-inner">
+                                <button type="button" id="stats-apply-all-btn" class="stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                                <button type="button" id="stats-apply-sel-btn" class="stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 
@@ -193,8 +220,190 @@ export function renderProductTable(container, products, options = {}) {
                 </div>
                 `;
             }).join('')}
+            
+            <!-- Mobile stats view -->
+            <div class="mt-4 p-5 bg-surface-container rounded-3xl border border-outline/10 space-y-4 select-none">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60 font-bold">Статистика:</span>
+                    <div class="flex items-center gap-1 bg-surface-container-low border border-outline/10 rounded-xl p-1 shadow-inner">
+                        <button type="button" id="stats-apply-all-btn-mobile" class="stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                        <button type="button" id="stats-apply-sel-btn-mobile" class="stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-[10px] uppercase font-bold text-on-surface-variant">
+                    <div>Всего строк: <span id="stats-total-rows-mobile" class="text-on-surface">0</span></div>
+                    <div>Сумма: <span id="stats-sum-price-mobile" class="text-primary">0 ₽</span></div>
+                    <div>Средняя: <span id="stats-avg-price-mobile" class="text-primary">0 ₽</span></div>
+                    <div>Мин / Макс: <span id="stats-range-price-mobile" class="text-on-surface">0 / 0 ₽</span></div>
+                </div>
+            </div>
         </div>
     `;
+
+    // Apply column visibility
+    const visibleColumns = new Set(options.visibleColumns || ['name', 'parent_category', 'category', 'vstatus', 'price', 'created_at']);
+    container.querySelectorAll('[data-col]').forEach(el => {
+        const colKey = el.dataset.col;
+        if (!visibleColumns.has(colKey)) {
+            el.classList.add('hidden');
+        } else {
+            el.classList.remove('hidden');
+        }
+    });
+
+    const selectAll = container.querySelector('#select-all-products');
+    const checkboxes = container.querySelectorAll('.product-checkbox');
+
+    // Initialize checkboxes based on options.selected
+    const selectedSet = new Set(options.selected || []);
+    checkboxes.forEach(cb => {
+        cb.checked = selectedSet.has(cb.dataset.id);
+    });
+
+    // Update row highlight function
+    const updateRowHighlights = () => {
+        checkboxes.forEach(cb => {
+            const tr = cb.closest('tr');
+            const card = cb.closest('.product-mobile-card');
+            const isChecked = cb.checked;
+            
+            if (isChecked) {
+                if (tr) {
+                    tr.classList.add('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+                    tr.classList.remove('hover:bg-on-surface/[0.02]');
+                }
+                if (card) {
+                    card.classList.add('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+                    card.classList.remove('bg-surface-container-lowest');
+                }
+            } else {
+                if (tr) {
+                    tr.classList.remove('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+                    tr.classList.add('hover:bg-on-surface/[0.02]');
+                }
+                if (card) {
+                    card.classList.remove('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+                    card.classList.add('bg-surface-container-lowest');
+                }
+            }
+        });
+    };
+    updateRowHighlights();
+
+    // Stats calculations
+    let statsMode = 'all'; // 'all' or 'selected'
+    const updateTableStatistics = () => {
+        const statsAllBtn = container.querySelector('#stats-apply-all-btn');
+        const statsSelBtn = container.querySelector('#stats-apply-sel-btn');
+        const statsAllBtnMobile = container.querySelector('#stats-apply-all-btn-mobile');
+        const statsSelBtnMobile = container.querySelector('#stats-apply-sel-btn-mobile');
+        
+        const totalSelectedOverall = options.selected?.length || 0;
+        if (statsSelBtn) statsSelBtn.textContent = `Выбр. (${totalSelectedOverall})`;
+        if (statsSelBtnMobile) statsSelBtnMobile.textContent = `Выбр. (${totalSelectedOverall})`;
+
+        let targets = [];
+        if (statsMode === 'all') {
+            targets = [...sortedProducts];
+        } else {
+            const selectedSet = new Set((options.selected || []).map(String));
+            checkboxes.forEach(c => {
+                if (c.checked) {
+                    selectedSet.add(String(c.dataset.id));
+                } else {
+                    selectedSet.delete(String(c.dataset.id));
+                }
+            });
+            targets = sortedProducts.filter(p => selectedSet.has(String(p.id)));
+        }
+
+        const count = targets.length;
+        const prices = targets.map(p => Number(p.price_ton || 0)).filter(p => p > 0);
+        const sum = prices.reduce((acc, p) => acc + p, 0);
+        const avg = count > 0 && prices.length > 0 ? Math.round(sum / prices.length) : 0;
+        const min = prices.length > 0 ? Math.min(...prices) : 0;
+        const max = prices.length > 0 ? Math.max(...prices) : 0;
+
+        // Desktop
+        const elSumPrice = container.querySelector('#stats-sum-price');
+        const elAvgPrice = container.querySelector('#stats-avg-price');
+        const elMinPrice = container.querySelector('#stats-min-price');
+        const elMaxPrice = container.querySelector('#stats-max-price');
+        if (elSumPrice) elSumPrice.textContent = sum.toLocaleString() + ' ₽';
+        if (elAvgPrice) elAvgPrice.textContent = avg.toLocaleString() + ' ₽';
+        if (elMinPrice) elMinPrice.textContent = min.toLocaleString() + ' ₽';
+        if (elMaxPrice) elMaxPrice.textContent = max.toLocaleString() + ' ₽';
+
+        // Mobile
+        const elTotalRowsMobile = container.querySelector('#stats-total-rows-mobile');
+        const elSumPriceMobile = container.querySelector('#stats-sum-price-mobile');
+        const elAvgPriceMobile = container.querySelector('#stats-avg-price-mobile');
+        const elRangePriceMobile = container.querySelector('#stats-range-price-mobile');
+        if (elTotalRowsMobile) elTotalRowsMobile.textContent = count;
+        if (elSumPriceMobile) elSumPriceMobile.textContent = sum.toLocaleString() + ' ₽';
+        if (elAvgPriceMobile) elAvgPriceMobile.textContent = avg.toLocaleString() + ' ₽';
+        if (elRangePriceMobile) elRangePriceMobile.textContent = `${min.toLocaleString()} / ${max.toLocaleString()} ₽`;
+
+        // Style buttons
+        const activeClass = 'stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary shadow-sm';
+        const inactiveClass = 'stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant hover:text-primary';
+        
+        if (statsAllBtn) statsAllBtn.className = statsMode === 'all' ? activeClass : inactiveClass;
+        if (statsSelBtn) statsSelBtn.className = statsMode === 'selected' ? activeClass : inactiveClass;
+        if (statsAllBtnMobile) statsAllBtnMobile.className = statsMode === 'all' ? activeClass : inactiveClass;
+        if (statsSelBtnMobile) statsSelBtnMobile.className = statsMode === 'selected' ? activeClass : inactiveClass;
+    };
+    updateTableStatistics();
+
+    // Stats click events
+    container.querySelectorAll('#stats-apply-all-btn, #stats-apply-all-btn-mobile').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            statsMode = 'all';
+            updateTableStatistics();
+        };
+    });
+    container.querySelectorAll('#stats-apply-sel-btn, #stats-apply-sel-btn-mobile').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            statsMode = 'selected';
+            updateTableStatistics();
+        };
+    });
+
+    // Range Selection logic
+    let lastChecked = null;
+    const handleProductSelectClick = (clickedId, event) => {
+        const clickedCb = event.target?.closest?.('.product-checkbox')
+            || container.querySelector(`.product-checkbox[data-id="${clickedId}"]`);
+        if (!clickedCb) return;
+
+        const isRangeSelect = event.shiftKey || event.ctrlKey;
+        const targetState = clickedCb.checked;
+
+        if (isRangeSelect && lastChecked) {
+            const scope = clickedCb.closest('table') || clickedCb.closest('.md\\:hidden') || container;
+            const cbArray = Array.from(scope.querySelectorAll('.product-checkbox'));
+            const start = cbArray.findIndex(c => String(c.dataset.id) === String(clickedId));
+            const end = cbArray.findIndex(c => String(c.dataset.id) === String(lastChecked.dataset.id));
+
+            if (start !== -1 && end !== -1) {
+                const min = Math.min(start, end);
+                const max = Math.max(start, end);
+
+                for (let i = min; i <= max; i++) {
+                    const targetCb = cbArray[i];
+                    if (targetCb.checked !== targetState) {
+                        targetCb.checked = targetState;
+                        const id = targetCb.dataset.id;
+                        container.querySelectorAll(`.product-checkbox[data-id="${id}"]`).forEach(c => c.checked = targetState);
+                    }
+                }
+            }
+        }
+        
+        lastChecked = clickedCb;
+    };
 
     // Add event listeners for both desktop table rows and mobile cards
     const items = container.querySelectorAll('tbody tr, .product-mobile-card');
@@ -203,8 +412,21 @@ export function renderProductTable(container, products, options = {}) {
         const product = sortedProducts.find(p => String(p.id) === String(id));
 
         item.addEventListener('click', (e) => {
-            if (e.target.closest('.product-select-cell') || e.target.closest('.product-select-cell-mobile') || e.target.closest('.product-status-cell') || e.target.closest('.product-status-badge') || e.target.closest('.product-l1-cell') || e.target.closest('.product-l1-badge') || e.target.closest('.product-l2-cell') || e.target.closest('.product-l2-badge') || e.target.closest('input[type="checkbox"]') || e.target.closest('button')) return;
-            if (options.onRowClick) options.onRowClick(product);
+            if (e.target.closest('.product-select-cell') || e.target.closest('.product-select-cell-mobile') || e.target.closest('.product-status-cell') || e.target.closest('.product-status-badge') || e.target.closest('.product-l1-cell') || e.target.closest('.product-l1-badge') || e.target.closest('.product-l2-cell') || e.target.closest('.product-l2-badge') || e.target.closest('.product-price-cell') || e.target.closest('input[type="checkbox"]') || e.target.closest('button')) return;
+            
+            const isRangeSelect = e.shiftKey || e.ctrlKey;
+            if (isRangeSelect) {
+                e.stopPropagation();
+                e.preventDefault();
+                const checkbox = item.querySelector('.product-checkbox');
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    handleProductSelectClick(checkbox.dataset.id, e);
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            } else {
+                if (options.onRowClick) options.onRowClick(product);
+            }
         });
 
         item.querySelector('.preview-row')?.addEventListener('click', (e) => {
@@ -221,8 +443,8 @@ export function renderProductTable(container, products, options = {}) {
 
         item.querySelector('.delete-row')?.addEventListener('click', async (e) => {
             e.stopPropagation();
+            const btn = e.currentTarget;
             if (await confirm(`Удалить товар "${product.name}"?`)) {
-                const btn = e.currentTarget;
                 const icon = btn.querySelector('.material-symbols-outlined');
                 if (icon) icon.textContent = 'hourglass_empty';
                 btn.disabled = true;
@@ -243,6 +465,7 @@ export function renderProductTable(container, products, options = {}) {
             const checkbox = cell.querySelector('.product-checkbox');
             if (checkbox && e.target !== checkbox) {
                 checkbox.checked = !checkbox.checked;
+                handleProductSelectClick(checkbox.dataset.id, e);
                 checkbox.dispatchEvent(new Event('change'));
             }
         });
@@ -252,10 +475,10 @@ export function renderProductTable(container, products, options = {}) {
     container.querySelectorAll('.header-select-cell').forEach(cell => {
         cell.addEventListener('click', (e) => {
             e.stopPropagation();
-            const selectAll = cell.querySelector('#select-all-products');
-            if (selectAll && e.target !== selectAll) {
-                selectAll.checked = !selectAll.checked;
-                selectAll.dispatchEvent(new Event('change'));
+            const selectAllVal = cell.querySelector('#select-all-products');
+            if (selectAllVal && e.target !== selectAllVal) {
+                selectAllVal.checked = !selectAllVal.checked;
+                selectAllVal.dispatchEvent(new Event('change'));
             }
         });
     });
@@ -299,6 +522,75 @@ export function renderProductTable(container, products, options = {}) {
         });
     });
 
+    // Inline Price Editor
+    container.querySelectorAll('.product-price-cell').forEach(cell => {
+        cell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (cell.querySelector('input')) return; // already editing
+
+            const id = cell.dataset.id;
+            const product = sortedProducts.find(p => String(p.id) === String(id));
+            if (!product) return;
+
+            const displayDiv = cell.querySelector('.price-display-value');
+            const editIcon = cell.querySelector('.material-symbols-outlined');
+            if (editIcon) editIcon.style.display = 'none';
+
+            const oldVal = Number(product.price_ton || 0);
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'bg-surface-container-lowest border border-primary/50 text-sm px-2 py-1 rounded-xl outline-none text-on-surface font-bold w-28 animate-in fade-in zoom-in-95 duration-150 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
+            input.value = oldVal;
+            
+            displayDiv.innerHTML = '';
+            displayDiv.appendChild(input);
+            input.focus();
+            input.select();
+
+            const finishPriceEdit = async (isSave) => {
+                if (input.parentNode === null) return;
+                const newValRaw = input.value.trim();
+                const newVal = Number(newValRaw);
+
+                // Restore display layout
+                displayDiv.innerHTML = `${oldVal.toLocaleString()} ₽`;
+                if (editIcon) editIcon.style.display = '';
+
+                if (!isSave || newValRaw === '' || isNaN(newVal) || newVal === oldVal) return;
+
+                // Show visual saving indicator
+                displayDiv.innerHTML = `<span class="inline-block animate-spin mr-1">⌛</span>${newVal.toLocaleString()} ₽`;
+
+                try {
+                    if (options.onPriceChangeGlobal) {
+                        await options.onPriceChangeGlobal(id, { price_ton: newVal });
+                        // Flash row green on success
+                        const tr = cell.closest('tr');
+                        if (tr) {
+                            tr.classList.add('row-flash-active');
+                            setTimeout(() => tr.classList.remove('row-flash-active'), 2500);
+                        }
+                    }
+                } catch (err) {
+                    alert('Ошибка при сохранении цены: ' + err.message);
+                    displayDiv.innerHTML = `${oldVal.toLocaleString()} ₽`;
+                }
+            };
+
+            input.onblur = () => finishPriceEdit(true);
+            input.onkeydown = (ev) => {
+                if (ev.key === 'Enter') {
+                    ev.preventDefault();
+                    finishPriceEdit(true);
+                } else if (ev.key === 'Escape') {
+                    ev.preventDefault();
+                    finishPriceEdit(false);
+                }
+            };
+        });
+    });
+
     // Sorting logic (desktop headers)
     const headers = container.querySelectorAll('th[data-sort]');
     headers.forEach(header => {
@@ -319,28 +611,54 @@ export function renderProductTable(container, products, options = {}) {
         });
     });
 
-    const selectAll = container.querySelector('#select-all-products');
-    const checkboxes = container.querySelectorAll('.product-checkbox');
-    
-    selectAll?.addEventListener('change', () => {
-        checkboxes.forEach(cb => cb.checked = selectAll.checked);
-        if (options.onSelectionChange) {
-            const selectedIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.dataset.id);
-            const uniqueIds = [...new Set(selectedIds)];
-            options.onSelectionChange(uniqueIds);
-        }
+    // Checkboxes click events for range select
+    checkboxes.forEach(cb => {
+        cb.addEventListener('click', (e) => {
+            handleProductSelectClick(cb.dataset.id, e);
+        });
     });
+
+    if (selectAll) {
+        selectAll.addEventListener('change', () => {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateRowHighlights();
+            updateTableStatistics();
+            
+            // Build the selection from option.selected
+            let currentSelected = new Set(options.selected || []);
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    currentSelected.add(cb.dataset.id);
+                } else {
+                    currentSelected.delete(cb.dataset.id);
+                }
+            });
+
+            if (options.onSelectionChange) {
+                options.onSelectionChange(Array.from(currentSelected));
+            }
+        });
+    }
 
     checkboxes.forEach(cb => {
         cb.addEventListener('change', (e) => {
             const id = cb.dataset.id;
             const isChecked = cb.checked;
             container.querySelectorAll(`.product-checkbox[data-id="${id}"]`).forEach(c => c.checked = isChecked);
+            updateRowHighlights();
+            updateTableStatistics();
+
+            let currentSelected = new Set(options.selected || []);
+            checkboxes.forEach(c => {
+                if (c.checked) {
+                    currentSelected.add(c.dataset.id);
+                } else {
+                    currentSelected.delete(c.dataset.id);
+                }
+            });
 
             if (options.onSelectionChange) {
-                const selectedIds = Array.from(checkboxes).filter(c => c.checked).map(c => c.dataset.id);
-                const uniqueIds = [...new Set(selectedIds)];
-                options.onSelectionChange(uniqueIds);
+                options.onSelectionChange(Array.from(currentSelected));
             }
             
             if (selectAll) {
@@ -350,4 +668,11 @@ export function renderProductTable(container, products, options = {}) {
             }
         });
     });
+
+    // Update selectAll master checkbox state on load
+    if (selectAll && checkboxes.length > 0) {
+        const allChecked = Array.from(checkboxes).every(c => c.checked);
+        selectAll.checked = allChecked;
+        selectAll.indeterminate = Array.from(checkboxes).some(c => c.checked) && !allChecked;
+    }
 }

@@ -14,30 +14,33 @@ function updateBulkLeadsToolbar(state) {
     }
 
     toolbar.innerHTML = `
-        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-surface-container-low/90 backdrop-blur-md border border-primary/20 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-6 animate-in slide-in-from-bottom-8 duration-500">
-            <div class="flex items-center gap-3 pr-6 border-r border-outline/10">
-                <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs">
-                    ${selectedLeadIds.size}
+        <div class="admin-bulk-bar fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1rem)] sm:w-auto max-w-[600px] bg-surface-container-low/95 backdrop-blur-md border border-primary/20 px-3 py-3 md:px-6 md:py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:items-center gap-3 md:gap-6 animate-in slide-in-from-bottom-8 duration-500">
+            <div class="flex items-center justify-between md:justify-start gap-3 md:pr-6 md:border-r border-outline/10 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0">
+                        ${selectedLeadIds.size}
+                    </div>
+                    <div class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant font-label-caps">Выбрано</div>
                 </div>
-                <div class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant font-label-caps">Выбрано</div>
+                <button id="bulk-lead-close-mobile" class="md:hidden p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant">
+                    <span class="material-symbols-outlined text-base">close</span>
+                </button>
             </div>
             
-            <div class="flex items-center gap-4">
-                <div class="relative flex items-center gap-2">
-                    <button type="button" id="bulk-lead-status-btn" class="flex items-center gap-2 bg-surface-container border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary outline-none cursor-pointer hover:bg-on-surface/5 transition-all shadow-md font-label-caps">
-                        <span class="material-symbols-outlined text-primary text-sm">donut_large</span>
-                        <span>Изменить статус...</span>
-                        <span class="material-symbols-outlined text-sm opacity-50 ml-1">expand_more</span>
-                    </button>
-                </div>
+            <div class="flex items-center gap-2 md:gap-4 overflow-x-auto custom-scrollbar md:overflow-visible -mx-1 px-1 md:mx-0 md:px-0">
+                <button type="button" id="bulk-lead-status-btn" class="flex items-center gap-2 bg-surface-container border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary outline-none cursor-pointer hover:bg-on-surface/5 transition-all shadow-md font-label-caps shrink-0">
+                    <span class="material-symbols-outlined text-primary text-sm">donut_large</span>
+                    <span>Статус...</span>
+                    <span class="material-symbols-outlined text-sm opacity-50 ml-1">expand_more</span>
+                </button>
                 
-                <button type="button" id="bulk-lead-delete-btn" class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 border border-error/20 rounded-xl transition-all text-xs font-bold uppercase tracking-widest text-error font-label-caps">
+                <button type="button" id="bulk-lead-delete-btn" class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 border border-error/20 rounded-xl transition-all text-xs font-bold uppercase tracking-widest text-error font-label-caps shrink-0">
                     <span class="material-symbols-outlined text-base">delete</span>
                     Удалить
                 </button>
             </div>
             
-            <button id="bulk-lead-close-btn" class="ml-4 p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant" title="Снять выделение">
+            <button id="bulk-lead-close-btn" class="hidden md:flex md:ml-4 p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant shrink-0" title="Снять выделение">
                 <span class="material-symbols-outlined text-base">close</span>
             </button>
         </div>
@@ -95,6 +98,8 @@ function updateBulkLeadsToolbar(state) {
         const selectAll = document.getElementById('leads-select-all');
         if (selectAll) selectAll.className = "w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-low text-transparent";
     };
+    const closeBtnMobile = toolbar.querySelector('#bulk-lead-close-mobile');
+    if (closeBtnMobile) closeBtnMobile.onclick = () => closeBtn.onclick();
 }
 
 /**
@@ -322,6 +327,26 @@ function renderLeadsTable(container, leads, state, typeMap, sortOptions = {}) {
                         </tr>`;
                     }).join('')}
                 </tbody>
+                <!-- Spreadsheet footer aggregates -->
+                <tfoot class="border-t-2 border-primary/20 bg-surface-container-low/50 text-xs font-bold text-on-surface select-none">
+                    <tr class="divide-x divide-outline/5">
+                        <td class="py-4 px-4"></td>
+                        <td class="py-4 px-6 text-[10px] uppercase font-bold text-on-surface-variant opacity-60">Итого:</td>
+                        <td class="py-4 px-6">
+                            <div class="text-[10px] text-on-surface-variant font-medium">ВСЕГО: <span id="lead-stats-count" class="font-bold text-primary">0</span></div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="text-[10px] text-on-surface-variant font-medium">ИСТОЧНИКИ:</div>
+                            <div class="text-[9px] text-on-surface-variant font-medium mt-0.5 opacity-80" id="lead-stats-types">Звонки: 0 • Формы: 0 • Быстрые заказы: 0</div>
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            <div class="flex items-center justify-end gap-1 px-1 py-0.5 bg-surface-container border border-outline/10 rounded-xl w-max ml-auto shadow-inner">
+                                <button type="button" id="lead-stats-all-btn" class="lead-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                                <button type="button" id="lead-stats-sel-btn" class="lead-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         <div class="grid grid-cols-1 gap-4 md:hidden p-4">
@@ -346,8 +371,141 @@ function renderLeadsTable(container, leads, state, typeMap, sortOptions = {}) {
                     </div>
                 </div>`;
             }).join('')}
+            
+            <!-- Mobile stats view -->
+            <div class="mt-4 p-5 bg-surface-container rounded-3xl border border-outline/10 space-y-4 select-none">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60 font-bold">Статистика:</span>
+                    <div class="flex items-center gap-1 bg-surface-container-low border border-outline/10 rounded-xl p-1 shadow-inner">
+                        <button type="button" id="lead-stats-all-btn-mobile" class="lead-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary">Все</button>
+                        <button type="button" id="lead-stats-sel-btn-mobile" class="lead-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant">Выбр.</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-[10px] uppercase font-bold text-on-surface-variant">
+                    <div>Всего: <span id="lead-stats-count-mobile" class="text-on-surface">0</span></div>
+                    <div class="col-span-2">Источники: <span id="lead-stats-types-mobile" class="text-primary font-mono leading-relaxed block mt-1">Звонки: 0 • Формы: 0</span></div>
+                </div>
+            </div>
         </div>
     `;
+
+    // Highlight updater, statistics updater, and range select
+    const updateLeadRowHighlights = () => {
+        container.querySelectorAll('.lead-row').forEach(row => {
+            const id = row.dataset.id;
+            const isSelected = selectedLeadIds.has(id);
+            if (isSelected) {
+                row.classList.add('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+            } else {
+                row.classList.remove('bg-[#964551]/10', 'hover:bg-[#964551]/15');
+            }
+        });
+    };
+    updateLeadRowHighlights();
+
+    let statsMode = 'all';
+    const updateLeadStatistics = () => {
+        const statsAllBtn = container.querySelector('#lead-stats-all-btn');
+        const statsSelBtn = container.querySelector('#lead-stats-sel-btn');
+        const statsAllBtnMobile = container.querySelector('#lead-stats-all-btn-mobile');
+        const statsSelBtnMobile = container.querySelector('#lead-stats-sel-btn-mobile');
+
+        if (statsSelBtn) statsSelBtn.textContent = `Выбр. (${selectedLeadIds.size})`;
+        if (statsSelBtnMobile) statsSelBtnMobile.textContent = `Выбр. (${selectedLeadIds.size})`;
+
+        let targets = [];
+        if (statsMode === 'all') {
+            targets = [...leads];
+        } else {
+            targets = leads.filter(l => selectedLeadIds.has(l.id));
+        }
+
+        const count = targets.length;
+        
+        const typeCounts = { callback: 0, form: 0, quote: 0, other: 0 };
+        targets.forEach(l => {
+            const t = l.type;
+            if (t === 'callback' || t === 'quick_order') typeCounts.callback++;
+            else if (t === 'quote' || t === 'drawing_upload') typeCounts.quote++;
+            else if (t === 'contact_form' || t === 'contact') typeCounts.form++;
+            else typeCounts.other++;
+        });
+
+        const elCount = container.querySelector('#lead-stats-count');
+        const elTypes = container.querySelector('#lead-stats-types');
+        if (elCount) elCount.textContent = count;
+        if (elTypes) {
+            elTypes.textContent = `Звонки: ${typeCounts.callback} • Расчеты: ${typeCounts.quote} • Формы: ${typeCounts.form} • Другое: ${typeCounts.other}`;
+        }
+
+        const elCountMobile = container.querySelector('#lead-stats-count-mobile');
+        const elTypesMobile = container.querySelector('#lead-stats-types-mobile');
+        if (elCountMobile) elCountMobile.textContent = count;
+        if (elTypesMobile) {
+            elTypesMobile.textContent = `Звонки: ${typeCounts.callback} • Расчеты: ${typeCounts.quote} • Формы: ${typeCounts.form}`;
+        }
+
+        const activeClass = 'lead-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all bg-primary text-on-primary shadow-sm';
+        const inactiveClass = 'lead-stats-apply-btn px-2.5 py-1.5 rounded-lg text-[8px] uppercase tracking-wider font-bold transition-all text-on-surface-variant hover:text-primary';
+        
+        if (statsAllBtn) statsAllBtn.className = statsMode === 'all' ? activeClass : inactiveClass;
+        if (statsSelBtn) statsSelBtn.className = statsMode === 'selected' ? activeClass : inactiveClass;
+        if (statsAllBtnMobile) statsAllBtnMobile.className = statsMode === 'all' ? activeClass : inactiveClass;
+        if (statsSelBtnMobile) statsSelBtnMobile.className = statsMode === 'selected' ? activeClass : inactiveClass;
+    };
+    updateLeadStatistics();
+
+    container.querySelectorAll('#lead-stats-all-btn, #lead-stats-all-btn-mobile').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            statsMode = 'all';
+            updateLeadStatistics();
+        };
+    });
+    container.querySelectorAll('#lead-stats-sel-btn, #lead-stats-sel-btn-mobile').forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            statsMode = 'selected';
+            updateLeadStatistics();
+        };
+    });
+
+    let lastChecked = null;
+    const handleLeadSelectClick = (clickedId, event) => {
+        const clickedCell = event.target?.closest?.('.lead-select-cell')
+            || container.querySelector(`.lead-select-cell[data-id="${clickedId}"]`);
+        if (!clickedCell) return;
+
+        const isRangeSelect = event.shiftKey || event.ctrlKey;
+        const targetState = selectedLeadIds.has(clickedId);
+
+        if (isRangeSelect && lastChecked) {
+            const scope = clickedCell.closest('table') || clickedCell.closest('.md\\:hidden') || container;
+            const cells = Array.from(scope.querySelectorAll('.lead-select-cell'));
+            const start = cells.findIndex(c => String(c.dataset.id) === String(clickedId));
+            const end = cells.findIndex(c => String(c.dataset.id) === String(lastChecked.dataset.id));
+
+            if (start !== -1 && end !== -1) {
+                const min = Math.min(start, end);
+                const max = Math.max(start, end);
+
+                for (let i = min; i <= max; i++) {
+                    const targetCell = cells[i];
+                    const targetId = targetCell.dataset.id;
+                    const block = targetCell.querySelector('.lead-select-block');
+                    if (targetState) {
+                        selectedLeadIds.add(targetId);
+                        if (block) block.className = "lead-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto bg-primary/20 border-primary/50 text-primary";
+                    } else {
+                        selectedLeadIds.delete(targetId);
+                        if (block) block.className = "lead-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-lowest text-transparent";
+                    }
+                }
+            }
+        }
+        
+        lastChecked = clickedCell;
+    };
 
     // Select cell click
     container.querySelectorAll('.lead-select-cell').forEach(cell => {
@@ -365,7 +523,10 @@ function renderLeadsTable(container, leads, state, typeMap, sortOptions = {}) {
                 block.className = "lead-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-lowest text-transparent";
             }
             
+            handleLeadSelectClick(id, e);
             updateBulkLeadsToolbar(state);
+            updateLeadRowHighlights();
+            updateLeadStatistics();
 
             // Update master check
             const selectAll = container.querySelector('#leads-select-all');
@@ -400,6 +561,8 @@ function renderLeadsTable(container, leads, state, typeMap, sortOptions = {}) {
             
             selectAll.className = `w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto ${willBeChecked ? 'bg-primary/20 border-primary/50 text-primary' : 'border-outline/20 bg-surface-container-lowest text-transparent'}`;
             updateBulkLeadsToolbar(state);
+            updateLeadRowHighlights();
+            updateLeadStatistics();
         };
     }
 
@@ -457,7 +620,42 @@ function renderLeadsTable(container, leads, state, typeMap, sortOptions = {}) {
         });
     });
 
-    container.querySelectorAll('.lead-row').forEach(row => row.onclick = (e) => { if (!e.target.closest('.lead-select-cell') && !e.target.closest('button')) openLeadDrawer(row.dataset.id, state); });
+    container.querySelectorAll('.lead-row').forEach(row => {
+        row.onclick = (e) => {
+            if (e.target.closest('.lead-select-cell') || e.target.closest('button')) return;
+            
+            const isRangeSelect = e.shiftKey || e.ctrlKey;
+            if (isRangeSelect) {
+                e.stopPropagation();
+                e.preventDefault();
+                const id = row.dataset.id;
+                const block = row.querySelector('.lead-select-block');
+                const isChecked = !selectedLeadIds.has(id);
+                
+                if (isChecked) {
+                    selectedLeadIds.add(id);
+                    if (block) block.className = "lead-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto bg-primary/20 border-primary/50 text-primary";
+                } else {
+                    selectedLeadIds.delete(id);
+                    if (block) block.className = "lead-select-block w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-lowest text-transparent";
+                }
+                
+                handleLeadSelectClick(id, e);
+                updateBulkLeadsToolbar(state);
+                updateLeadRowHighlights();
+                updateLeadStatistics();
+
+                const selectAllVal = container.querySelector('#leads-select-all');
+                if (selectAllVal) {
+                    const allVisibleCells = container.querySelectorAll('.lead-select-cell');
+                    const allChecked = Array.from(allVisibleCells).every(c => selectedLeadIds.has(c.dataset.id));
+                    selectAllVal.className = `w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto ${allChecked ? 'bg-primary/20 border-primary/50 text-primary' : 'border-outline/20 bg-surface-container-lowest text-transparent'}`;
+                }
+            } else {
+                openLeadDrawer(row.dataset.id, state);
+            }
+        };
+    });
 }
 
 async function openLeadDrawer(leadId, state) {
@@ -490,12 +688,12 @@ async function openLeadDrawer(leadId, state) {
                 return `
                     <div class="flex flex-col items-end mb-4 animate-in fade-in duration-300">
                         <div class="flex items-end gap-2 max-w-[85%] md:max-w-[75%]">
-                            <div class="px-5 py-3 rounded-3xl text-sm bg-[#ca7093] text-[#0f0e0c] rounded-br-none shadow-md font-medium leading-relaxed">
+                            <div class="px-5 py-3 rounded-3xl text-sm bg-[#964551] text-[#0f0e0c] rounded-br-none shadow-md font-medium leading-relaxed">
                                 ${m.text.replace(/\n/g, '<br>')}
                             </div>
                         </div>
                         <div class="text-[10px] text-on-surface-variant opacity-70 font-mono mt-1.5 flex items-center gap-1 mr-1">
-                            <span class="material-symbols-outlined text-[12px] text-[#ca7093]">done_all</span>
+                            <span class="material-symbols-outlined text-[12px] text-[#964551]">done_all</span>
                             Вы (Менеджер) • ${dateStr} ${timeStr}
                         </div>
                     </div>
@@ -508,7 +706,7 @@ async function openLeadDrawer(leadId, state) {
                                 ${m.text.replace(/\n/g, '<br>')}
                             </div>
                         </div>
-                        <div class="text-[10px] text-[#ca7093] font-mono mt-1.5 flex items-center gap-1 ml-1 font-bold">
+                        <div class="text-[10px] text-[#964551] font-mono mt-1.5 flex items-center gap-1 ml-1 font-bold">
                             <span class="material-symbols-outlined text-[12px]">person</span>
                             Клиент • ${dateStr} ${timeStr}
                         </div>
@@ -576,7 +774,7 @@ async function openLeadDrawer(leadId, state) {
                             chatBox.innerHTML = renderMessages();
                             chatBox.scrollTop = chatBox.scrollHeight;
                             chatBox.style.transition = 'background 0.3s';
-                            chatBox.style.background = 'rgba(202, 112, 147, 0.05)';
+                            chatBox.style.background = 'rgba(150, 69, 81, 0.05)';
                             setTimeout(() => { chatBox.style.background = ''; }, 600);
                         }
                     }

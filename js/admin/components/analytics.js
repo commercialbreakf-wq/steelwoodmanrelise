@@ -7,7 +7,7 @@ export const renderAnalyticsView = async (container, state) => {
                     <p class="text-sm text-on-surface-variant mt-1">Продуктовая и финансовая аналитика по всем каналам продаж</p>
                 </div>
                 <div class="flex gap-2">
-                    <button id="refresh-analytics-btn" class="flex items-center justify-center gap-2 px-6 py-4 bg-surface-variant text-[#ca7093] rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-[#ca7093]/10 transition-all">
+                    <button id="refresh-analytics-btn" class="flex items-center justify-center gap-2 px-6 py-4 bg-surface-variant text-[#964551] rounded-2xl font-bold uppercase text-[10px] tracking-widest hover:bg-[#964551]/10 transition-all">
                         <span class="material-symbols-outlined text-base">refresh</span>
                         Обновить аналитику
                     </button>
@@ -15,10 +15,10 @@ export const renderAnalyticsView = async (container, state) => {
             </div>
 
             <div id="analytics-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
-                <div class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
-                <div class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
-                <div class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
+                <div class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
+                <div class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
+                <div class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
+                <div class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center animate-pulse bg-white/5 h-40"></div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -30,7 +30,7 @@ export const renderAnalyticsView = async (container, state) => {
                             <p class="text-[10px] text-on-surface-variant opacity-70 uppercase tracking-widest mt-1">Подтвержденные продажи за последние 30 дней</p>
                         </div>
                         <div id="total-month-rev" class="text-right">
-                             <div class="text-lg font-bold text-[#ca7093]">0 ₽</div>
+                             <div class="text-lg font-bold text-[#964551]">0 ₽</div>
                              <div class="text-[9px] uppercase font-bold text-on-surface-variant opacity-60">Итого за период</div>
                         </div>
                     </div>
@@ -61,7 +61,7 @@ export const renderAnalyticsView = async (container, state) => {
                 <div class="glass rounded-[2.5rem] p-8 border-outline/10 min-h-[400px]">
                     <div class="flex items-center justify-between mb-6">
                         <h4 class="text-lg font-bold font-['Space Grotesk'] uppercase tracking-tight text-on-surface">Топ драйверов выручки</h4>
-                        <span class="material-symbols-outlined text-[#ca7093]">trending_up</span>
+                        <span class="material-symbols-outlined text-[#964551]">trending_up</span>
                     </div>
                     <div id="top-revenue-products" class="space-y-4">
                         <div class="text-center py-20 text-on-surface-variant opacity-60">Обработка товарных позиций...</div>
@@ -72,7 +72,7 @@ export const renderAnalyticsView = async (container, state) => {
                 <div class="glass rounded-[2.5rem] p-8 border-outline/10 min-h-[400px]">
                     <div class="flex items-center justify-between mb-6">
                         <h4 class="text-lg font-bold font-['Space Grotesk'] uppercase tracking-tight text-on-surface">Статус воронки и риски</h4>
-                        <span class="material-symbols-outlined text-[#ca7093]">analytics</span>
+                        <span class="material-symbols-outlined text-[#964551]">analytics</span>
                     </div>
                     <div id="status-distribution" class="space-y-6">
                         <div class="text-center py-20 text-on-surface-variant opacity-60">Анализ жизненного цикла заказов...</div>
@@ -100,11 +100,11 @@ export const renderAnalyticsView = async (container, state) => {
                     </div>
                     <div class="flex justify-between items-center border-t border-outline/5 pt-3">
                         <span class="text-xs text-on-surface-variant font-medium">Маржинальность (оценка):</span>
-                        <span class="text-sm font-bold text-[#ca7093]">15.0%</span>
+                        <span class="text-sm font-bold text-[#964551]">15.0%</span>
                     </div>
-                    <div class="flex justify-between items-center border-t border-[#ca7093]/20 pt-4">
+                    <div class="flex justify-between items-center border-t border-[#964551]/20 pt-4">
                         <span class="text-sm font-bold">Расчетная прибыль:</span>
-                        <span class="text-lg font-bold text-[#ca7093] font-mono">${estimatedProfit.toLocaleString(undefined, {maximumFractionDigits: 0})} ₽</span>
+                        <span class="text-lg font-bold text-[#964551] font-mono">${estimatedProfit.toLocaleString(undefined, {maximumFractionDigits: 0})} ₽</span>
                     </div>
                 </div>
                 <p class="text-[10px] text-on-surface-variant opacity-60 italic text-center font-medium leading-relaxed">
@@ -124,10 +124,10 @@ export const renderAnalyticsView = async (container, state) => {
         const listHtml = sorted.map((order, idx) => {
             const date = new Date(order.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
             return `
-                <div class="p-5 rounded-2xl bg-surface-container-lowest border border-outline/10 flex justify-between items-center hover:border-[#ca7093]/30 transition-all cursor-pointer group/item active:scale-98" onclick="if(window.openOrderDrawer) { window.openOrderDrawer('${order.id}', window.adminStateGlobal || state); }">
+                <div class="p-5 rounded-2xl bg-surface-container-lowest border border-outline/10 flex justify-between items-center hover:border-[#964551]/30 transition-all cursor-pointer group/item active:scale-98" onclick="if(window.openOrderDrawer) { window.openOrderDrawer('${order.id}', window.adminStateGlobal || state); }">
                     <div>
-                        <div class="text-xs font-mono font-bold text-[#ca7093]">${order.id}</div>
-                        <div class="text-sm font-bold text-on-surface uppercase tracking-tight mt-1 group-hover/item:text-[#ca7093] transition-colors">${order.customer_name || 'Не указано'}</div>
+                        <div class="text-xs font-mono font-bold text-[#964551]">${order.id}</div>
+                        <div class="text-sm font-bold text-on-surface uppercase tracking-tight mt-1 group-hover/item:text-[#964551] transition-colors">${order.customer_name || 'Не указано'}</div>
                         <div class="text-[9px] text-on-surface-variant opacity-50 font-label-caps uppercase tracking-widest mt-1">${date}</div>
                     </div>
                     <div class="text-right">
@@ -139,9 +139,9 @@ export const renderAnalyticsView = async (container, state) => {
 
         window.showModalGlobal('Реестр закрытых заказов', `
             <div class="space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#ca7093]/5 border border-[#ca7093]/10 rounded-2xl p-6 -mt-2 text-on-surface">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#964551]/5 border border-[#964551]/10 rounded-2xl p-6 -mt-2 text-on-surface">
                     <div>
-                        <div class="text-[9px] text-[#ca7093] uppercase font-label-caps tracking-widest font-bold">Средний чек</div>
+                        <div class="text-[9px] text-[#964551] uppercase font-label-caps tracking-widest font-bold">Средний чек</div>
                         <div class="text-2xl font-bold font-mono mt-1">${avgCheck.toLocaleString(undefined, {maximumFractionDigits: 0})} ₽</div>
                     </div>
                     <div class="text-left sm:text-right">
@@ -208,14 +208,14 @@ export const renderAnalyticsView = async (container, state) => {
             }
 
             return `
-                <div class="p-5 rounded-2xl bg-surface-container-lowest border border-outline/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-[#ca7093]/30 transition-all cursor-pointer group/item active:scale-98" onclick="if(window.openOrderDrawer) { window.openOrderDrawer('${order.id}', window.adminStateGlobal || state); }">
+                <div class="p-5 rounded-2xl bg-surface-container-lowest border border-outline/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-[#964551]/30 transition-all cursor-pointer group/item active:scale-98" onclick="if(window.openOrderDrawer) { window.openOrderDrawer('${order.id}', window.adminStateGlobal || state); }">
                     <div class="space-y-1.5 flex-grow font-body-md">
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-mono font-bold text-primary">${order.id}</span>
                             <span class="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-[0.15em] ${statusBg} ${statusColor} font-label-caps">${statusText}</span>
                             <span class="text-[9px] text-on-surface-variant opacity-50 font-label-caps uppercase tracking-widest">${date}</span>
                         </div>
-                        <div class="text-sm font-bold text-on-surface uppercase tracking-tight group-hover/item:text-[#ca7093] transition-colors">${order.customer_name || 'Не указано'}</div>
+                        <div class="text-sm font-bold text-on-surface uppercase tracking-tight group-hover/item:text-[#964551] transition-colors">${order.customer_name || 'Не указано'}</div>
                         <div class="text-[11px] text-on-surface-variant space-y-1">
                             ${items.map(i => `<div>• ${i.product_name || i.name} <span class="text-primary font-bold">x${i.quantity}</span></div>`).join('')}
                         </div>
@@ -229,9 +229,9 @@ export const renderAnalyticsView = async (container, state) => {
 
         window.showModalGlobal(`Заказы за ${displayDate}`, `
             <div class="space-y-6 text-on-surface">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#ca7093]/5 border border-[#ca7093]/10 rounded-2xl p-6 -mt-2">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#964551]/5 border border-[#964551]/10 rounded-2xl p-6 -mt-2">
                     <div>
-                        <div class="text-[9px] text-[#ca7093] uppercase font-label-caps tracking-widest font-bold">Выручка за день</div>
+                        <div class="text-[9px] text-[#964551] uppercase font-label-caps tracking-widest font-bold">Выручка за день</div>
                         <div class="text-2xl font-bold font-mono mt-1">${totalDailyRevenue.toLocaleString()} ₽</div>
                     </div>
                     <div class="text-left sm:text-right">
@@ -300,16 +300,16 @@ export const renderAnalyticsView = async (container, state) => {
             }
 
             return `
-                <div class="p-5 rounded-2xl bg-surface-container-lowest border border-outline/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-[#ca7093]/30 transition-all cursor-pointer group/item active:scale-98" onclick="if(window.openOrderDrawer) { window.openOrderDrawer('${order.id}', window.adminStateGlobal || state); }">
+                <div class="p-5 rounded-2xl bg-surface-container-lowest border border-outline/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-[#964551]/30 transition-all cursor-pointer group/item active:scale-98" onclick="if(window.openOrderDrawer) { window.openOrderDrawer('${order.id}', window.adminStateGlobal || state); }">
                     <div class="space-y-1.5 flex-grow font-body-md">
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-mono font-bold text-primary">${order.id}</span>
                             <span class="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-[0.15em] ${statusBg} ${statusColor} font-label-caps">${statusText}</span>
                             <span class="text-[9px] text-on-surface-variant opacity-50 font-label-caps uppercase tracking-widest">${date}</span>
                         </div>
-                        <div class="text-sm font-bold text-on-surface uppercase tracking-tight group-hover/item:text-[#ca7093] transition-colors">${order.customer_name || 'Не указано'}</div>
+                        <div class="text-sm font-bold text-on-surface uppercase tracking-tight group-hover/item:text-[#964551] transition-colors">${order.customer_name || 'Не указано'}</div>
                         <div class="text-xs text-on-surface-variant">
-                            Куплено: <span class="text-[#ca7093] font-bold font-mono">${qty} ед.</span> по цене <span class="font-mono">${Number(price).toLocaleString()} ₽</span>
+                            Куплено: <span class="text-[#964551] font-bold font-mono">${qty} ед.</span> по цене <span class="font-mono">${Number(price).toLocaleString()} ₽</span>
                         </div>
                     </div>
                     <div class="text-left sm:text-right shrink-0">
@@ -321,9 +321,9 @@ export const renderAnalyticsView = async (container, state) => {
 
         window.showModalGlobal(`Заказы с товаром: ${productName}`, `
             <div class="space-y-6 text-on-surface">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#ca7093]/5 border border-[#ca7093]/10 rounded-2xl p-6 -mt-2">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#964551]/5 border border-[#964551]/10 rounded-2xl p-6 -mt-2">
                     <div>
-                        <div class="text-[9px] text-[#ca7093] uppercase font-label-caps tracking-widest font-bold">Выручка по товару</div>
+                        <div class="text-[9px] text-[#964551] uppercase font-label-caps tracking-widest font-bold">Выручка по товару</div>
                         <div class="text-2xl font-bold font-mono mt-1">${totalProductRevenue.toLocaleString()} ₽</div>
                     </div>
                     <div class="text-left sm:text-right">
@@ -380,28 +380,28 @@ export const renderAnalyticsView = async (container, state) => {
 
             // Update main KPI cards
             document.getElementById('analytics-stats').innerHTML = `
-                <div id="kpi-revenue" class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center group hover:bg-[#ca7093]/5 hover:border-[#ca7093]/50 transition-all cursor-pointer active:scale-98">
-                    <div class="w-12 h-12 rounded-2xl bg-[#ca7093]/10 flex items-center justify-center text-[#ca7093] mb-4 group-hover:scale-110 transition-transform">
+                <div id="kpi-revenue" class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center group hover:bg-[#964551]/5 hover:border-[#964551]/50 transition-all cursor-pointer active:scale-98">
+                    <div class="w-12 h-12 rounded-2xl bg-[#964551]/10 flex items-center justify-center text-[#964551] mb-4 group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined">payments</span>
                     </div>
                     <div class="text-2xl font-bold font-['Space Grotesk'] mb-1 text-on-surface">${totalRevenue.toLocaleString()} ₽</div>
                     <div class="text-[10px] uppercase font-bold text-on-surface-variant opacity-70">Выручка (завершено)</div>
                 </div>
-                <div id="kpi-profit" class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center group hover:bg-[#ca7093]/5 hover:border-[#ca7093]/50 transition-all cursor-pointer active:scale-98">
+                <div id="kpi-profit" class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center group hover:bg-[#964551]/5 hover:border-[#964551]/50 transition-all cursor-pointer active:scale-98">
                     <div class="w-12 h-12 rounded-2xl bg-surface-variant flex items-center justify-center text-on-surface-variant mb-4 group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined">query_stats</span>
                     </div>
                     <div class="text-2xl font-bold font-['Space Grotesk'] mb-1 text-on-surface">${estimatedProfit.toLocaleString(undefined, {maximumFractionDigits: 0})} ₽</div>
                     <div class="text-[10px] uppercase font-bold text-on-surface-variant opacity-70">Прибыль (est. 15%)</div>
                 </div>
-                <div id="kpi-avgcheck" class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center group hover:bg-[#ca7093]/5 hover:border-[#ca7093]/50 transition-all cursor-pointer active:scale-98">
-                    <div class="w-12 h-12 rounded-2xl bg-[#ca7093]/10 flex items-center justify-center text-[#ca7093] mb-4 group-hover:scale-110 transition-transform">
+                <div id="kpi-avgcheck" class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center group hover:bg-[#964551]/5 hover:border-[#964551]/50 transition-all cursor-pointer active:scale-98">
+                    <div class="w-12 h-12 rounded-2xl bg-[#964551]/10 flex items-center justify-center text-[#964551] mb-4 group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined">receipt_long</span>
                     </div>
                     <div class="text-2xl font-bold font-['Space Grotesk'] mb-1 text-on-surface">${averageCheck.toLocaleString(undefined, {maximumFractionDigits: 0})} ₽</div>
                     <div class="text-[10px] uppercase font-bold text-on-surface-variant opacity-70">Средний чек</div>
                 </div>
-                <div id="kpi-pending" class="glass p-8 rounded-3xl border-[#ca7093]/20 flex flex-col items-center text-center group hover:bg-[#ca7093]/5 hover:border-[#ca7093]/50 transition-all cursor-pointer active:scale-98">
+                <div id="kpi-pending" class="glass p-8 rounded-3xl border-[#964551]/20 flex flex-col items-center text-center group hover:bg-[#964551]/5 hover:border-[#964551]/50 transition-all cursor-pointer active:scale-98">
                     <div class="w-12 h-12 rounded-2xl bg-surface-variant flex items-center justify-center text-on-surface-variant mb-4 group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined">hourglass_empty</span>
                     </div>
@@ -477,9 +477,9 @@ export const renderAnalyticsView = async (container, state) => {
                 const displayDate = dailyLabels[i];
                 return `
                     <div class="revenue-bar flex-1 h-full flex items-end justify-center group relative cursor-pointer" data-date-key="${dateKey}" data-display-date="${displayDate}">
-                        <div class="w-full bg-[#ca7093]/20 hover:bg-[#ca7093] transition-all rounded-t-lg" style="height: ${height}%"></div>
+                        <div class="w-full bg-[#964551]/20 hover:bg-[#964551] transition-all rounded-t-lg" style="height: ${height}%"></div>
                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-inverse-surface border border-primary/30 text-inverse-on-surface text-[10px] font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 whitespace-nowrap z-20 pointer-events-none shadow-2xl">
-                            <div class="text-[#ca7093] mb-0.5">${rev.toLocaleString()} ₽</div>
+                            <div class="text-[#964551] mb-0.5">${rev.toLocaleString()} ₽</div>
                             <div class="text-[8px] opacity-60 uppercase">${dailyLabels[i]}</div>
                         </div>
                     </div>
@@ -508,7 +508,7 @@ export const renderAnalyticsView = async (container, state) => {
                     <div class="glass p-6 rounded-2xl bg-surface-variant">
                         <div class="flex justify-between items-end mb-4">
                             <div>
-                                <div class="text-2xl font-bold font-['Space Grotesk'] text-[#ca7093]">${leadToOrderConv}%</div>
+                                <div class="text-2xl font-bold font-['Space Grotesk'] text-[#964551]">${leadToOrderConv}%</div>
                                 <div class="text-[10px] uppercase font-bold text-on-surface-variant opacity-70 tracking-widest mt-1">Лиды → Заказы</div>
                             </div>
                             <div class="text-right">
@@ -517,7 +517,7 @@ export const renderAnalyticsView = async (container, state) => {
                             </div>
                         </div>
                         <div class="h-1.5 bg-surface-container rounded-full overflow-hidden">
-                            <div class="h-full bg-[#ca7093]" style="width: ${Math.min(leadToOrderConv, 100)}%"></div>
+                            <div class="h-full bg-[#964551]" style="width: ${Math.min(leadToOrderConv, 100)}%"></div>
                         </div>
                     </div>
                     
@@ -537,10 +537,10 @@ export const renderAnalyticsView = async (container, state) => {
                         </div>
                     </div>
 
-                    <div class="bg-[#ca7093]/5 border border-[#ca7093]/10 p-4 rounded-2xl">
+                    <div class="bg-[#964551]/5 border border-[#964551]/10 p-4 rounded-2xl">
                          <div class="flex items-center gap-2 mb-2">
-                            <span class="material-symbols-outlined text-[#ca7093] text-sm">info</span>
-                            <span class="text-[10px] uppercase font-bold text-[#ca7093] tracking-widest">Итоговая конверсия</span>
+                            <span class="material-symbols-outlined text-[#964551] text-sm">info</span>
+                            <span class="text-[10px] uppercase font-bold text-[#964551] tracking-widest">Итоговая конверсия</span>
                          </div>
                          <div class="text-xl font-bold text-on-surface">${leadCount > 0 ? (confirmedCount / leadCount * 100).toFixed(1) : 0}%</div>
                          <p class="text-[9px] text-on-surface-variant opacity-60 mt-1 italic">Процент оплаченных заказов от общего числа входящих лидов за все время.</p>
@@ -566,9 +566,9 @@ export const renderAnalyticsView = async (container, state) => {
                 .slice(0, 6);
 
             document.getElementById('top-revenue-products').innerHTML = drivers.length > 0 ? drivers.map(([name, data], i) => `
-                <div class="driver-card flex items-center justify-between p-4 bg-surface-variant rounded-2xl border border-outline/10 hover:border-[#ca7093]/50 transition-all group cursor-pointer active:scale-98" data-product-name="${name}">
+                <div class="driver-card flex items-center justify-between p-4 bg-surface-variant rounded-2xl border border-outline/10 hover:border-[#964551]/50 transition-all group cursor-pointer active:scale-98" data-product-name="${name}">
                     <div class="flex items-center gap-4 min-w-0">
-                        <div class="w-10 h-10 rounded-xl bg-[#ca7093]/10 flex items-center justify-center text-[#ca7093] group-hover:bg-[#ca7093] group-hover:text-on-primary transition-all font-bold text-xs">
+                        <div class="w-10 h-10 rounded-xl bg-[#964551]/10 flex items-center justify-center text-[#964551] group-hover:bg-[#964551] group-hover:text-on-primary transition-all font-bold text-xs">
                             ${i + 1}
                         </div>
                         <div class="truncate">
@@ -577,7 +577,7 @@ export const renderAnalyticsView = async (container, state) => {
                         </div>
                     </div>
                     <div class="text-right ml-4">
-                        <div class="text-sm font-bold text-[#ca7093]">${data.revenue.toLocaleString()} ₽</div>
+                        <div class="text-sm font-bold text-[#964551]">${data.revenue.toLocaleString()} ₽</div>
                         <div class="text-[9px] uppercase font-bold text-on-surface-variant opacity-60 tracking-tighter">${(data.revenue / totalRevenue * 100).toFixed(1)}% доли</div>
                     </div>
                 </div>
@@ -623,7 +623,7 @@ export const renderAnalyticsView = async (container, state) => {
                                 <span class="text-[11px] font-bold uppercase tracking-wider text-on-surface">${cfg.label}</span>
                             </div>
                             <div class="text-right">
-                                <span class="text-xs font-bold text-[#ca7093]">${data.revenue.toLocaleString()} ₽</span>
+                                <span class="text-xs font-bold text-[#964551]">${data.revenue.toLocaleString()} ₽</span>
                                 <span class="text-[9px] text-on-surface-variant opacity-60 ml-2">${data.count} зак.</span>
                             </div>
                         </div>
@@ -641,7 +641,7 @@ export const renderAnalyticsView = async (container, state) => {
                     <span class="material-symbols-outlined text-5xl text-red-500 mb-4">analytics_off</span>
                     <h4 class="text-lg font-bold font-['Space Grotesk'] text-on-surface mb-2">Ошибка синхронизации данных</h4>
                     <p class="text-sm text-on-surface-variant opacity-80 max-w-md mx-auto mb-8">${e.message}</p>
-                    <button id="retry-analytics-btn" class="px-8 py-4 bg-white/5 hover:bg-white/10 text-[#ca7093] rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all">
+                    <button id="retry-analytics-btn" class="px-8 py-4 bg-white/5 hover:bg-white/10 text-[#964551] rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all">
                         Попробовать снова
                     </button>
                 </div>

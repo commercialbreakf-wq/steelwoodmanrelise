@@ -18,13 +18,13 @@ export function renderLayout() {
             <!-- Sidebar -->
             <aside id="admin-sidebar" class="fixed lg:static inset-y-0 left-0 w-72 bg-[#1d1b19] border-r border-[#534347]/20 flex flex-col z-50 transition-transform duration-300 -translate-x-full lg:translate-x-0">
                 <div class="p-8 border-b border-[#534347]/20 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <img src="/images/logo_icon.png" class="w-10 h-10 rounded-full" alt="IW">
+                    <a href="/" class="flex items-center gap-3 hover:opacity-85 transition-opacity group">
+                        <img src="/images/logo_icon.png" class="w-10 h-10 rounded-full group-hover:scale-105 transition-transform" alt="IW">
                         <div class="font-['Space Grotesk'] font-bold text-sm tracking-tight leading-none">
-                            <div class="text-[#e7e2dd]">WOODMAN</div>
-                            <div class="text-[#ffb0cc]">ADMIN</div>
+                            <div class="text-[#e7e2dd] group-hover:text-white transition-colors">WOODMAN</div>
+                            <div class="text-[#964551]">ADMIN</div>
                         </div>
-                    </div>
+                    </a>
                     <button id="close-sidebar" class="lg:hidden p-2 text-[#d7c1c7] hover:text-white transition-colors">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -44,7 +44,7 @@ export function renderLayout() {
             <main id="admin-main" class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
                 <header id="admin-header" class="h-20 border-b border-[#534347]/20 px-6 lg:px-10 flex items-center justify-between bg-[#151311]/50 backdrop-blur-md sticky top-0 z-30">
                     <div class="flex items-center gap-4">
-                        <button id="mobile-menu-toggle" class="lg:hidden p-2 text-[#ffb0cc] hover:bg-white/5 rounded-lg transition-all">
+                        <button id="mobile-menu-toggle" class="lg:hidden p-2 text-[#964551] hover:bg-white/5 rounded-lg transition-all">
                             <span class="material-symbols-outlined">menu</span>
                         </button>
                         <h2 id="admin-title" class="font-['Space Grotesk'] text-lg lg:text-xl font-bold uppercase tracking-tight truncate">Дашборд</h2>
@@ -53,10 +53,10 @@ export function renderLayout() {
                     <div id="admin-user-info" class="flex items-center gap-3 lg:gap-4">
                         <div class="text-right hidden sm:block">
                             <div id="admin-user-name" class="text-sm font-bold text-[#e7e2dd]">Admin User</div>
-                            <div class="text-[10px] text-[#ffb0cc] uppercase font-['Space Grotesk'] tracking-widest">Administrator</div>
+                            <div class="text-[10px] text-[#964551] uppercase font-['Space Grotesk'] tracking-widest">Administrator</div>
                         </div>
-                        <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-[#ffb0cc]/20 flex items-center justify-center border border-[#ffb0cc]/30">
-                            <span class="material-symbols-outlined text-[#ffb0cc] text-xl lg:text-2xl">person</span>
+                        <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-[#964551]/20 flex items-center justify-center border border-[#964551]/30">
+                            <span class="material-symbols-outlined text-[#964551] text-xl lg:text-2xl">person</span>
                         </div>
                     </div>
                 </header>
@@ -118,19 +118,60 @@ function renderSidebar() {
     const nav = document.getElementById('admin-nav');
     const items = [
         { id: 'dashboard', label: 'Дашборд', icon: 'dashboard' },
-        { id: 'products', label: 'Товары', icon: 'inventory_2' },
+        { 
+            id: 'products', 
+            label: 'Товары', 
+            icon: 'inventory_2',
+            subitems: [
+                { id: 'products_nomenclature', label: 'Список товаров', icon: 'list_alt', tab: 'products', parentLabel: 'Товары' },
+                { id: 'products_l1', label: 'Категории L1', icon: 'folder', tab: 'l1', parentLabel: 'Товары' },
+                { id: 'products_l2', label: 'Категории L2', icon: 'folder_open', tab: 'l2', parentLabel: 'Товары' },
+                { id: 'products_l3', label: 'L3 (табы)', icon: 'tab', tab: 'l3', parentLabel: 'Товары' },
+                { id: 'products_parameters', label: 'Параметры', icon: 'tune', tab: 'parameters', parentLabel: 'Товары' }
+            ]
+        },
         { id: 'orders', label: 'Заказы', icon: 'shopping_cart' },
-        { id: 'support', label: 'Поддержка', icon: 'forum' },
+        { 
+            id: 'support', 
+            label: 'Поддержка', 
+            icon: 'forum',
+            subitems: [
+                { id: 'support_chats', label: 'Обращения (Чаты)', icon: 'chat', tab: 'chats', parentLabel: 'Поддержка' },
+                { id: 'support_leads', label: 'Заявки', icon: 'description', tab: 'leads', parentLabel: 'Поддержка' }
+            ]
+        },
         { id: 'users', label: 'Клиенты', icon: 'group' },
         { id: 'leads', label: 'Лиды', icon: 'leaderboard' },
         { id: 'analytics', label: 'Аналитика', icon: 'insights' }
     ];
 
-    nav.innerHTML = items.map(item => `
-        <button data-view="${item.id}" data-label="${item.label}" class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-sm font-medium text-[#d7c1c7] group text-left">
-            <span class="material-symbols-outlined text-[#ffb0cc] group-hover:scale-110 transition-transform">${item.icon}</span>
-            <span class="flex-1 truncate">${item.label}</span>
-        </button>
-    `).join('');
+    nav.innerHTML = items.map(item => {
+        const hasSubitems = item.subitems && item.subitems.length > 0;
+        
+        let html = `
+            <div class="sidebar-group flex flex-col">
+                <button data-view="${item.id}" data-label="${item.label}" class="nav-item w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-sm font-medium text-[#d7c1c7] group text-left">
+                    <span class="material-symbols-outlined text-[#964551] group-hover:scale-110 transition-transform">${item.icon}</span>
+                    <span class="flex-1 truncate">${item.label}</span>
+                    ${hasSubitems ? '<span class="material-symbols-outlined text-xs text-[#d7c1c7]/40 rotate-180 transition-transform duration-200">keyboard_arrow_up</span>' : ''}
+                </button>
+        `;
+        
+        if (hasSubitems) {
+            html += `
+                <div class="ml-6 pl-4 border-l border-[#534347]/20 mt-1 mb-2 space-y-1 flex flex-col">
+                    ${item.subitems.map(sub => `
+                        <button data-view="${sub.id}" data-tab="${sub.tab}" data-label="${sub.parentLabel || item.label}" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-xs font-medium text-[#d7c1c7]/80 group text-left">
+                            <span class="material-symbols-outlined text-[#964551]/80 text-[16px] group-hover:scale-110 transition-transform">${sub.icon}</span>
+                            <span class="flex-1 truncate">${sub.label}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        html += `</div>`;
+        return html;
+    }).join('');
 }
 

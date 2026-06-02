@@ -15,7 +15,7 @@ export function renderBulkToolbar(container, selectedIds, callbacks, currentProd
 
     container.classList.remove('hidden');
     container.innerHTML = `
-        <div class="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 duration-500 w-[calc(100%-1rem)] sm:w-auto max-w-[600px]">
+        <div class="admin-bulk-bar fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-8 duration-500 w-[calc(100%-1rem)] sm:w-auto max-w-[600px]">
             <div class="liquid-glass px-3 py-3 md:px-6 md:py-4 rounded-2xl border border-primary/20 shadow-2xl shadow-black/50 flex flex-col md:flex-row md:items-center gap-3 md:gap-6 bg-surface-container/95">
                 <div class="flex items-center justify-between md:justify-start gap-3 md:pr-6 md:border-r border-outline/10 shrink-0">
                     <div class="flex items-center gap-3">
@@ -400,7 +400,15 @@ export function showConfirmPromptModal(options, onConfirm) {
     const text = options.text || 'Вы уверены?';
     const confirmText = options.confirmText || 'Подтвердить';
     const confirmClass = options.confirmClass || 'bg-primary text-on-primary hover:bg-on-surface hover:text-surface shadow-primary/20';
-    
+    const inputOpts = options.input || null;
+
+    const inputHtml = inputOpts ? `
+                <input id="bulk-confirm-input" type="text" autocomplete="off"
+                    value="${(inputOpts.value || '').replace(/"/g, '&quot;')}"
+                    placeholder="${(inputOpts.placeholder || '').replace(/"/g, '&quot;')}"
+                    class="w-full bg-surface-container-lowest border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface">
+    ` : '';
+
     modalWrapper.innerHTML = `
         <div id="bulk-confirm-backdrop" class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"></div>
         <div id="bulk-confirm-container" class="relative w-full max-w-md bg-surface-container border border-outline/20 rounded-[2rem] p-6 shadow-2xl flex flex-col transform scale-95 transition-transform duration-300 text-on-surface">
@@ -418,6 +426,7 @@ export function showConfirmPromptModal(options, onConfirm) {
                 <p class="text-sm text-on-surface-variant opacity-90 leading-relaxed font-medium">
                     ${text}
                 </p>
+                ${inputHtml}
                 
                 <div class="flex justify-end gap-3 pt-4">
                     <button id="bulk-confirm-cancel-btn" class="px-5 py-3 rounded-xl border border-outline/20 hover:bg-surface-variant transition-all text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label-caps">
@@ -436,6 +445,7 @@ export function showConfirmPromptModal(options, onConfirm) {
     if (window.lockScrollGlobal) window.lockScrollGlobal();
     
     const container = modalWrapper.querySelector('#bulk-confirm-container');
+    const inputEl = modalWrapper.querySelector('#bulk-confirm-input');
     
     const close = () => {
         modalWrapper.classList.add('opacity-0');
@@ -445,7 +455,8 @@ export function showConfirmPromptModal(options, onConfirm) {
     };
     
     const confirm = () => {
-        onConfirm();
+        const val = inputEl ? inputEl.value : undefined;
+        onConfirm(val);
         close();
     };
     
@@ -453,9 +464,15 @@ export function showConfirmPromptModal(options, onConfirm) {
     modalWrapper.querySelector('#bulk-confirm-close').onclick = close;
     modalWrapper.querySelector('#bulk-confirm-cancel-btn').onclick = close;
     modalWrapper.querySelector('#bulk-confirm-submit-btn').onclick = confirm;
+    if (inputEl) {
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); confirm(); }
+        });
+    }
     
     requestAnimationFrame(() => {
         modalWrapper.classList.remove('opacity-0');
         container.classList.remove('scale-95');
+        if (inputEl) { inputEl.focus(); inputEl.select(); }
     });
 }

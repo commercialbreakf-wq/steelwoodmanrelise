@@ -1,4 +1,4 @@
-import { state } from '../state.js';
+import { state } from '../state.js?v=20260601b';
 import { fetchAllParameters } from './parameters.js';
 
 /**
@@ -106,13 +106,19 @@ export function openDrawer(product, onSave) {
 
     // Wizard state (4 steps for Create mode; Edit mode is single scrollable card)
     let currentStep = 1;
-    const totalSteps = 4;
+    const totalSteps = 7;
 
     // Get unique categories from state
     const l1Categories = [...new Set(state.products.map(p => p.parent_category).filter(Boolean))].sort();
     const getL2Categories = (l1) => {
         return [...new Set(state.products.filter(p => !l1 || p.parent_category === l1).map(p => p.category).filter(Boolean))].sort();
     };
+    const getL3Tabs = (l2) => {
+        if (!l2) return [];
+        return [...new Set(state.products.filter(p => p.category === l2).map(p => (p.l3 || '').toString().trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    };
+    const escapeAttr = (str) => String(str === null || str === undefined ? '' : str)
+        .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
     // Helper for category-based parameter suggestions (23met.ru taxonomy)
     const getCategorySuggestions = (parentCat, cat) => {
@@ -144,10 +150,13 @@ export function openDrawer(product, onSave) {
         if (isEdit) return ''; // No steps in edit mode
 
         const stepsMeta = [
-            { step: 1, title: 'Классификация', desc: 'Выберите категорию каталога и укажите базовое наименование', icon: 'category' },
-            { step: 2, title: 'Цена и Фото', desc: 'Укажите стоимость за тонну и загрузите изображение товара', icon: 'payments' },
-            { step: 3, title: 'Описание', desc: 'Добавьте подробное описание и особенности применения', icon: 'description' },
-            { step: 4, title: 'Параметры', desc: 'Настройте характеристики товара и спецификации', icon: 'tune' }
+            { step: 1, title: 'Классификация', desc: 'Категория, подкатегория, наименование товара', icon: 'category' },
+            { step: 2, title: 'Параметры фильтра', desc: 'Размер, толщина, длина, марка', icon: 'filter_alt' },
+            { step: 3, title: 'Привязка таба', desc: 'Привязка вкладки (L3)', icon: 'tab' },
+            { step: 4, title: 'Характеристики', desc: 'Настройте детальные параметры и спецификации', icon: 'tune' },
+            { step: 5, title: 'Описание', desc: 'Описание товара и ИИ-генератор', icon: 'description' },
+            { step: 6, title: 'Цена и Фото', desc: 'Укажите стоимость и загрузите изображение', icon: 'payments' },
+            { step: 7, title: 'Предпросмотр', desc: 'Проверка готовой карточки товара перед сохранением', icon: 'preview' }
         ];
 
         const currentMeta = stepsMeta[currentStep - 1];
@@ -166,7 +175,7 @@ export function openDrawer(product, onSave) {
                             </span>
                         </div>
                         ${idx < stepsMeta.length - 1 ? `
-                            <div class="flex-1 h-0.5 mx-2 lg:mx-4 rounded-full transition-colors duration-300 ${currentStep > item.step ? 'bg-primary/40 shadow-[0_0_8px_rgba(202, 112, 147,0.4)]' : 'bg-outline/10'}"></div>
+                            <div class="flex-1 h-0.5 mx-2 lg:mx-4 rounded-full transition-colors duration-300 ${currentStep > item.step ? 'bg-primary/40 shadow-[0_0_8px_rgba(150, 69, 81,0.4)]' : 'bg-outline/10'}"></div>
                         ` : ''}
                     `).join('')}
                 </div>
@@ -220,7 +229,181 @@ export function openDrawer(product, onSave) {
         </div>
     `;
 
-    const renderClassificationSection = () => `
+    const getParamSuggestions = (field) => {
+        if (!data.category) return [];
+        return [...new Set(state.products
+            .filter(p => p.category === data.category && p[field])
+            .map(p => p[field].toString().trim())
+            .filter(Boolean)
+        )].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    };
+
+    const syncFilterParamsToSpecs = () => {
+        const updateOrAddSpec = (key, val) => {
+            const idx = specs.findIndex(s => (s[0] || '').toLowerCase().trim().includes(key.toLowerCase()));
+            if (idx !== -1) {
+                if (val) {
+                    specs[idx][1] = val;
+                } else {
+                    specs.splice(idx, 1);
+                }
+            } else if (val) {
+                specs.push([key, val]);
+            }
+        };
+        updateOrAddSpec('Размер / Диаметр', data.vid);
+        updateOrAddSpec('Толщина / Стенка', data.width);
+        updateOrAddSpec('Длина / Формат', data.length);
+        updateOrAddSpec('Марка / Стандарт', data.type);
+        data.specs = JSON.stringify(specs);
+    };
+
+    const renderFilterParametersSection = () => {
+        const vidSuggestions = getParamSuggestions('vid');
+        const widthSuggestions = getParamSuggestions('width');
+        const lengthSuggestions = getParamSuggestions('length');
+        const typeSuggestions = getParamSuggestions('type');
+
+        const renderFieldSelect = (field, label, value, suggestions, placeholder) => {
+            const hasValueInSuggestions = suggestions.includes(value);
+            return `
+                <div class="space-y-2 p-6 rounded-3xl bg-surface-container/50 border border-outline/5 shadow-sm">
+                    <label class="text-[10px] uppercase opacity-60 text-on-surface-variant font-bold font-label-caps tracking-widest">${label}</label>
+                    <div class="flex flex-col gap-2">
+                        <select style="color-scheme: dark;" id="${field}-select" class="param-filter-select w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface shadow-inner">
+                            <option value="">-- Выберите значение --</option>
+                            ${suggestions.map(val => `<option value="${escapeAttr(val)}" ${value === val ? 'selected' : ''}>${escapeAttr(val)}</option>`).join('')}
+                            <option value="_new_" ${value && !hasValueInSuggestions ? 'selected' : ''}>➕ Ввести новое значение...</option>
+                        </select>
+                        <input type="text" id="${field}-custom" name="${field}" value="${escapeAttr(value || '')}" placeholder="${placeholder}" class="param-filter-input w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface shadow-inner ${suggestions.length === 0 || (value && !hasValueInSuggestions) ? '' : 'hidden'}">
+                    </div>
+                </div>
+            `;
+        };
+
+        return `
+            <div class="p-6 rounded-3xl bg-surface-container/50 border border-outline/5 space-y-6 shadow-sm">
+                <h4 class="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-2 font-label-caps">
+                    <span class="material-symbols-outlined text-base">filter_alt</span>
+                    Параметры для фильтрации в каталоге
+                </h4>
+                <p class="text-xs text-on-surface-variant opacity-70">Эти параметры используются для подбора товаров покупателями в фильтрах.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${renderFieldSelect('vid', 'Размер / Диаметр (vid)', data.vid, vidSuggestions, 'напр. 12 / 40х40 / 120')}
+                    ${renderFieldSelect('width', 'Толщина / Стенка (width)', data.width, widthSuggestions, 'напр. 4 / 2.0 / 1.5')}
+                    ${renderFieldSelect('length', 'Длина / Формат (length)', data.length, lengthSuggestions, 'напр. 6м / 11.7м / 1250х2500')}
+                    ${renderFieldSelect('type', 'Марка / Стандарт (type)', data.type, typeSuggestions, 'напр. А500С / Ст3 / ГОСТ 3262')}
+                </div>
+            </div>
+        `;
+    };
+
+    
+    const renderTabBindingSection = () => `
+        <div class="p-6 rounded-3xl bg-surface-container/50 border border-outline/5 space-y-6 shadow-sm">
+            <h4 class="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-2 font-label-caps">
+                <span class="material-symbols-outlined text-base">tab</span>
+                Привязка таба / вкладки (L3)
+            </h4>
+            <div id="l3-container" class="space-y-2 ${!data.category ? 'hidden' : ''}">
+                <label class="text-[10px] uppercase opacity-60 text-on-surface-variant font-bold font-label-caps tracking-widest">Таб / Под-вариант (L3)</label>
+                <div class="flex flex-col gap-2">
+                    <select style="color-scheme: dark;" id="l3-select" class="w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface shadow-inner">
+                        <option value="">— Без таба —</option>
+                        ${getL3Tabs(data.category).map(t => `<option value="${escapeAttr(t)}" ${(data.l3 || '') === t ? 'selected' : ''}>${escapeAttr(t)}</option>`).join('')}
+                        <option value="_new_" ${data.l3 && !getL3Tabs(data.category).includes(data.l3) ? 'selected' : ''}>➕ Создать новый таб...</option>
+                    </select>
+                    <input type="text" id="l3-custom" name="l3" value="${escapeAttr(data.l3 || '')}" placeholder="напр. Горячекатаный / Оцинкованный / DIN" class="w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface shadow-inner ${(getL3Tabs(data.category).includes(data.l3) || !data.l3) ? 'hidden' : ''}">
+                </div>
+                <p class="text-[10px] text-on-surface-variant opacity-60">Таб группирует товары внутри подкатегории (как вкладка в каталоге).</p>
+            </div>
+            ${!data.category ? `<div class="text-xs text-error font-bold font-label-caps">Сначала выберите подкатегорию на Шаге 1</div>` : ''}
+        </div>
+    `;
+
+    const triggerAIDescriptionGen = () => {
+        const btn = modalWrapper.querySelector('#generate-ai-desc-btn');
+        const textarea = modalWrapper.querySelector('#product-desc-input');
+        if (!btn || !textarea) return;
+
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-spin material-symbols-outlined text-sm">sync</span> Генерация...';
+            
+            setTimeout(() => {
+                const name = data.name || 'Товар металлопроката';
+                const pCat = data.parent_category || '';
+                const cat = data.category || '';
+                const type = data.type || '';
+                const vid = data.vid || '';
+                const width = data.width || '';
+                const length = data.length || '';
+
+                let desc = '';
+                if (pCat.includes('Армат') || cat.includes('Армат')) {
+                    desc = `Высококачественная арматура ${name}. Изготовлена из прочной стали стандарта ${type || 'ГОСТ'}. Диаметр составляет ${vid || 'стандартный'} мм. Поставляется хлыстами длиной ${length || '6'} м. Предназначена для армирования ответственных железобетонных конструкций, заливки фундаментов любой сложности, а также изготовления прочных каркасов и сеток. Изделие устойчиво к механическим нагрузкам и обладает отличной свариваемостью.`;
+                } else if (pCat.includes('Труб') || cat.includes('Труб')) {
+                    desc = `Профильная труба ${name} сечением ${vid || 'стандартным'} мм и толщиной стенки ${width || '2'} мм. Продукт произведен по стандартам ГОСТ из углеродистой стали марки ${type || 'Ст3'}. Длина хлыста составляет ${length || '6'} метров. Применяется для возведения легких строительных лесов, несущих металлоконструкций, каркасов малых архитектурных форм, ограждений и опор. Отличается ровной геометрией, простотой монтажа и долговечностью в эксплуатации.`;
+                } else if (pCat.includes('Лист') || cat.includes('Лист')) {
+                    desc = `Листовой металлопрокат ${name} толщиной ${width || '2'} мм и раскроем ${vid || '1500х6000'}. Стандарт изготовления: ${type || 'ГОСТ'}. Применяется в строительстве, машиностроении, для производства гнутых профилей, штамповки деталей и обшивки конструкций. Лист имеет гладкую и чистую поверхность, отлично поддается механической обработке, резке и сварке.`;
+                } else {
+                    desc = `Высококачественный металлопрокат ${name}. Характеристики изделия: размер/диаметр ${vid || '-'} мм, толщина/стенка ${width || '-'} мм, марка стали/стандарт ${type || '-'}. Длина поставляемого изделия составляет ${length || '-'} м. Изделие предназначено для широкого спектра строительных, монтажных и производственных работ. Соответствует всем необходимым техническим стандартам, долговечно и надежно.`;
+                }
+
+                textarea.value = desc;
+                data.description = desc;
+                updateLivePreview();
+
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined text-sm">check</span> Готово!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            }, 800);
+        };
+    };
+
+    const parseLength = (str) => {
+        if (!str) return 6;
+        const num = parseFloat(str.toString().replace(/,/g, '.').replace(/[^0-9.]/g, ''));
+        return isNaN(num) || num <= 0 ? 6 : num;
+    };
+    
+    const parseWeight = (str) => {
+        if (!str) return 1;
+        const num = parseFloat(str.toString().replace(/,/g, '.').replace(/[^0-9.]/g, ''));
+        return isNaN(num) || num <= 0 ? 1 : num;
+    };
+
+    const recalculatePrices = () => {
+        const pParsed = window.parseUniversalSpecs ? window.parseUniversalSpecs(data) : data;
+        const len = pParsed.mLenVal || parseLength(data.length || data.vid || '6');
+        const weight = pParsed.wUnitVal || 1;
+
+        const priceTon = parseFloat(data.price_ton) || 0;
+        if (priceTon > 0) {
+            const priceMeter = Math.round((priceTon / 1000) * weight);
+            const priceUnit = Math.round(priceMeter * len);
+            
+            data.price_unit = priceUnit;
+            
+            const priceUnitInput = modalWrapper.querySelector('#price-unit-input');
+            const priceMeterInput = modalWrapper.querySelector('#price-meter-input');
+            
+            if (priceUnitInput) priceUnitInput.value = priceUnit;
+            if (priceMeterInput) priceMeterInput.value = priceMeter;
+
+            const helperTextEl = modalWrapper.querySelector('#price-calc-helper-text');
+            if (helperTextEl) {
+                helperTextEl.innerHTML = `Расчет цен произведен для: длина хлыста — <strong>${len} м</strong>, вес — <strong>${weight.toFixed(3)} кг/м</strong> (из характеристик).`;
+            }
+            updateLivePreview();
+        }
+    };
+
+const renderClassificationSection = () => `
         <div class="p-6 rounded-3xl bg-surface-container/50 border border-outline/5 space-y-6 shadow-sm">
             <h4 class="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-2 font-label-caps">
                 <span class="material-symbols-outlined text-base">account_tree</span>
@@ -238,7 +421,7 @@ export function openDrawer(product, onSave) {
                         <input type="text" id="l1-custom" name="parent_category" value="${data.parent_category || ''}" placeholder="Название новой категории" class="w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface shadow-inner ${l1Categories.includes(data.parent_category) || !data.parent_category ? 'hidden' : ''}">
                     </div>
                 </div>
-                <div class="space-y-2">
+                <div id="l2-container" class="space-y-2 ${!data.parent_category ? 'hidden' : ''}">
                     <label class="text-[10px] uppercase opacity-60 text-on-surface-variant font-bold font-label-caps tracking-widest">Подкатегория (L2)</label>
                     <div class="flex flex-col gap-2">
                         <select style="color-scheme: dark;" id="l2-select" class="w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface shadow-inner">
@@ -250,6 +433,7 @@ export function openDrawer(product, onSave) {
                     </div>
                 </div>
             </div>
+            
             <div class="space-y-2">
                 <label class="text-[10px] uppercase opacity-60 text-on-surface-variant font-bold font-label-caps tracking-widest">Наименование товара (L3)</label>
                 <input type="text" id="product-name-input" name="name" value="${data.name || ''}" placeholder="напр. Арматура А1 6 м" class="w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-sm font-bold text-on-surface shadow-inner">
@@ -291,6 +475,7 @@ export function openDrawer(product, onSave) {
                 Цена товара
             </h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div id="price-calc-helper-text" class="col-span-full text-[11px] text-primary/80 font-bold p-3 rounded-2xl bg-primary/5 border border-primary/10 hidden"></div>
                 <div class="space-y-2">
                     <label class="text-[10px] uppercase opacity-60 text-on-surface-variant font-bold font-label-caps tracking-widest">Цена за тонну, ₽</label>
                     <input type="number" id="price-ton-input" name="price_ton" value="${data.price_ton || 0}" class="w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all text-lg text-primary font-bold shadow-inner">
@@ -352,11 +537,19 @@ export function openDrawer(product, onSave) {
 
     const renderDescriptionSection = () => `
         <div class="p-6 rounded-3xl bg-surface-container/50 border border-outline/5 space-y-6 shadow-sm">
-            <h4 class="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-2 font-label-caps">
-                <span class="material-symbols-outlined text-base">description</span>
-                Подробное описание товара
-            </h4>
-            <div class="space-y-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-outline/5">
+                <div>
+                    <h4 class="text-xs uppercase tracking-widest text-primary font-bold flex items-center gap-2 font-label-caps">
+                        <span class="material-symbols-outlined text-base">description</span>
+                        Подробное описание товара
+                    </h4>
+                    <p class="text-xs text-on-surface-variant opacity-70 mt-1">Добавьте подробное описание или воспользуйтесь генерацией ИИ на основе названия и характеристик.</p>
+                </div>
+                <button type="button" id="generate-ai-desc-btn" class="px-5 py-2.5 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-xs font-bold text-primary transition-all flex items-center gap-1.5 shadow-md shrink-0 font-label-caps">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span> Сгенерировать ИИ
+                </button>
+            </div>
+            <div class="space-y-2 mt-4">
                 <textarea id="product-desc-input" name="description" rows="6" placeholder="Введите описание, особенности применения, соответствие стандартам..." class="w-full bg-surface-container-lowest border border-outline/30 rounded-2xl px-4 py-3.5 focus:border-primary outline-none transition-all resize-none text-sm text-on-surface shadow-inner font-body-md">${data.description || ''}</textarea>
             </div>
         </div>
@@ -471,6 +664,8 @@ export function openDrawer(product, onSave) {
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pb-2">
                     <div class="lg:col-span-2 space-y-8">
                         ${renderClassificationSection()}
+                        ${renderFilterParametersSection()}
+                        ${renderTabBindingSection()}
                         ${renderPricingAndPhotoSection()}
                         ${renderDescriptionSection()}
                         ${renderParametersSection()}
@@ -487,27 +682,48 @@ export function openDrawer(product, onSave) {
                 </div>
             `;
         } else {
-            // Create Mode: 4-step wizard
+            // Create Mode: 7-step wizard
+            if (currentStep === 7) {
+                // Step 7: Full size preview confirmation page
+                return `
+                    ${renderStepHeader()}
+                    <div class="max-w-xl mx-auto flex-1 min-h-0 overflow-y-auto custom-scrollbar pb-2 flex items-center justify-center w-full">
+                        <div class="w-full">
+                            ${renderLivePreview()}
+                        </div>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <div id="modal-footer" class="mt-8 pt-6 border-t border-outline/10 flex justify-end gap-4 bg-surface-container-low shrink-0 relative z-10 rounded-b-3xl w-full">
+                        <button type="button" id="prev-step" class="px-7 py-3.5 rounded-2xl border border-outline/20 hover:bg-surface-variant transition-all text-[11px] font-bold uppercase tracking-widest text-on-surface-variant shadow-sm font-label-caps">Назад</button>
+                        <button type="button" id="save-product" class="px-7 py-3.5 rounded-2xl bg-primary text-on-primary hover:bg-on-surface hover:text-surface transition-all text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20 font-label-caps">Создать товар</button>
+                    </div>
+                `;
+            }
+
             return `
                 ${renderStepHeader()}
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pb-2">
-                    <div class="lg:col-span-2 space-y-6">
+                <div class="max-w-4xl mx-auto flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2 pb-2 w-full">
+                    <div class="space-y-6">
                         <div id="step-1-container" class="${currentStep !== 1 ? 'hidden' : ''}">
                             ${renderClassificationSection()}
                         </div>
-                        <div id="step-2-container" class="space-y-6 ${currentStep !== 2 ? 'hidden' : ''}">
-                            ${renderPricingAndPhotoSection()}
+                        <div id="step-2-container" class="${currentStep !== 2 ? 'hidden' : ''}">
+                            ${renderFilterParametersSection()}
                         </div>
                         <div id="step-3-container" class="${currentStep !== 3 ? 'hidden' : ''}">
-                            ${renderDescriptionSection()}
+                            ${renderTabBindingSection()}
                         </div>
                         <div id="step-4-container" class="${currentStep !== 4 ? 'hidden' : ''}">
                             ${renderParametersSection()}
                         </div>
-                    </div>
-                    <div class="lg:col-span-1">
-                        ${renderLivePreview()}
+                        <div id="step-5-container" class="${currentStep !== 5 ? 'hidden' : ''}">
+                            ${renderDescriptionSection()}
+                        </div>
+                        <div id="step-6-container" class="${currentStep !== 6 ? 'hidden' : ''}">
+                            ${renderPricingAndPhotoSection()}
+                        </div>
                     </div>
                 </div>
 
@@ -542,7 +758,7 @@ export function openDrawer(product, onSave) {
         if (catEl) catEl.textContent = `${data.parent_category || 'Категория'} / ${data.category || 'Подкатегория'}`;
         if (statusEl) {
             statusEl.textContent = data.vstatus === 'archived' ? 'АРХИВ' : 'В НАЛИЧИИ';
-            statusEl.className = `absolute top-3 left-3 px-3 py-1 rounded-xl bg-[#0f0e0c]/80 backdrop-blur-md border text-[10px] font-bold uppercase tracking-wider ${data.vstatus === 'archived' ? 'border-red-500/30 text-red-400' : 'border-white/10 text-[#ca7093]'}`;
+            statusEl.className = `absolute top-3 left-3 px-3 py-1 rounded-xl bg-[#0f0e0c]/80 backdrop-blur-md border text-[10px] font-bold uppercase tracking-wider ${data.vstatus === 'archived' ? 'border-red-500/30 text-red-400' : 'border-white/10 text-[#964551]'}`;
         }
     };
 
@@ -712,7 +928,7 @@ export function openDrawer(product, onSave) {
         if (!form) return;
         const formData = new FormData(form);
         for (let [key, value] of formData.entries()) {
-            if (key !== 'parent_category' && key !== 'category' && key !== 'vstatus' && key !== 'description') {
+            if (key !== 'parent_category' && key !== 'category' && key !== 'vstatus' && key !== 'description' && key !== 'vid' && key !== 'width' && key !== 'length' && key !== 'type') {
                 data[key] = value;
             }
         }
@@ -724,13 +940,19 @@ export function openDrawer(product, onSave) {
         const l2Custom = modalWrapper.querySelector('#l2-custom');
         const statusSelect = modalWrapper.querySelector('#product-status-select');
         const descInput = modalWrapper.querySelector('#product-desc-input');
-        const priceTonInput = modalWrapper.querySelector('#price-ton-input');
+        let priceTonInput = modalWrapper.querySelector('#price-ton-input');
+    let l3Select, l3Custom;
 
         if (l1Select && l1Select.value !== '_new_') data.parent_category = l1Select.value;
         else if (l1Custom) data.parent_category = l1Custom.value;
 
         if (l2Select && l2Select.value !== '_new_') data.category = l2Select.value;
         else if (l2Custom) data.category = l2Custom.value;
+
+        l3Select = modalWrapper.querySelector('#l3-select');
+        l3Custom = modalWrapper.querySelector('#l3-custom');
+        if (l3Select && l3Select.value !== '_new_') data.l3 = l3Select.value;
+        else if (l3Custom) data.l3 = l3Custom.value.trim();
 
         if (statusSelect) data.vstatus = statusSelect.value;
         if (descInput) data.description = descInput.value;
@@ -741,6 +963,21 @@ export function openDrawer(product, onSave) {
         if (priceUnitInput) {
             data.price_unit = parseFloat(priceUnitInput.value) || 0;
         }
+
+        ['vid', 'width', 'length', 'type'].forEach(field => {
+            const sel = modalWrapper.querySelector(`#${field}-select`);
+            const custom = modalWrapper.querySelector(`#${field}-custom`);
+            if (sel) {
+                if (sel.value === '_new_') {
+                    if (custom) data[field] = custom.value.trim();
+                } else {
+                    data[field] = sel.value;
+                }
+            } else if (custom) {
+                data[field] = custom.value.trim();
+            }
+        });
+        syncFilterParamsToSpecs();
 
         updateSpecsFromRows();
     };
@@ -828,7 +1065,7 @@ export function openDrawer(product, onSave) {
                     }
                 };
 
-                const { showConfirmPromptModal } = await import('./bulk-toolbar.js');
+                const { showConfirmPromptModal } = await import('./bulk-toolbar.js?v=20260601b');
                 showConfirmPromptModal({
                     title: isEdit ? 'Сохранение изменений товара' : 'Создание нового товара',
                     icon: isEdit ? 'edit' : 'add',
@@ -844,6 +1081,41 @@ export function openDrawer(product, onSave) {
 
     const bindEvents = () => {
         const closeModalBtn = modalWrapper.querySelector('#close-modal');
+        
+        // Setup Tab L3 selection events if elements exist in Step 3 or Edit Mode
+        let l3Select = modalWrapper.querySelector('#l3-select');
+    let l3Custom = modalWrapper.querySelector('#l3-custom');
+        if (l3Select && l3Custom) {
+            l3Select.onchange = () => {
+                if (l3Select.value === '_new_') {
+                    l3Custom.classList.remove('hidden');
+                    l3Custom.value = '';
+                    l3Custom.focus();
+                    data.l3 = '';
+                } else {
+                    l3Custom.classList.add('hidden');
+                    l3Custom.value = l3Select.value;
+                    data.l3 = l3Select.value;
+                }
+                updateDataFromForm();
+            };
+            l3Custom.oninput = () => {
+                data.l3 = l3Custom.value.trim();
+            };
+        }
+
+        // Setup AI Description Generator in Step 5
+        triggerAIDescriptionGen();
+
+        // Setup Price Calculation on Ton Price input
+        const priceTonInput = modalWrapper.querySelector('#price-ton-input');
+        if (priceTonInput) {
+            const helperTextEl = modalWrapper.querySelector('#price-calc-helper-text');
+            if (helperTextEl) helperTextEl.classList.remove('hidden');
+            recalculatePrices();
+            priceTonInput.addEventListener('input', recalculatePrices);
+        }
+
         const modalBackdrop = modalWrapper.querySelector('#modal-backdrop');
         if (closeModalBtn) closeModalBtn.onclick = close;
         if (modalBackdrop) modalBackdrop.onclick = close;
@@ -875,6 +1147,15 @@ export function openDrawer(product, onSave) {
                     data.parent_category = l1Select.value;
                 }
                 updateDataFromForm();
+
+                const l2Container = modalWrapper.querySelector('#l2-container');
+                const l3Container = modalWrapper.querySelector('#l3-container');
+                if (data.parent_category) {
+                    l2Container?.classList.remove('hidden');
+                } else {
+                    l2Container?.classList.add('hidden');
+                    l3Container?.classList.add('hidden');
+                }
                 
                 if (l2Select) {
                     const l2Cats = getL2Categories(data.parent_category);
@@ -900,6 +1181,9 @@ export function openDrawer(product, onSave) {
                         }
                     }
                 }
+
+                // L2 changed as a result of L1 change → refresh L3 tab options
+                if (typeof refreshL3Options === 'function') refreshL3Options();
                 
                 // Update suggestions bar
                 const suggestionsContainer = modalWrapper.querySelector('#category-suggestions-container');
@@ -907,7 +1191,7 @@ export function openDrawer(product, onSave) {
                     const suggestions = getCategorySuggestions(data.parent_category, data.category);
                     suggestionsContainer.innerHTML = suggestions.map(s => `
                         <button type="button" class="suggestion-add-btn px-3 py-1.5 rounded-xl bg-surface-variant hover:bg-primary/10 border border-outline/10 text-xs text-on-surface font-bold transition-all flex items-center gap-1 shadow-sm font-label-caps" data-key="${s}">
-                            <span class="material-symbols-outlined text-[10px] text-[#ca7093]">add</span> ${s}
+                            <span class="material-symbols-outlined text-[10px] text-[#964551]">add</span> ${s}
                         </button>
                     `).join('');
                     bindSuggestionsEvents();
@@ -934,13 +1218,23 @@ export function openDrawer(product, onSave) {
                 }
                 updateDataFromForm();
 
+                const l3Container = modalWrapper.querySelector('#l3-container');
+                if (data.category) {
+                    l3Container?.classList.remove('hidden');
+                } else {
+                    l3Container?.classList.add('hidden');
+                }
+
+                // Refresh the L3 (tab) options for the newly selected subcategory
+                refreshL3Options();
+
                 // Update suggestions bar
                 const suggestionsContainer = modalWrapper.querySelector('#category-suggestions-container');
                 if (suggestionsContainer) {
                     const suggestions = getCategorySuggestions(data.parent_category, data.category);
                     suggestionsContainer.innerHTML = suggestions.map(s => `
                         <button type="button" class="suggestion-add-btn px-3 py-1.5 rounded-xl bg-surface-variant hover:bg-primary/10 border border-outline/10 text-xs text-on-surface font-bold transition-all flex items-center gap-1 shadow-sm font-label-caps" data-key="${s}">
-                            <span class="material-symbols-outlined text-[10px] text-[#ca7093]">add</span> ${s}
+                            <span class="material-symbols-outlined text-[10px] text-[#964551]">add</span> ${s}
                         </button>
                     `).join('');
                     bindSuggestionsEvents();
@@ -950,6 +1244,62 @@ export function openDrawer(product, onSave) {
             l2Custom.oninput = () => {
                 data.category = l2Custom.value;
                 updateLivePreview();
+            };
+        }
+
+        // ─── L3 (tab) picker wiring ───────────────────────────────────────
+        const refreshL3Options = () => {
+            l3Select = modalWrapper.querySelector('#l3-select');
+            l3Custom = modalWrapper.querySelector('#l3-custom');
+            l3Container = modalWrapper.querySelector('#l3-container');
+            if (data.category) {
+                l3Container?.classList.remove('hidden');
+            } else {
+                l3Container?.classList.add('hidden');
+            }
+            if (!l3Select) return;
+            const tabs = getL3Tabs(data.category);
+            const cur = data.l3 || '';
+            const stillValid = tabs.includes(cur);
+            if (!stillValid && cur && (l3Custom && l3Custom.value.trim() === cur)) {
+                // keep custom value
+            } else if (!stillValid) {
+                data.l3 = '';
+            }
+            l3Select.innerHTML = `
+                <option value="">— Без таба —</option>
+                ${tabs.map(t => `<option value="${escapeAttr(t)}" ${(data.l3 || '') === t ? 'selected' : ''}>${escapeAttr(t)}</option>`).join('')}
+                <option value="_new_" ${data.l3 && !tabs.includes(data.l3) ? 'selected' : ''}>➕ Создать новый таб...</option>
+            `;
+            if (l3Custom) {
+                if (data.l3 && !tabs.includes(data.l3)) {
+                    l3Custom.classList.remove('hidden');
+                    l3Custom.value = data.l3;
+                } else {
+                    l3Custom.classList.add('hidden');
+                    l3Custom.value = data.l3 || '';
+                }
+            }
+        };
+
+        l3Select = modalWrapper.querySelector('#l3-select');
+        l3Custom = modalWrapper.querySelector('#l3-custom');
+        if (l3Select && l3Custom) {
+            l3Select.onchange = () => {
+                if (l3Select.value === '_new_') {
+                    l3Custom.classList.remove('hidden');
+                    l3Custom.value = '';
+                    l3Custom.focus();
+                    data.l3 = '';
+                } else {
+                    l3Custom.classList.add('hidden');
+                    l3Custom.value = l3Select.value;
+                    data.l3 = l3Select.value;
+                }
+                updateDataFromForm();
+            };
+            l3Custom.oninput = () => {
+                data.l3 = l3Custom.value.trim();
             };
         }
 
@@ -1004,7 +1354,7 @@ export function openDrawer(product, onSave) {
             });
         }
 
-        const priceTonInput = modalWrapper.querySelector('#price-ton-input');
+        // priceTonInput is already declared as const at the top of bindEvents
         const priceUnitInput = modalWrapper.querySelector('#price-unit-input');
         const priceMeterInput = modalWrapper.querySelector('#price-meter-input');
 
@@ -1086,14 +1436,14 @@ export function openDrawer(product, onSave) {
 
             dropzone.ondragover = (e) => {
                 e.preventDefault();
-                dropzone.classList.add('border-[#ca7093]', 'bg-[#ca7093]/5');
+                dropzone.classList.add('border-[#964551]', 'bg-[#964551]/5');
             };
             dropzone.ondragleave = () => {
-                dropzone.classList.remove('border-[#ca7093]', 'bg-[#ca7093]/5');
+                dropzone.classList.remove('border-[#964551]', 'bg-[#964551]/5');
             };
             dropzone.ondrop = (e) => {
                 e.preventDefault();
-                dropzone.classList.remove('border-[#ca7093]', 'bg-[#ca7093]/5');
+                dropzone.classList.remove('border-[#964551]', 'bg-[#964551]/5');
                 const file = e.dataTransfer.files[0];
                 if (file && file.type.startsWith('image/')) {
                     const reader = new FileReader();
@@ -1187,6 +1537,35 @@ export function openDrawer(product, onSave) {
                 data.description = productDescInput.value;
             };
         }
+
+        const bindFilterParamEvents = () => {
+            ['vid', 'width', 'length', 'type'].forEach(field => {
+                const sel = modalWrapper.querySelector(`#${field}-select`);
+                const custom = modalWrapper.querySelector(`#${field}-custom`);
+                if (sel && custom) {
+                    sel.onchange = () => {
+                        if (sel.value === '_new_') {
+                            custom.classList.remove('hidden');
+                            custom.value = '';
+                            custom.focus();
+                            data[field] = '';
+                        } else {
+                            custom.classList.add('hidden');
+                            custom.value = sel.value;
+                            data[field] = sel.value;
+                        }
+                        syncFilterParamsToSpecs();
+                        updateLivePreview();
+                    };
+                    custom.oninput = () => {
+                        data[field] = custom.value.trim();
+                        syncFilterParamsToSpecs();
+                        updateLivePreview();
+                    };
+                }
+            });
+        };
+        bindFilterParamEvents();
 
         bindSuggestionsEvents();
     };

@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "Auto-Translate Localization Files",
+  "description": "Watches primary-language (English) localization files (JSON/YAML and similar) and, when they change, identifies new or modified user-facing text and generates context-aware Russian (ru) translations.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/locales/en/**/*.json",
+      "**/locales/en.json",
+      "**/i18n/en/**/*.json",
+      "**/i18n/en.json",
+      "**/lang/en/**/*.json",
+      "**/en.yaml",
+      "**/en.yml",
+      "**/locales/en/**/*.yaml",
+      "**/locales/en/**/*.yml",
+      "**/messages/en.json",
+      "**/translations/en.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A primary-language (English) localization file was just changed. Do the following:\n\n1. The configured target language is Russian (ru). Locate (or create, matching the project's existing layout) the Russian locale file that corresponds to the edited source file (e.g. locales/ru/..., i18n/ru.json, messages/ru.json, ru.yaml). If the project also contains other target-language locale files, include those as additional targets too.\n\n2. Determine what changed: compare the edited source file against its existing translations to find keys that are new, modified, or missing. Only translate those entries; leave unchanged, already-correct translations alone.\n\n3. For each target language, generate translations that:\n   - Preserve meaning and tone of the source text.\n   - Respect locale-specific conventions (date/number/currency formats, pluralization rules, formality/honorifics, text direction).\n   - Keep all interpolation tokens, placeholders, ICU/format syntax, and HTML/markup intact and unmodified (e.g. {{name}}, {count}, %s, <b>).\n   - Maintain the exact key structure and ordering of the source file.\n\n4. Write the translations into the matching target-language files using the same format (JSON/YAML) and structure as the source. Do not alter unrelated keys.\n\n5. Validate that each updated file is syntactically valid (valid JSON/YAML) and that every source key has a corresponding entry in each target file.\n\n6. Summarize what you translated: which languages, how many keys added/updated, and flag any strings you were unsure about for human review. Do not invent target languages or send anything outside the workspace."
+  }
+}

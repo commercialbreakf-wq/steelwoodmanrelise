@@ -86,6 +86,7 @@ const pageRoutes = [
   { path: '/cabinet', file: 'cabinet.html' },
   { path: '/product', file: 'product.html' },
   { path: '/reset-password', file: 'reset-password.html' },
+  { path: '/admin', file: 'admin.html' },
 ];
 
 pageRoutes.forEach(({ path: routePath, file }) => {

@@ -32,8 +32,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="/js/shared-ui.js?v=21" defer></script>
-<script src="/js/theme.js?v=6"></script>
+<script src="/js/shared-ui.js?v=1780400000" defer></script>
+<script src="/js/theme.js?v=1780400000"></script>
 <style>
 .liquid-glass {
     background: rgba(255, 255, 255, 0.03);
@@ -46,6 +46,142 @@
 .pink-glow:hover{box-shadow:0 0 20px rgba(150,69,81,0.25)}
 .card-enter{animation:cardIn .5s cubic-bezier(.16,1,.3,1) both}
 @keyframes cardIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   FILTER & TAB ANIMATIONS (PC hover + Mobile press) — unified across catalog
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* All filter dropdown buttons in the toolbar (size/length/type/sort) */
+#topBarFilters button[onclick*="toggleCustomDropdown"],
+#sortDropdownBtn {
+    transition: transform .25s cubic-bezier(.16,1,.3,1),
+                box-shadow .25s ease,
+                border-color .25s ease,
+                background-color .25s ease,
+                color .25s ease !important;
+    will-change: transform, box-shadow;
+}
+
+/* Desktop hover: gentle lift + soft pink glow */
+@media (hover: hover) and (pointer: fine) {
+    #topBarFilters button[onclick*="toggleCustomDropdown"]:hover,
+    #sortDropdownBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(150, 69, 81, 0.18);
+    }
+    /* L3 tabs */
+    #categoryL3Tabs button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(150, 69, 81, 0.22);
+    }
+    /* Apply / Reset / dropdown apply / mobile filter triggers */
+    #topBarFilters button[onclick*="applyFilters"]:hover,
+    #topBarFilters button[onclick*="resetFilters"]:hover,
+    .custom-dropdown-menu button[onclick*="applyFilters"]:hover,
+    #mobileFilterButtonsWrapper button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(150, 69, 81, 0.28);
+    }
+    /* Dropdown items inside open menus */
+    .custom-dropdown-menu .custom-dropdown-item:hover {
+        background-color: rgba(202, 112, 147, 0.08);
+        transform: translateX(2px);
+    }
+}
+
+/* Tap feedback (always on, also fires on touch devices) */
+#topBarFilters button[onclick*="toggleCustomDropdown"]:active,
+#sortDropdownBtn:active,
+#categoryL3Tabs button:active,
+#topBarFilters button[onclick*="applyFilters"]:active,
+#topBarFilters button[onclick*="resetFilters"]:active,
+.custom-dropdown-menu button[onclick*="applyFilters"]:active,
+#mobileFilterButtonsWrapper button:active,
+.custom-dropdown-menu .custom-dropdown-item:active {
+    transform: scale(.96);
+    transition: transform .12s ease;
+}
+
+/* Pulsing ripple for L3 tabs (mobile click feedback) */
+#categoryL3Tabs button {
+    position: relative;
+    overflow: hidden;
+    transition: transform .25s cubic-bezier(.16,1,.3,1),
+                box-shadow .25s ease,
+                border-color .25s ease,
+                background-color .25s ease,
+                color .25s ease !important;
+}
+#categoryL3Tabs button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,.35) 0%, transparent 60%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+}
+#categoryL3Tabs button:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+}
+
+/* Rotate the dropdown chevron when its menu is open */
+[data-dropdown-open="true"] .material-symbols-outlined,
+button[aria-expanded="true"] .material-symbols-outlined.transition-transform {
+    transform: rotate(180deg);
+}
+
+/* Smooth reveal of dropdown menus */
+.custom-dropdown-menu:not(.hidden) {
+    animation: dropdownIn .22s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes dropdownIn {
+    from { opacity: 0; transform: translateY(-6px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   TOOLBAR LAYOUT: tabs aligned cleanly, no overlap with sort dropdown
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* L3 tabs container — proper alignment, scrollable on overflow, no overlap */
+#categoryL3Tabs {
+    align-items: center;
+    flex-wrap: nowrap;
+    min-width: 0;          /* allow shrinking inside the flex row */
+    max-width: 100%;
+    padding-bottom: 0;
+    margin: 0;
+    scrollbar-width: none; /* Firefox */
+}
+#categoryL3Tabs::-webkit-scrollbar { display: none; }
+
+#categoryL3Tabs button {
+    flex-shrink: 0;        /* tabs don't squish; they scroll horizontally instead */
+}
+
+@media (min-width: 768px) {
+    /* Right-side cluster: tabs + sort align on the same baseline */
+    #categoryL3Tabs {
+        max-width: clamp(240px, 50vw, 640px);
+        margin-right: 4px;
+        padding-bottom: 6px;   /* visual baseline match with sort button */
+    }
+}
+
+@media (max-width: 767px) {
+    /* On mobile: tabs sit above the sort dropdown, full width, scrollable */
+    #categoryL3Tabs {
+        width: 100%;
+        max-width: 100%;
+        padding-bottom: 4px;
+        scroll-snap-type: x proximity;
+    }
+    #categoryL3Tabs button {
+        scroll-snap-align: start;
+    }
+}
 
 /* Premium Mobile Filter Buttons Transitions */
 #mobileFilterButtonsWrapper {
@@ -114,7 +250,7 @@
 }
 .filter-parent-category:hover {
     background-color: #964551 !important;
-    color: #c7c5c5 !important;
+    color: #ffffff !important;
     border: none !important;
     border-width: 0 !important;
     border-style: none !important;
@@ -122,9 +258,9 @@
 }
 .filter-parent-category.is-active {
     background-color: #964551 !important;
-    color: #e7e2dd !important;
+    color: #ffffff !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 14px rgba(150, 69, 81, 0.2) !important;
+    box-shadow: 0 4px 14px rgba(150, 69, 81, 0.3) !important;
     border: none !important;
     border-width: 0 !important;
     border-style: none !important;
@@ -132,11 +268,11 @@
 }
 .filter-parent-category.is-active span,
 .filter-parent-category.is-active .material-symbols-outlined {
-    color: #e7e2dd !important;
+    color: #ffffff !important;
 }
 .filter-parent-category:hover span,
 .filter-parent-category:hover .material-symbols-outlined {
-    color: #c7c5c5 !important;
+    color: #ffffff !important;
 }
 
 .filter-subcategory {
@@ -157,7 +293,7 @@
     color: #e7e2dd !important;
 }
 .filter-subcategory:hover {
-    background-color: rgba(150, 69, 81, 0.08) !important;
+    background-color: rgba(150, 69, 81, 0.12) !important;
     color: #964551 !important;
     border: none !important;
     border-width: 0 !important;
@@ -165,8 +301,8 @@
     outline: none !important;
 }
 .filter-subcategory.is-active {
-    background-color: rgba(150, 69, 81, 0.15) !important;
-    color: #e7e2dd !important;
+    background-color: rgba(150, 69, 81, 0.18) !important;
+    color: #964551 !important;
     font-weight: 700 !important;
     border: none !important;
     border-width: 0 !important;
@@ -236,7 +372,7 @@ html.light .compact-select {
 /* Ensure active subcategory text uses light gray, and hover uses dark text on dark theme */
 .filter-subcategory.is-active .filter-subcategory-name,
 .filter-subcategory.is-active .filter-subcategory-count {
-    color: #e7e2dd !important;
+    color: #964551 !important;
     opacity: 1 !important;
 }
 .filter-subcategory:hover .filter-subcategory-name,
@@ -322,7 +458,14 @@ html.light #sortSelect {
     color: #151311 !important;
 }
 
-/* Centered Parameters Modal on Mobile */
+/* === LIGHT THEME: keep pink accent in filter dropdowns (dark theme stays wine) === */
+html.light .custom-dropdown-menu .bg-\[\#964551\] { background-color: #ca7093 !important; }
+html.light .custom-dropdown-menu .border-\[\#964551\] { border-color: #ca7093 !important; }
+/* count badges + checkboxes rendered inline with wine -> pink in light mode */
+html.light [class*="bg-[#964551]"] { background-color: #ca7093 !important; }
+html.light [class*="border-[#964551]"] { border-color: #ca7093 !important; }
+/* size/length/type dropdown "Применить" button + L3 tabs badges */
+html.light .custom-dropdown-menu button.bg-\[\#964551\]:hover { background-color: #b85d80 !important; }
 @media (max-width: 767px) {
     #topBarFilters {
         display: none !important; /* Hide by default from main flow */
@@ -336,8 +479,8 @@ html.light #sortSelect {
         width: calc(100% - 32px) !important;
         max-width: 360px !important;
         background: #151311 !important;
-        border: 1px solid rgba(202, 112, 147, 0.25) !important;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(202, 112, 147, 0.15) !important;
+        border: 1px solid rgba(150, 69, 81, 0.25) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(150, 69, 81, 0.15) !important;
         border-radius: 20px !important;
         padding: 24px !important;
         z-index: 7000 !important;
@@ -350,8 +493,8 @@ html.light #sortSelect {
         background: rgba(250, 250, 250, 0.9) !important;
         backdrop-filter: blur(25px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-        border: 1px solid rgba(202, 112, 147, 0.3) !important;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 20px rgba(202, 112, 147, 0.1) !important;
+        border: 1px solid rgba(150, 69, 81, 0.3) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 20px rgba(150, 69, 81, 0.1) !important;
     }
     .params-modal-active #topBarFilters > div {
         width: 100% !important;
@@ -388,7 +531,7 @@ html.light #sortSelect {
             background: rgba(21, 19, 17, 0.8) !important;
             backdrop-filter: blur(25px) saturate(180%) !important;
             -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.02), inset 0 0 40px rgba(202, 112, 147, 0.02) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.02), inset 0 0 40px rgba(150, 69, 81, 0.02) !important;
             z-index: 999999; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
@@ -405,7 +548,7 @@ html.light #sortSelect {
         }
         .loader-ring {
             position: absolute; inset: 0;
-            border: 1px solid rgba(202, 112, 147, 0.05);
+            border: 1px solid rgba(150, 69, 81, 0.05);
             border-radius: 50%;
         }
         .loader-ring::after {
@@ -417,21 +560,21 @@ html.light #sortSelect {
         }
         .loader-hex {
             width: 100px; height: 100px;
-            background: rgba(202, 112, 147, 0.03);
+            background: rgba(150, 69, 81, 0.03);
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(202, 112, 147, 0.2);
+            border: 1px solid rgba(150, 69, 81, 0.2);
             animation: preloader-pulse 2s ease-in-out infinite;
             position: relative; overflow: hidden;
         }
         .loader-hex::before {
             content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
-            background: linear-gradient(to bottom, transparent, rgba(202, 112, 147, 0.3), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(150, 69, 81, 0.3), transparent);
             animation: preloader-scan 3s ease-in-out infinite;
         }
         .loader-logo {
             width: 64px; height: 64px; object-fit: cover; border-radius: 50%;
-            filter: drop-shadow(0 0 15px rgba(202, 112, 147, 0.4));
+            filter: drop-shadow(0 0 15px rgba(150, 69, 81, 0.4));
             z-index: 10;
             opacity: 0.9;
         }
@@ -442,7 +585,7 @@ html.light #sortSelect {
             animation: preloader-text-pulse 1.5s ease-in-out infinite;
         }
         .loader-progress-track {
-            width: 200px; height: 1px; background: rgba(202, 112, 147, 0.1);
+            width: 200px; height: 1px; background: rgba(150, 69, 81, 0.1);
             margin-top: 16px; position: relative; overflow: hidden;
         }
         .loader-progress-bar {
@@ -454,8 +597,8 @@ html.light #sortSelect {
             to { transform: rotate(360deg); }
         }
         @keyframes preloader-pulse {
-            0%, 100% { transform: scale(1); border-color: rgba(202, 112, 147, 0.2); }
-            50% { transform: scale(1.02); border-color: rgba(202, 112, 147, 0.5); }
+            0%, 100% { transform: scale(1); border-color: rgba(150, 69, 81, 0.2); }
+            50% { transform: scale(1.02); border-color: rgba(150, 69, 81, 0.5); }
         }
         @keyframes preloader-scan {
             0% { transform: translateY(-100%); }
@@ -472,34 +615,34 @@ html.light #sortSelect {
             background-color: rgba(250, 250, 250, 0.75) !important;
             backdrop-filter: blur(25px) saturate(200%) !important;
             -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.5), inset 0 0 40px rgba(202, 112, 147, 0.03) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.5), inset 0 0 40px rgba(150, 69, 81, 0.03) !important;
         }
         html.light .loader-ring, html:not(.dark) .loader-ring {
-            border-color: rgba(202, 112, 147, 0.08) !important;
+            border-color: rgba(150, 69, 81, 0.08) !important;
         }
         html.light .loader-ring::after, html:not(.dark) .loader-ring::after {
-            border-top-color: #ca7093 !important;
+            border-top-color: #964551 !important;
         }
         html.light .loader-hex, html:not(.dark) .loader-hex {
-            background: rgba(202, 112, 147, 0.03) !important;
-            border-color: rgba(202, 112, 147, 0.2) !important;
+            background: rgba(150, 69, 81, 0.03) !important;
+            border-color: rgba(150, 69, 81, 0.2) !important;
         }
         html.light .loader-hex::before, html:not(.dark) .loader-hex::before {
-            background: linear-gradient(to bottom, transparent, rgba(202, 112, 147, 0.3), transparent) !important;
+            background: linear-gradient(to bottom, transparent, rgba(150, 69, 81, 0.3), transparent) !important;
         }
         html.light .loader-logo, html:not(.dark) .loader-logo {
-            filter: drop-shadow(0 0 15px rgba(202, 112, 147, 0.3)) !important;
+            filter: drop-shadow(0 0 15px rgba(150, 69, 81, 0.3)) !important;
         }
         html.light .loader-text, html:not(.dark) .loader-text {
             color: #3B3B3B !important;
             opacity: 0.8 !important;
         }
         html.light .loader-progress-track, html:not(.dark) .loader-progress-track {
-            background: rgba(202, 112, 147, 0.1) !important;
+            background: rgba(150, 69, 81, 0.1) !important;
         }
         html.light .loader-progress-bar, html:not(.dark) .loader-progress-bar {
-            background: #ca7093 !important;
-            box-shadow: 0 0 10px rgba(202, 112, 147, 0.5) !important;
+            background: #964551 !important;
+            box-shadow: 0 0 10px rgba(150, 69, 81, 0.5) !important;
         }
 /* Overlay and tab styles */
 .glassmorphism {
@@ -573,7 +716,7 @@ html.light #sortSelect {
         <span class="material-symbols-outlined text-base">category</span>
         <span id="categoriesToggleBtnLabel">ВЫБЕРИТЕ КАТЕГОРИЮ</span>
     </button>
-    <button id="filterToggleBtn" onclick="openParamsModal()" class="py-3.5 bg-primary text-on-primary font-bold uppercase text-[10px] tracking-wider flex items-center justify-center gap-1.5 rounded-xl shadow-[0_8px_20px_rgba(202,112,147,0.3)] backdrop-blur-md active:scale-95 transition-all">
+    <button id="filterToggleBtn" onclick="openParamsModal()" class="py-3.5 bg-primary text-on-primary font-bold uppercase text-[10px] tracking-wider flex items-center justify-center gap-1.5 rounded-xl shadow-[0_8px_20px_rgba(150, 69, 81,0.3)] backdrop-blur-md active:scale-95 transition-all">
         <span class="material-symbols-outlined text-base">tune</span>
         ПАРАМЕТРЫ
     </button>
@@ -582,6 +725,11 @@ html.light #sortSelect {
 <input id="searchInput" aria-label="Поиск по каталогу" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="w-full bg-surface-container border border-outline-variant/30 focus:border-primary outline-none py-3 px-4 rounded-xl font-label-caps text-xs md:text-label-caps transition-all text-on-surface" placeholder="ПОИСК ПО КАТАЛОГУ..." type="text"/>
 <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
 </div>
+</div>
+
+<!-- Dynamic Category Header -->
+<div id="categoryHeaderContainer" class="mb-6 hidden select-none animate-in fade-in slide-in-from-top-4 duration-300">
+    <h1 id="categoryPageTitle" class="text-2xl md:text-3xl font-extrabold font-['Space+Grotesk'] text-on-surface tracking-tight uppercase"></h1>
 </div>
 
 
@@ -608,7 +756,7 @@ html.light #sortSelect {
         </div>
         
         <div class="flex flex-col gap-2 pb-6 md:pb-0 mt-0 md:mt-4">
-            <button onclick="applyFilters(true)" class="w-full py-3.5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 hover:shadow-[0_8px_24px_rgba(202, 112, 147,0.15)] transition-all duration-300 rounded-xl uppercase font-bold border-none active:scale-95">
+            <button onclick="applyFilters(true)" class="w-full py-3.5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 hover:shadow-[0_8px_24px_rgba(150, 69, 81,0.15)] transition-all duration-300 rounded-xl uppercase font-bold border-none active:scale-95">
                 ПРИМЕНИТЬ ПАРАМЕТРЫ
             </button>
             <button onclick="resetFilters()" class="w-full py-3.5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-300 rounded-xl uppercase font-bold bg-white/[0.02]">
@@ -627,12 +775,16 @@ html.light #sortSelect {
 <div class="flex-1 min-w-0">
     <!-- Toolbar: Sorting & Desktop count -->
     <div class="mb-6 md:mb-8 bg-surface-container md:bg-transparent p-1 md:p-0 rounded-2xl border border-white/5 md:border-0">
-        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 flex-wrap">
              <!-- Left side: Parameter Dropdowns & External Actions -->
              <div id="topBarFilters" class="flex flex-wrap gap-3 flex-1 min-w-0 items-end"></div>
              
-             <!-- Right side: Page text & Custom Sorting Dropdown -->
-             <div class="flex flex-col items-center md:items-end shrink-0 gap-2 select-none w-full md:w-auto">
+             <!-- Right side: L3 Tabs + Page text & Custom Sorting Dropdown -->
+             <div class="flex flex-col md:flex-row md:items-center gap-3 shrink-0 w-full md:w-auto select-none flex-wrap min-w-0">
+                  <!-- L3 Tabs (placed to the LEFT of sorting) -->
+                  <div id="categoryL3Tabs" class="hidden gap-2 overflow-x-auto whitespace-nowrap select-none"></div>
+
+                  <div class="flex flex-col items-center md:items-end shrink-0 gap-2 select-none w-full md:w-auto">
                   <div class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest whitespace-nowrap w-full text-center md:text-right">
                      Страница <span id="currentPageDisplay" class="text-primary">1</span>
                   </div>
@@ -645,27 +797,28 @@ html.light #sortSelect {
                           <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">СОРТИРОВКА</div>
                           <div class="grid grid-cols-1 gap-0.5 px-0.5">
                               <div onclick="selectCustomSort('default')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-default" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-[#ca7093] border-[#ca7093]">✔</span>
+                                  <span id="sort-opt-default" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-[#964551] border-[#964551]">✔</span>
                                   <span class="text-on-surface/90 font-medium">ПО УМОЛЧАНИЮ</span>
                               </div>
                               <div onclick="selectCustomSort('price_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-price_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span id="sort-opt-price_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
                                   <span class="text-on-surface/90 font-medium">СНАЧАЛА ДЕШЕВЛЕ</span>
                               </div>
                               <div onclick="selectCustomSort('price_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-price_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span id="sort-opt-price_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
                                   <span class="text-on-surface/90 font-medium">СНАЧАЛА ДОРОЖЕ</span>
                               </div>
                               <div onclick="selectCustomSort('name_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-name_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span id="sort-opt-name_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
                                   <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (А-Я)</span>
                               </div>
                               <div onclick="selectCustomSort('name_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-name_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                  <span id="sort-opt-name_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
                                   <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (Я-А)</span>
                               </div>
                           </div>
                       </div>
+                  </div>
                   </div>
              </div>
         </div>
@@ -674,11 +827,10 @@ html.light #sortSelect {
     <!-- Table Header (Desktop Only) -->
     <div class="hidden md:flex items-center px-4 py-2 border-b border-outline-variant/10 text-[9px] font-bold text-on-surface-variant uppercase tracking-widest font-label-caps gap-4 mb-2">
         <div class="flex-1">Наименование</div>
-        <div class="w-24">Стандарт / Сталь</div>
-        <div class="w-24">Размеры</div>
-        <div class="w-28 text-right pr-2">Цена</div>
-        <div class="w-28 text-center">Количество</div>
-        <div class="w-12 text-center">Купить</div>
+        <div class="w-28">ГОСТ / Марка стали</div>
+        <div class="w-24">Длина / Вес 1м</div>
+        <div class="w-48 text-right pr-2">Варианты цен</div>
+        <div class="w-[230px] text-right">Расчет / Купить</div>
     </div>
 
     <div id="productGrid" class="flex flex-col gap-2"></div>
@@ -763,6 +915,18 @@ async function loadFilters() {
     try {
         const res = await fetch('/api/filters');
         filterData = await res.json();
+        
+        // Also fetch public parameters if not loaded yet
+        if (!window.catalogParameters) {
+            try {
+                const paramRes = await fetch('/api/parameters');
+                const paramData = paramRes.ok ? await paramRes.json() : null;
+                window.catalogParameters = Array.isArray(paramData) ? paramData : [];
+            } catch (e) {
+                console.error('Failed to load parameters catalog', e);
+                window.catalogParameters = [];
+            }
+        }
         
         // Resolve the actual parent category if the current parent category is "Популярные категории"
         if (activeFilters.parentCategory.includes('Популярные категории') && activeFilters.category.length > 0) {
@@ -876,6 +1040,9 @@ async function fetchProducts() {
             return;
         }
 
+        // Cache the dynamic facet counts globally
+        window.currentFacets = data.facets || {};
+
         renderProducts(data.products);
         renderPagination(data.pagination);
         
@@ -889,6 +1056,9 @@ async function fetchProducts() {
         } else {
             noResults.classList.add('hidden');
         }
+
+        // Dynamic render filters on every successful load to refresh facet counts and re-sort active items
+        renderFilters();
     } catch (e) {
         console.error('Failed to fetch products', e);
         grid.style.opacity = '1';
@@ -926,6 +1096,167 @@ function updateBreadcrumbs() {
 function renderFilters() {
     updateBreadcrumbs();
     const container = document.getElementById('categoryFilters');
+
+    // Helper functions for parameter mapping and sorting
+    function resolveParameterMapping(activeCat, dropdownType) {
+        // Defensive: ensure catalogParameters is always a usable array
+        if (!Array.isArray(window.catalogParameters)) {
+            window.catalogParameters = [];
+        }
+        if (window.catalogParameters.length === 0) {
+            if (dropdownType === 'size') return { name: 'РАЗМЕРЫ', unit: '' };
+            if (dropdownType === 'length') return { name: 'ДЛИНА', unit: '' };
+            if (dropdownType === 'type') return { name: 'МАРКА СТАЛИ', unit: '' };
+            if (dropdownType === 'l3') return { name: 'ПОДГРУППА', unit: '' };
+        }
+        
+        const catNorm = activeCat.toLowerCase();
+        
+        // Filter parameters matching this category hint or "общее" or empty
+        const candidateParams = window.catalogParameters.filter(p => {
+            const hint = (p.category_hint || '').toLowerCase();
+            if (hint.includes('общее') || !hint) return true;
+            
+            if (catNorm.includes('арматур') && hint.includes('арматур')) return true;
+            if (catNorm.includes('труб') && hint.includes('труб')) return true;
+            if (catNorm.includes('лист') && hint.includes('лист')) return true;
+            if (catNorm.includes('уголок') && hint.includes('уголок')) return true;
+            if (catNorm.includes('балк') && hint.includes('балк')) return true;
+            if (catNorm.includes('швеллер') && hint.includes('швеллер')) return true;
+            if ((catNorm.includes('кровл') || catNorm.includes('черепиц') || catNorm.includes('шифер') || catNorm.includes('водосток')) && hint.includes('кровл')) return true;
+            
+            return hint.split(',').some(part => catNorm.includes(part.trim()) || part.trim().includes(catNorm));
+        });
+
+        if (dropdownType === 'size') {
+            const names = ['диаметр', 'размер полок', 'толщина листа', 'сечение', 'высота', 'номер швеллера', 'раскрой'];
+            for (const n of names) {
+                const matched = candidateParams.find(p => p.name.toLowerCase().includes(n));
+                if (matched) return matched;
+            }
+            const fallback = candidateParams.find(p => p.unit === 'мм');
+            return fallback || { name: 'РАЗМЕРЫ', unit: 'мм' };
+        }
+        
+        if (dropdownType === 'length') {
+            const matched = candidateParams.find(p => p.name.toLowerCase().includes('длина') || p.name.toLowerCase().includes('раскрой'));
+            return matched || { name: 'ДЛИНА', unit: '' };
+        }
+        
+        if (dropdownType === 'type') {
+            const names = ['класс', 'марка стали', 'тип уголка', 'тип полок', 'тип граней', 'марка / профиль'];
+            for (const n of names) {
+                const matched = candidateParams.find(p => p.name.toLowerCase().includes(n));
+                if (matched) return matched;
+            }
+            const matchedAnyType = candidateParams.find(p => p.name.toLowerCase().includes('марка') || p.name.toLowerCase().includes('сталь') || p.name.toLowerCase().includes('тип'));
+            return matchedAnyType || { name: 'МАРКА СТАЛИ', unit: '' };
+        }
+        
+        if (dropdownType === 'l3') {
+            const matched = candidateParams.find(p => p.name.toLowerCase().includes('поверхность') || p.name.toLowerCase().includes('покрытие'));
+            return matched || { name: 'ПОДГРУППА', unit: '' };
+        }
+        
+        return { name: 'ПАРАМЕТР', unit: '' };
+    }
+
+    function sortOptionsByCount(options, getCountFn) {
+        return [...options].sort((a, b) => {
+            const countA = getCountFn(a);
+            const countB = getCountFn(b);
+            
+            const isZeroA = countA === 0 ? 1 : 0;
+            const isZeroB = countB === 0 ? 1 : 0;
+            
+            if (isZeroA !== isZeroB) {
+                return isZeroA - isZeroB;
+            }
+            
+            return a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' });
+        });
+    }
+
+    function getColorHexForRal(label) {
+        const l = label.toLowerCase();
+        if (l.includes('6005') || l.includes('зелен')) return '#0e4429';
+        if (l.includes('3005') || l.includes('красн') || l.includes('вишн')) return '#58111a';
+        if (l.includes('8017') || l.includes('коричн') || l.includes('шоколад')) return '#3d2314';
+        if (l.includes('5005') || l.includes('син')) return '#154889';
+        if (l.includes('7016') || l.includes('антрацит')) return '#383e42';
+        if (l.includes('7024') || l.includes('графит')) return '#474a51';
+        if (l.includes('9003') || l.includes('бел')) return '#f4f8f4';
+        if (l.includes('8004') || l.includes('терракот')) return '#ad4f30';
+        if (l.includes('оникс')) return '#1c1c1c';
+        if (l.includes('алланит')) return '#2e251b';
+        if (l.includes('серый')) return '#8a8e91';
+        if (l.includes('черн')) return '#0f0f0f';
+        if (l.includes('оцинков')) return 'linear-gradient(135deg, #a1a8a9, #eef2f3)';
+        return null;
+    }
+
+    const getUniqueFilters = (arr) => {
+        const groups = {};
+        arr.forEach(item => {
+            if (!item) return;
+            const str = item.toString();
+            const normalized = str.toLowerCase().replace(/окрашенный|оцинкованный|полиэстер|профнастил|односторонний|двусторонний|металлочерепица|водосток/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').replace(/,/g, '.').trim();
+            if (!normalized) return;
+            if (!groups[normalized] || str.length > groups[normalized].length) groups[normalized] = str;
+        });
+        return Object.values(groups);
+    };
+
+    const activeCat = activeFilters.category[0];
+
+    // Render page headline and scrollable variations tabs
+    const headerContainer = document.getElementById('categoryHeaderContainer');
+    const pageTitle = document.getElementById('categoryPageTitle');
+    const tabsContainer = document.getElementById('categoryL3Tabs');
+    
+    if (headerContainer && pageTitle && tabsContainer) {
+        if (activeCat) {
+            headerContainer.classList.remove('hidden');
+            pageTitle.textContent = activeCat;
+            
+            const cf = categoryFiltersCache[activeCat];
+            if (cf && cf.l3 && cf.l3.length > 0) {
+                const uniqueL3 = getUniqueFilters(cf.l3);
+                const sortedL3 = sortOptionsByCount(uniqueL3, v => window.currentFacets?.l3?.[v] || 0);
+                
+                const isAllActive = activeFilters.l3.length === 0;
+                let tabsHtml = `
+                  <button onclick="window.setL3Filter('')" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 border cursor-pointer active:scale-95 select-none whitespace-nowrap ${isAllActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'}">
+                    Все варианты
+                  </button>
+                `;
+                
+                sortedL3.forEach(v => {
+                    const isActive = activeFilters.l3.includes(v);
+                    const count = window.currentFacets?.l3?.[v] || 0;
+                    tabsHtml += `
+                      <button onclick="window.setL3Filter('${v.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 border cursor-pointer active:scale-95 select-none inline-flex items-center gap-2 whitespace-nowrap ${isActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'} ${count === 0 ? 'opacity-40 hover:opacity-60' : ''}">
+                        <span>${v}</span>
+                        <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold transition-all shrink-0 ${isActive ? 'bg-white/20 text-white' : 'text-white bg-[#964551] border border-[#964551] shadow-sm'}">${count}</span>
+                      </button>
+                    `;
+                });
+                tabsContainer.innerHTML = tabsHtml;
+                tabsContainer.classList.remove('hidden');
+                tabsContainer.classList.add('flex');
+            } else {
+                tabsContainer.innerHTML = '';
+                tabsContainer.classList.add('hidden');
+                tabsContainer.classList.remove('flex');
+            }
+        } else {
+            headerContainer.classList.remove('hidden');
+            pageTitle.textContent = 'Каталог металлопроката';
+            tabsContainer.innerHTML = '';
+            tabsContainer.classList.add('hidden');
+            tabsContainer.classList.remove('flex');
+        }
+    }
 
     // Exclude 'Популярные категории' from sidebar filter categories
     let filtersHtml = filterData.parentCategories.filter(p => p !== 'Популярные категории').map(p => {
@@ -976,32 +1307,25 @@ function renderFilters() {
     const topBarContainer = document.getElementById('topBarFilters');
     if (topBarContainer) {
         let topFiltersHtml = '';
-        const activeCat = activeFilters.category[0];
         if (activeCat && categoryFiltersCache[activeCat]) {
             const cf = categoryFiltersCache[activeCat];
-            
-            const getUniqueFilters = (arr) => {
-                const groups = {};
-                arr.forEach(item => {
-                    if (!item) return;
-                    const str = item.toString();
-                    const normalized = str.toLowerCase().replace(/окрашенный|оцинкованный|полиэстер|профнастил|односторонний|двусторонний|металлочерепица|водосток/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').replace(/,/g, '.').trim();
-                    if (!normalized) return;
-                    if (!groups[normalized] || str.length > groups[normalized].length) groups[normalized] = str;
-                });
-                return Object.values(groups);
-            };
 
             // 1. Size Dropdown Rendering
             const rawSizes = [...new Set([...cf.vids, ...cf.widths])];
-            const allSizes = getUniqueFilters(rawSizes).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+            const allSizes = getUniqueFilters(rawSizes);
 
             if (allSizes.length > 0) {
-                const selectedSizesCount = activeFilters.vid.length + activeFilters.width.length;
-                const sizeLabel = selectedSizesCount > 0 ? `РАЗМЕРЫ: ВЫБРАНО (${selectedSizesCount})` : 'РАЗМЕРЫ / ВИД: ВСЕ';
+                const sizeParam = resolveParameterMapping(activeCat, 'size');
+                const sizeTitle = sizeParam.name.toUpperCase();
+                const selectedSizesCount = new Set([...activeFilters.vid, ...activeFilters.width]).size;
+                const sizeLabel = selectedSizesCount > 0 ? `${sizeTitle}: ВЫБРАНО (${selectedSizesCount})` : `${sizeTitle}: ВСЕ`;
                 const sizeDropdownWidth = allSizes.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
                 const sizeCols = allSizes.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
                 
+                const sortedSizes = sortOptionsByCount(allSizes, s => {
+                    return (window.currentFacets?.vids?.[s] || 0) + (window.currentFacets?.widths?.[s] || 0);
+                });
+
                 topFiltersHtml += `
                   <div class="relative w-full md:w-60" id="sizeDropdownContainer" onclick="event.stopPropagation()">
                     <button onclick="toggleCustomDropdown('sizeDropdown')" class="w-full bg-surface-container border border-outline-variant/20 hover:border-primary outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer flex items-center justify-between transition-all select-none">
@@ -1009,22 +1333,30 @@ function renderFilters() {
                       <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
                     </button>
                     <div id="sizeDropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${sizeDropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
-                      <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ РАЗМЕРЫ</div>
+                      <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ ${sizeTitle}</div>
                       <div class="grid ${sizeCols} gap-0.5 max-h-[220px] overflow-y-auto custom-scrollbar px-0.5">
-                        ${allSizes.map(s => {
+                        ${sortedSizes.map(s => {
                           const cleanLabel = s.toString().replace(/Швеллер|Балка|Арматура|Лист|Труба|Профнастил|сетка|окрашенный|оцинкованный|полиэстер|односторонний|двусторонний/gi, '').replace(/\s*(мм?|mm|м|m)\.?/gi, '').trim();
                           const isActiveVid = activeFilters.vid.includes(s) || activeFilters.width.includes(s);
+                          const count = (window.currentFacets?.vids?.[s] || 0) + (window.currentFacets?.widths?.[s] || 0);
+                          const unitSuffix = sizeParam.unit && !cleanLabel.toLowerCase().includes(sizeParam.unit.toLowerCase()) ? ' ' + sizeParam.unit : '';
+
                           return `
-                            <div onclick="toggleFilterParam('vid', '${s}', '${activeCat}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                              <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded text-white text-[8px] font-bold transition-all ${isActiveVid ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
-                                ${isActiveVid ? '✔' : ''}
+                            <div onclick="toggleFilterParam('vid', '${s}', '${activeCat}')" class="custom-dropdown-item flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-all select-none hover:bg-white/[0.03] ${count === 0 ? 'opacity-40 hover:opacity-60' : ''}">
+                              <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded text-white text-[8px] font-bold transition-all ${isActiveVid ? 'bg-[#964551] border-[#964551]' : 'bg-transparent border-outline-variant/30'}">
+                                  ${isActiveVid ? '✔' : ''}
+                                </span>
+                                <span class="text-on-surface/90 font-medium truncate">${cleanLabel || s}${unitSuffix}</span>
+                              </div>
+                              <span class="ml-2 text-[11px] font-bold px-2 py-0.5 rounded-md min-w-[26px] text-center transition-all shrink-0 ${count > 0 ? 'text-white bg-[#964551] border border-[#964551] shadow-sm' : 'text-on-surface-variant/30 bg-white/5 border border-white/5'}">
+                                ${count}
                               </span>
-                              <span class="text-on-surface/90 font-medium truncate">${cleanLabel || s}</span>
                             </div>
                           `;
                         }).join('')}
                       </div>
-                      <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedSizesCount > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
+                      <button onclick="applyFilters(true); closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 bg-[#964551] text-white hover:bg-[#964551]/90 shadow-[0_4px_12px_rgba(150, 69, 81,0.3)] active:scale-95 cursor-pointer transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ПРИМЕНИТЬ</button>
                     </div>
                   </div>
                 `;
@@ -1040,48 +1372,20 @@ function renderFilters() {
             }
 
             if (cf.l3 && cf.l3.length > 0) {
-                const uniqueL3 = getUniqueFilters(cf.l3).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-                if (uniqueL3.length > 0) {
-                    const selectedL3Count = activeFilters.l3.length;
-                    const l3Label = selectedL3Count > 0 ? `ПОДГРУППА: ВЫБРАНО (${selectedL3Count})` : 'ПОДГРУППА: ЛЮБАЯ';
-                    const l3DropdownWidth = uniqueL3.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
-                    const l3Cols = uniqueL3.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
-
-                    topFiltersHtml += `
-                      <div class="relative w-full md:w-60" id="l3DropdownContainer" onclick="event.stopPropagation()">
-                        <button onclick="toggleCustomDropdown('l3Dropdown')" class="w-full bg-surface-container border border-outline-variant/20 hover:border-primary outline-none focus:ring-0 shadow-md py-3 px-4 rounded-xl font-bold text-xs md:text-sm text-on-surface cursor-pointer flex items-center justify-between transition-all select-none">
-                          <span class="truncate">${l3Label}</span>
-                          <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
-                        </button>
-                        <div id="l3Dropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${l3DropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
-                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ ПОДГРУППУ</div>
-                          <div class="grid ${l3Cols} gap-0.5 max-h-[220px] overflow-y-auto custom-scrollbar px-0.5">
-                            ${uniqueL3.map(v => {
-                              const isActiveL3 = activeFilters.l3.includes(v);
-                              return `
-                                <div onclick="toggleFilterParam('l3', '${v.replace(/'/g, "\\'")}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all ${isActiveL3 ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
-                                    ${isActiveL3 ? '✔' : ''}
-                                  </span>
-                                  <span class="text-on-surface/90 font-medium truncate">${v}</span>
-                                </div>
-                              `;
-                            }).join('')}
-                          </div>
-                          <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedL3Count > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
-                        </div>
-                      </div>
-                    `;
-                }
+                // L3 уже отображается как табы сверху каталога — дропдаун не нужен
             }
 
             if (cf.lengths && cf.lengths.length > 0 && parentCategory !== 'Кровельные материалы' && parentCategory !== 'Кровля и фасад') {
-                const uniqueLengths = getUniqueFilters(cf.lengths).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+                const uniqueLengths = getUniqueFilters(cf.lengths);
                 if (uniqueLengths.length > 0) {
+                    const lenParam = resolveParameterMapping(activeCat, 'length');
+                    const lenTitle = lenParam.name.toUpperCase();
                     const selectedLengthsCount = activeFilters.length.length;
-                    const lengthLabel = selectedLengthsCount > 0 ? `ДЛИНА: ВЫБРАНО (${selectedLengthsCount})` : 'ДЛИНА: ЛЮБАЯ';
+                    const lengthLabel = selectedLengthsCount > 0 ? `${lenTitle}: ВЫБРАНО (${selectedLengthsCount})` : `${lenTitle}: ВСЕ`;
                     const lengthDropdownWidth = uniqueLengths.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
                     const lengthCols = uniqueLengths.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
+
+                    const sortedLengths = sortOptionsByCount(uniqueLengths, l => window.currentFacets?.lengths?.[l] || 0);
 
                     topFiltersHtml += `
                       <div class="relative w-full md:w-60" id="lengthDropdownContainer" onclick="event.stopPropagation()">
@@ -1090,35 +1394,47 @@ function renderFilters() {
                           <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
                         </button>
                         <div id="lengthDropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${lengthDropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
-                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ ДЛИНУ</div>
+                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ ${lenTitle}</div>
                           <div class="grid ${lengthCols} gap-0.5 max-h-[180px] overflow-y-auto custom-scrollbar px-0.5">
-                            ${uniqueLengths.map(l => {
+                            ${sortedLengths.map(l => {
                               const isActiveLen = activeFilters.length.includes(l);
+                              const count = window.currentFacets?.lengths?.[l] || 0;
+                              const unitSuffix = lenParam.unit && !l.toLowerCase().includes(lenParam.unit.toLowerCase()) ? ' ' + lenParam.unit : '';
+
                               return `
-                                <div onclick="toggleFilterParam('length', '${l}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all ${isActiveLen ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
-                                    ${isActiveLen ? '✔' : ''}
+                                <div onclick="toggleFilterParam('length', '${l}')" class="custom-dropdown-item flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-all select-none hover:bg-white/[0.03] ${count === 0 ? 'opacity-40 hover:opacity-60' : ''}">
+                                  <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all ${isActiveLen ? 'bg-[#964551] border-[#964551]' : 'bg-transparent border-outline-variant/30'}">
+                                      ${isActiveLen ? '✔' : ''}
+                                    </span>
+                                    <span class="text-on-surface/90 font-medium truncate">${l}${unitSuffix}</span>
+                                  </div>
+                                  <span class="ml-2 text-[11px] font-bold px-2 py-0.5 rounded-md min-w-[26px] text-center transition-all shrink-0 ${count > 0 ? 'text-white bg-[#964551] border border-[#964551] shadow-sm' : 'text-on-surface-variant/30 bg-white/5 border border-white/5'}">
+                                    ${count}
                                   </span>
-                                  <span class="text-on-surface/90 font-medium truncate">${l}</span>
                                 </div>
                               `;
                             }).join('')}
                           </div>
-                          <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedLengthsCount > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
+                          <button onclick="applyFilters(true); closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 bg-[#964551] text-white hover:bg-[#964551]/90 shadow-[0_4px_12px_rgba(150, 69, 81,0.3)] active:scale-95 cursor-pointer transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ПРИМЕНИТЬ</button>
                         </div>
                       </div>
                     `;
                 }
             }
 
-            // 3. Steel Type (Grade) Dropdown Rendering
+            // 3. Steel Type (Grade / Color) Dropdown Rendering
             if (cf.types && cf.types.length > 0) {
-                const uniqueTypes = getUniqueFilters(cf.types).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+                const uniqueTypes = getUniqueFilters(cf.types);
                 if (uniqueTypes.length > 0) {
+                    const typeParam = resolveParameterMapping(activeCat, 'type');
+                    const typeTitle = typeParam.name.toUpperCase();
                     const selectedTypesCount = activeFilters.type.length;
-                    const typeLabel = selectedTypesCount > 0 ? `МАРКА СТАЛИ: ВЫБРАНО (${selectedTypesCount})` : 'МАРКА СТАЛИ: ВСЕ';
+                    const typeLabel = selectedTypesCount > 0 ? `${typeTitle}: ВЫБРАНО (${selectedTypesCount})` : `${typeTitle}: ВСЕ`;
                     const typeDropdownWidth = uniqueTypes.length > 8 ? 'w-[320px] md:w-[480px]' : 'w-full min-w-[240px]';
                     const typeCols = uniqueTypes.length > 8 ? 'grid-cols-2 gap-x-3' : 'grid-cols-1';
+
+                    const sortedTypes = sortOptionsByCount(uniqueTypes, t => window.currentFacets?.types?.[t] || 0);
 
                     topFiltersHtml += `
                       <div class="relative w-full md:w-60" id="typeDropdownContainer" onclick="event.stopPropagation()">
@@ -1127,21 +1443,31 @@ function renderFilters() {
                           <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
                         </button>
                         <div id="typeDropdown" class="custom-dropdown-menu absolute left-0 top-full mt-2 ${typeDropdownWidth} rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
-                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ МАРКУ СТАЛИ</div>
+                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">ВЫБЕРИТЕ ${typeTitle}</div>
                           <div class="grid ${typeCols} gap-0.5 max-h-[180px] overflow-y-auto custom-scrollbar px-0.5">
-                            ${uniqueTypes.map(t => {
+                            ${sortedTypes.map(t => {
                               const isActiveType = activeFilters.type.includes(t);
+                              const count = window.currentFacets?.types?.[t] || 0;
+                              const unitSuffix = typeParam.unit && !t.toLowerCase().includes(typeParam.unit.toLowerCase()) ? ' ' + typeParam.unit : '';
+                              const colorValue = getColorHexForRal(t);
+
                               return `
-                                <div onclick="toggleFilterParam('type', '${t}')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded text-white text-[8px] font-bold transition-all ${isActiveType ? 'bg-[#ca7093] border-[#ca7093]' : 'bg-transparent border-outline-variant/30'}">
-                                    ${isActiveType ? '✔' : ''}
+                                <div onclick="toggleFilterParam('type', '${t}')" class="custom-dropdown-item flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-all select-none hover:bg-white/[0.03] ${count === 0 ? 'opacity-40 hover:opacity-60' : ''}">
+                                  <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded text-white text-[8px] font-bold transition-all ${isActiveType ? 'bg-[#964551] border-[#964551]' : 'bg-transparent border-outline-variant/30'}">
+                                      ${isActiveType ? '✔' : ''}
+                                    </span>
+                                    ${colorValue ? `<span class="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0 shadow-sm" style="background: ${colorValue}"></span>` : ''}
+                                    <span class="text-on-surface/90 font-medium truncate">${t}${unitSuffix}</span>
+                                  </div>
+                                  <span class="ml-2 text-[11px] font-bold px-2 py-0.5 rounded-md min-w-[26px] text-center transition-all shrink-0 ${count > 0 ? 'text-white bg-[#964551] border border-[#964551] shadow-sm' : 'text-on-surface-variant/30 bg-white/5 border border-white/5'}">
+                                    ${count}
                                   </span>
-                                  <span class="text-on-surface/90 font-medium truncate">${t}</span>
                                 </div>
                               `;
                             }).join('')}
                           </div>
-                          <button onclick="closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 ${selectedTypesCount > 0 ? 'bg-[#ca7093] text-white hover:bg-[#ca7093]/90 shadow-[0_4px_12px_rgba(202,112,147,0.3)] active:scale-95 cursor-pointer' : 'bg-[#ca7093]/10 text-[#ca7093]/40 border border-[#ca7093]/10 pointer-events-none opacity-60'} transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ВЫБРАТЬ</button>
+                          <button onclick="applyFilters(true); closeAllCustomDropdowns();" class="mt-3 w-full py-2.5 bg-[#964551] text-white hover:bg-[#964551]/90 shadow-[0_4px_12px_rgba(150, 69, 81,0.3)] active:scale-95 cursor-pointer transition-all duration-200 rounded-xl text-[10px] font-bold uppercase tracking-widest">ПРИМЕНИТЬ</button>
                         </div>
                       </div>
                     `;
@@ -1231,6 +1557,9 @@ function toggleCustomDropdown(id) {
     if (!isOpen) {
         el.classList.remove('hidden');
         openDropdownId = id;
+        // Mark trigger so the chevron can rotate via CSS
+        const trigger = document.querySelector('button[onclick*="toggleCustomDropdown(\'' + id + '\')"]');
+        if (trigger) trigger.setAttribute('data-dropdown-open', 'true');
     } else {
         openDropdownId = null;
     }
@@ -1242,6 +1571,8 @@ function closeAllCustomDropdowns() {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
+    // Clear all open-state markers on triggers
+    document.querySelectorAll('[data-dropdown-open="true"]').forEach(b => b.removeAttribute('data-dropdown-open'));
     openDropdownId = null;
 }
 
@@ -1283,10 +1614,10 @@ function updateSortDropdownUI() {
         const el = document.getElementById(`sort-opt-${opt}`);
         if (el) {
             if (currentSort === opt) {
-                el.className = 'w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-[#ca7093] border-[#ca7093]';
+                el.className = 'w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-[#964551] border-[#964551]';
                 el.innerHTML = '✔';
             } else {
-                el.className = 'w-4 h-4 shrink-0 flex items-center justify-center border border-[#ca7093] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30';
+                el.className = 'w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30';
                 el.innerHTML = '';
             }
         }
@@ -1478,61 +1809,300 @@ function resetParams() {
   closeAllCustomDropdowns();
 }
 
+window.getCatalogProductModes = function(p) {
+    const modes = [];
+    const p_ton = parseFloat(p.price_ton || p.priceTonNum || 0) || 0;
+    let p_meter = parseFloat(p.price_meter || 0) || 0;
+    const p_whip = parseFloat(p.price_whip || p.price_unit || 0) || 0;
+    const isSheet = p.name.toLowerCase().includes('лист');
+    const pieceLabel = isSheet ? 'лист' : (p.unit_label || 'хлыст');
+
+    // Parse whip length from product length (default 11.7)
+    let whipLen = 11.7;
+    if (p.length) {
+        const num = parseFloat(p.length.toString().replace(',', '.'));
+        if (!isNaN(num) && num > 0) whipLen = num;
+    }
+
+    if (p_whip > 0 && p_meter === 0 && whipLen > 0) {
+        // Не делаем производных расчётов цены за метр.
+    }
+
+    if (p_ton > 0) {
+        modes.push({ name: 'тонну', unit: 'т.', price: p_ton, step: 0.1, min: 1, decimals: 1 });
+    }
+    if (p_meter > 0) {
+        modes.push({ name: 'метр', unit: isSheet ? 'м²' : 'пог. м.', price: p_meter, step: whipLen, min: whipLen, decimals: whipLen % 1 === 0 ? 0 : 1 });
+    }
+    if (p_whip > 0) {
+        modes.push({ name: pieceLabel, unit: pieceLabel, price: p_whip, step: 1, min: 1, decimals: 0 });
+    }
+
+    if (modes.length === 0) {
+        modes.push({ name: 'запрос', unit: 'ед.', price: 0, step: 1, min: 1, decimals: 0 });
+    }
+
+    return modes;
+};
+
 function renderProducts(products) {
+  window.currentProductsList = products;
   const grid = document.getElementById('productGrid');
+  
+  if (!window.catalogProductSelectedModes) {
+      window.catalogProductSelectedModes = {};
+  }
+
   grid.innerHTML = products.map((p, i) => {
+    const modes = window.getCatalogProductModes(p);
+
+    let activeIdx = window.catalogProductSelectedModes[p.id];
+    if (activeIdx === undefined) {
+        const tonIdx = modes.findIndex(m => m.unit === 'т.');
+        activeIdx = tonIdx >= 0 ? tonIdx : 0;
+        window.catalogProductSelectedModes[p.id] = activeIdx;
+    }
+    const currentMode = modes[activeIdx] || modes[0];
+
+    const radiosHtml = modes.map((m, idx) => {
+      if (m.price === 0) return `<span class="text-xs text-on-surface-variant/40 italic">Цена по запросу</span>`;
+      return `
+        <label class="flex items-center gap-2 cursor-pointer select-none justify-start md:justify-end text-[11px] md:text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors py-0.5" onclick="event.stopPropagation()">
+          <input type="radio" name="mode-${p.id}" ${idx === activeIdx ? 'checked' : ''} onchange="window.selectCatalogProductMode('${p.id}', ${idx})" class="w-3.5 h-3.5 text-primary border-outline-variant/30 focus:ring-0 bg-transparent cursor-pointer"/>
+          <span class="${idx === activeIdx ? 'text-primary font-bold' : ''}">${Math.round(m.price).toLocaleString('ru-RU')} ₽/${m.unit}</span>
+        </label>
+      `;
+    }).join('');
+
+    const steel = p.type || 'Ст3';
+    const standard = p.specs && p.specs.find(s => s[0].toLowerCase().includes('гост') || s[0].toLowerCase().includes('стандарт'))?.[1] || 'ГОСТ';
+    const weightFmt = p.weight ? p.weight : (p.perTon ? p.perTon : '');
+    const lenFmt = p.length ? p.length : 'Немерная';
+
     return `
-    <div class="group relative overflow-hidden border border-outline-variant/10 bg-surface-container-lowest hover:border-primary/20 hover:bg-white/[0.02] transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between p-5 gap-6 rounded-2xl cursor-pointer card-enter shadow-lg shadow-black/5" style="animation-delay:${i * 20}ms" onclick="window.location.href='/product?id=${p.id}'">
+    <div class="group relative overflow-hidden border border-outline-variant/10 bg-surface-container-lowest hover:border-primary/20 hover:bg-white/[0.02] transition-all duration-300 p-5 rounded-2xl shadow-lg shadow-black/5 cursor-pointer flex flex-col md:flex-row md:items-center gap-4 select-none" style="animation-delay:${i * 20}ms" onclick="window.location.href='/product?id=${p.id}'">
+      
+      <!-- 1. Name Column (flex-1) -->
       <div class="flex-1 min-w-0 pointer-events-none">
-        <div class="flex items-center gap-2 mb-2">
+        <div class="flex items-center gap-2 mb-1.5">
           <span class="text-[9px] font-label-caps uppercase tracking-widest text-primary/80">${p.category}</span>
         </div>
-        <h4 class="font-headline-md text-lg md:text-xl font-semibold text-on-surface group-hover:text-primary transition-colors truncate">${p.name}</h4>
-        <div class="flex flex-wrap gap-4 mt-2">
-            <p class="text-on-surface-variant text-xs flex items-center gap-1.5 whitespace-nowrap">
-                <span class="material-symbols-outlined text-[16px] opacity-40">verified</span> ${p.steel || 'Ст3'}
-            </p>
-            <p class="text-on-surface-variant text-xs flex items-center gap-1.5 whitespace-nowrap">
-                <span class="material-symbols-outlined text-[16px] opacity-40">straighten</span> ${p.length || 'Немерная'}
-            </p>
-            <p class="text-on-surface-variant text-xs flex items-center gap-1.5 whitespace-nowrap">
-                <span class="material-symbols-outlined text-[16px] opacity-40">inventory_2</span> ${p.standard || 'ГОСТ'}
-            </p>
-        </div>
+        <h4 class="font-headline-md text-base md:text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-snug break-words" title="${p.name}">${p.name}</h4>
       </div>
 
-      <div class="w-full md:w-auto flex flex-row md:flex-col items-end justify-between md:justify-center gap-4 md:text-right z-10 pointer-events-none ${(p.price_ton || 0) <= 0 ? 'hidden md:flex' : 'flex'}">
-        <div class="whitespace-nowrap">
-            <p class="font-label-caps text-[9px] text-on-surface-variant mb-0.5 uppercase tracking-widest">${p.price_ton ? 'ЦЕНА ЗА ТОННУ' : 'ЦЕНА'}</p>
-            <p class="text-primary text-xl md:text-2xl font-bold tracking-tight leading-none">${p.price_ton > 0 ? p.priceTon + ' ₽' : 'По запросу'}</p>
-        </div>
-        <div class="md:border-t md:border-outline-variant/10 md:pt-2 whitespace-nowrap">
-            <p class="font-label-caps text-[9px] text-on-surface-variant mb-0.5 uppercase tracking-widest">${p.unitLabel || 'ЕД.'}</p>
-            <p class="text-on-surface font-semibold text-sm leading-none">${p.price_unit > 0 ? p.priceUnit + ' ₽' : 'По запросу'}</p>
-        </div>
+      <!-- 2. Standard / Steel (w-28) -->
+      <div class="w-full md:w-28 shrink-0 pointer-events-none flex md:flex-col gap-2 md:gap-0.5 text-xs text-on-surface-variant font-medium">
+         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest">Сталь: </span>
+         <span>${steel}</span>
+         <span class="hidden md:inline border-t border-outline-variant/10 my-0.5 w-12"></span>
+         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest ml-4">ГОСТ: </span>
+         <span class="truncate max-w-[100px]">${standard}</span>
       </div>
 
-      <div class="w-full md:w-72 flex items-center gap-2 z-10" onclick="event.stopPropagation()">
-        <div class="qty-selector-container flex-1 flex items-center bg-surface-container border border-outline-variant/10 overflow-hidden h-11">
-            <input type="text" id="qty-${p.id}" value="1.00" inputmode="decimal" onblur="window.validateCatalogQtyInput(this, ${!!p.price_ton})" onchange="window.validateCatalogQtyInput(this, ${!!p.price_ton})" class="w-16 bg-transparent border-none text-left pl-3 font-bold text-on-surface outline-none text-sm h-full"/>
-            <span class="text-[9px] font-label-caps text-on-surface-variant uppercase tracking-widest flex-1 opacity-60">${p.price_ton ? 'Т' : 'ЕД.'}</span>
-            <div class="flex flex-col h-full w-10 border-l border-white/5 bg-white/5">
-                <button onclick="changeQty('${p.id}', 1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors border-b border-white/5 group">
-                    <span class="material-symbols-outlined text-primary text-[18px] group-hover:scale-125 transition-transform">expand_less</span>
-                </button>
-                <button onclick="changeQty('${p.id}', -1)" class="flex-1 flex items-center justify-center hover:bg-primary/20 transition-colors group">
-                    <span class="material-symbols-outlined text-primary text-[18px] group-hover:scale-125 transition-transform">expand_more</span>
-                </button>
-            </div>
-        </div>
-        <button onclick="addToCart('${p.id}')" class="catalog-cart-btn w-12 h-11 bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow rounded-xl border border-primary cursor-pointer active:scale-95">
-            <span class="material-symbols-outlined">shopping_cart</span>
-        </button>
+      <!-- 3. Dimensions / Weight (w-24) -->
+      <div class="w-full md:w-24 shrink-0 pointer-events-none flex md:flex-col gap-2 md:gap-0.5 text-xs text-on-surface-variant font-medium">
+         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest">Длина: </span>
+         <span>${lenFmt}</span>
+         <span class="hidden md:inline border-t border-outline-variant/10 my-0.5 w-12"></span>
+         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest ml-4">Вес: </span>
+         <span>${weightFmt}</span>
       </div>
+
+      <!-- 4. Price Options (w-48) -->
+      <div class="w-full md:w-48 shrink-0 flex flex-col items-start md:items-end justify-center gap-0.5">
+         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest self-start mb-1">Варианты цен:</span>
+         ${radiosHtml}
+      </div>
+
+      <!-- 5. Quantity selector & Buy Button (w-[230px]) -->
+      <div class="w-full md:w-[230px] shrink-0 flex items-center justify-between md:justify-end gap-3" onclick="event.stopPropagation()">
+         <div class="text-right shrink-0 flex flex-col justify-center">
+             <span class="text-[9px] font-label-caps text-on-surface-variant uppercase tracking-widest opacity-60">Итого</span>
+             <span id="total-${p.id}" class="text-primary font-bold text-sm md:text-base leading-none">0 ₽</span>
+         </div>
+
+         <div class="flex flex-col items-center gap-1 select-none w-24">
+             <div class="qty-selector-container flex items-center bg-[#0a0908] dark:bg-[#0a0908] border border-white/10 overflow-hidden h-9 w-full rounded-xl shadow-inner">
+                 <button type="button" onclick="window.stepCatalogQty('${p.id}', -1)" class="w-8 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-r border-white/5 select-none bg-transparent">
+                     <span class="material-symbols-outlined text-[10px] font-bold">remove</span>
+                 </button>
+                 <input type="text" id="qty-${p.id}" value="${Number((currentMode.min || currentMode.step).toFixed(currentMode.decimals)).toString()}" inputmode="decimal" onblur="window.handleCatalogQtyBlur('${p.id}')" oninput="window.handleCatalogQtyInput('${p.id}')" class="w-8 bg-transparent border-none text-center font-bold text-on-surface outline-none text-[11px] h-full p-0 focus:ring-0 focus:outline-none"/>
+                 <button type="button" onclick="window.stepCatalogQty('${p.id}', 1)" class="w-8 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-l border-white/5 select-none bg-transparent">
+                     <span class="material-symbols-outlined text-[10px] font-bold">add</span>
+                 </button>
+             </div>
+             <span id="unit-${p.id}" class="text-[9px] font-bold uppercase tracking-widest text-[#964551] leading-none mt-0.5">${currentMode.unit}</span>
+         </div>
+
+         <button onclick="window.addCatalogProductToCart('${p.id}')" class="w-10 h-10 bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow rounded-full border border-primary cursor-pointer active:scale-95">
+             <span class="material-symbols-outlined text-base">shopping_cart</span>
+         </button>
+      </div>
+
     </div>
     `;
   }).join('');
+
+  products.forEach(p => window.updateCatalogProductTotal(p.id));
 }
+
+window.setL3Filter = function(val) {
+    if (!val) {
+        activeFilters.l3 = [];
+    } else {
+        activeFilters.l3 = [val];
+    }
+    currentPage = 1;
+    applyFilters(true);
+};
+
+window.selectCatalogProductMode = function(id, modeIdx) {
+    window.catalogProductSelectedModes[id] = modeIdx;
+    
+    const input = document.getElementById('qty-' + id);
+    const unitSpan = document.getElementById('unit-' + id);
+    
+    const p = window.currentProductsList.find(x => x.id === id);
+    if (!p) return;
+
+    const modes = window.getCatalogProductModes(p);
+    const mode = modes[modeIdx] || modes[0];
+    if (input) {
+        input.value = Number((mode.min || mode.step).toFixed(mode.decimals)).toString();
+    }
+    if (unitSpan) {
+        unitSpan.textContent = mode.unit;
+    }
+    
+    window.updateCatalogProductTotal(id);
+};
+
+window.stepCatalogQty = function(id, delta) {
+    const input = document.getElementById('qty-' + id);
+    if (!input) return;
+
+    const p = window.currentProductsList.find(x => x.id === id);
+    if (!p) return;
+
+    const modes = window.getCatalogProductModes(p);
+    const selectedIdx = window.catalogProductSelectedModes[id] || 0;
+    const mode = modes[selectedIdx] || modes[0];
+    if (!mode) return;
+
+    let val = parseFloat(input.value.replace(',', '.')) || 0;
+    let newVal = val + (delta * mode.step);
+
+    const minVal = mode.min !== undefined ? mode.min : mode.step;
+    let finalVal = Math.max(minVal, newVal);
+    
+    if (mode.unit === 'т.' && finalVal > 1000) {
+        alert("Максимум 1000 т в одном заказе.");
+        return;
+    }
+
+    input.value = Number(finalVal.toFixed(mode.decimals)).toString();
+    window.updateCatalogProductTotal(id);
+};
+
+window.handleCatalogQtyInput = function(id) {
+    window.updateCatalogProductTotal(id);
+};
+
+window.handleCatalogQtyBlur = function(id) {
+    const input = document.getElementById('qty-' + id);
+    if (!input) return;
+    
+    const p = window.currentProductsList.find(x => x.id === id);
+    if (!p) return;
+
+    const modes = window.getCatalogProductModes(p);
+    const selectedIdx = window.catalogProductSelectedModes[id] || 0;
+    const mode = modes[selectedIdx] || modes[0];
+
+    let val = parseFloat(input.value.replace(',', '.')) || 0;
+    const minVal = mode.min !== undefined ? mode.min : mode.step;
+    if (val < minVal) val = minVal;
+    if (mode.unit === 'т.' && val > 1000) {
+        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+        val = 1000;
+    }
+
+    input.value = Number(val.toFixed(mode.decimals)).toString();
+    window.updateCatalogProductTotal(id);
+};
+
+window.updateCatalogProductTotal = function(id) {
+    const input = document.getElementById('qty-' + id);
+    const totalSpan = document.getElementById('total-' + id);
+    if (!input || !totalSpan) return;
+
+    const p = window.currentProductsList.find(x => x.id === id);
+    if (!p) return;
+
+    const modes = window.getCatalogProductModes(p);
+    const selectedIdx = window.catalogProductSelectedModes[id] || 0;
+    const mode = modes[selectedIdx] || modes[0];
+
+    const qty = parseFloat(input.value.replace(',', '.')) || 0;
+    const total = qty * (mode ? mode.price : 0);
+    
+    totalSpan.textContent = total > 0 ? Math.round(total).toLocaleString('ru-RU') + ' ₽' : 'По запросу';
+};
+
+window.addCatalogProductToCart = function(id) {
+    const qtyInput = document.getElementById('qty-' + id);
+    let qty = qtyInput ? parseFloat(qtyInput.value.replace(',', '.')) : 1;
+    if (isNaN(qty) || qty <= 0) qty = 1;
+
+    const selectedIdx = window.catalogProductSelectedModes[id] || 0;
+    
+    const p = window.currentProductsList.find(x => x.id === id);
+    if (!p) return;
+
+    const modes = window.getCatalogProductModes(p);
+    const mode = modes[selectedIdx] || modes[0];
+    if (!mode) return;
+
+    let price = mode.price;
+    let unit = mode.unit;
+
+    if (unit === 'т.' && qty > 1000) {
+        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+        qty = 1000;
+        if (qtyInput) qtyInput.value = "1000.0";
+    }
+
+    let cart = JSON.parse(localStorage.getItem('metal_cart') || '[]');
+    const existing = cart.find(item => item.id === id && item.unit === unit);
+    if (existing) {
+        let newQty = parseFloat(existing.qty) + qty;
+        if (unit === 'т.' && newQty > 1000) {
+            alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
+            newQty = 1000;
+        }
+        existing.qty = newQty.toFixed(mode.decimals);
+    } else {
+        const len = parseFloat(p.length) || 0;
+        cart.push({
+            id: p.id,
+            qty: qty.toFixed(mode.decimals),
+            name: p.name,
+            price: price,
+            unit: unit,
+            length: len,
+            img: p.image || p.img
+        });
+    }
+    localStorage.setItem('metal_cart', JSON.stringify(cart));
+    if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();
+    if (window.toggleCartDrawerGlobal) window.toggleCartDrawerGlobal();
+
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-8 right-8 bg-primary text-on-primary px-6 py-3 font-label-caps text-sm shadow-2xl z-[100]';
+    toast.textContent = 'ТОВАР ДОБАВЛЕН В КОРЗИНУ';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+};
 
 function renderPagination(nav) {
     const div = document.getElementById('pagination');
@@ -1574,60 +2144,6 @@ function changePage(p) {
     window.scrollToTopGlobal();
     fetchProducts();
 }
-
-window.validateCatalogQtyInput = function(input, isTon) {
-    let val = parseFloat(input.value.replace(',', '.')) || 0;
-    if (isTon && val > 1000) {
-        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
-        val = 1000;
-    }
-    if (val < 0) val = 0;
-    input.value = val.toFixed(2);
-};
-
-window.changeQty = function(id, delta) {
-    const input = document.getElementById('qty-' + id);
-    if (!input) return;
-    let val = parseFloat(input.value.replace(',', '.')) || 1;
-    const unitText = input.nextElementSibling.textContent;
-    const step = unitText === 'Т' ? 0.1 : 1;
-    
-    if (unitText === 'Т' && delta > 0 && val >= 1000) {
-        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
-        return;
-    }
-    
-    val = Math.max(0, val + (delta * step));
-    if (unitText === 'Т') val = Math.min(1000, val);
-    input.value = val.toFixed(2);
-    
-    const mobInput = document.getElementById('qty-mob-' + id);
-    if (mobInput) mobInput.value = val.toFixed(2);
-};
-
-window.changeQtyMob = function(id, delta) {
-    const input = document.getElementById('qty-mob-' + id);
-    if (!input) return;
-    let val = parseFloat(input.value.replace(',', '.')) || 1;
-    const unitText = input.nextElementSibling.textContent;
-    const step = unitText === 'Т' ? 0.1 : 1;
-    
-    if (unitText === 'Т' && delta > 0 && val >= 1000) {
-        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
-        return;
-    }
-    
-    val = Math.max(0, val + (delta * step));
-    if (unitText === 'Т') val = Math.min(1000, val);
-    input.value = val.toFixed(2);
-    
-    const deskInput = document.getElementById('qty-' + id);
-    if (deskInput) deskInput.value = val.toFixed(2);
-};
-
-window.addToCartMob = function(id) {
-    addToCart(id);
-};
 
 document.getElementById('searchInput').addEventListener('input', (e) => {
   searchQuery = e.target.value.toLowerCase();

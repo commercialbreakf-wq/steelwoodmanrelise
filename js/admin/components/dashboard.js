@@ -108,7 +108,7 @@ export async function renderDashboard(container, state) {
 
             <!-- Главные метрики -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                ${renderStatCard('Товары в базе', '<div class="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>', 'inventory_2', '#ca7093', 'products')}
+                ${renderStatCard('Товары в базе', '<div class="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>', 'inventory_2', '#964551', 'products')}
                 ${renderStatCard('Активные заказы', '<div class="w-6 h-6 border-2 border-blue-400/20 border-t-blue-400 rounded-full animate-spin"></div>', 'shopping_cart', '#60a5fa', 'active-orders')}
                 ${renderStatCard('Выручка (тек. мес)', '<div class="w-6 h-6 border-2 border-green-400/20 border-t-green-400 rounded-full animate-spin"></div>', 'payments', '#4ade80', 'revenue')}
                 ${renderStatCard('Входящие лиды', '<div class="w-6 h-6 border-2 border-orange-400/20 border-t-orange-400 rounded-full animate-spin"></div>', 'leaderboard', '#fb923c', 'leads')}

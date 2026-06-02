@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" media="print" onload="this.media='all'">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" media="print" onload="this.media='all'">
+<script src="/js/shared-ui.js?v=3"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "outline-variant": "#534347",
+                    "surface-container-lowest": "#0f0e0c",
+                    "on-tertiary-container": "#282a2a",
+                    "surface-container-highest": "#373431",
+                    "primary-container": "#cf7498",
+                    "surface-container-high": "#2c2a27",
+                    "on-secondary": "#660029",
+                    "on-surface-variant": "#d7c1c7",
+                    "surface-tint": "#ffb0cc",
+                    "on-surface": "#e7e2dd",
+                    "on-primary-container": "#520d2f",
+                    "inverse-primary": "#944365",
+                    "inverse-on-surface": "#32302d",
+                    "surface-container-low": "#1d1b19",
+                    "tertiary": "#c6c6c7",
+                    "on-primary": "#5a1536",
+                    "surface-variant": "#373431",
+                    "on-secondary-fixed-variant": "#8e093d",
+                    "surface-container": "#211f1d",
+                    "primary-fixed": "#ffd9e4",
+                    "primary": "#ffb0cc",
+                    "on-secondary-fixed": "#3f0017",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "secondary-container": "#8e093d",
+                    "surface": "#151311",
+                    "on-background": "#e7e2dd",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-dim": "#151311",
+                    "on-error": "#690005",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-secondary-container": "#ff96ad",
+                    "error-container": "#93000a",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-error-container": "#ffdad6",
+                    "secondary": "#ffb1c0",
+                    "inverse-surface": "#e7e2dd",
+                    "primary-fixed-dim": "#ffb0cc",
+                    "outline": "#a08c91",
+                    "surface-bright": "#3b3936",
+                    "on-primary-fixed": "#3e0020",
+                    "secondary-fixed-dim": "#ffb1c0",
+                    "background": "#151311",
+                    "on-tertiary": "#2f3131",
+                    "tertiary-container": "#909191",
+                    "on-primary-fixed-variant": "#772c4d",
+                    "secondary-fixed": "#ffd9df"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-edge": "64px",
+                    "margin-edge-mobile": "20px",
+                    "section-gap": "160px",
+                    "section-gap-mobile": "80px",
+                    "gutter": "24px",
+                    "unit": "8px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter", "sans-serif"],
+                    "label-caps": ["Space Grotesk", "sans-serif"],
+                    "headline-lg": ["Space Grotesk", "sans-serif"],
+                    "display-xl": ["Space Grotesk", "sans-serif"],
+                    "body-lg": ["Inter", "sans-serif"],
+                    "headline-md": ["Space Grotesk", "sans-serif"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "headline-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                    "display-xl": ["120px", {"lineHeight": "110px", "letterSpacing": "-0.04em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["48px", {"lineHeight": "56px", "fontWeight": "500"}]
+            }
+
+          }
+        }
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        background: rgba(21, 19, 17, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(231, 226, 221, 0.05);
+      }
+      .hover-glow:hover {
+        box-shadow: 0 0 40px -10px rgba(255, 176, 204, 0.2);
+      }
+      .pink-slide {
+        position: relative;
+        overflow: hidden;
+      }
+      .pink-slide::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: #ffb0cc;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: -1;
+      }
+      .pink-slide:hover::after {
+        transform: translateX(100%);
+      }
+      .asymmetric-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 24px;
+      }
+    
+      .zoom-image:hover {
+        transform: scale(1.1);
+      }
+      
+      /* Local styles end */
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md">
+<!-- Shared Header will be injected here -->
+<main class="overflow-x-hidden" data-block-scroll>
+<!-- Hero Section -->
+<section id="hero" class="relative min-h-[100dvh] flex flex-col border-b border-white/5 bg-background pt-20 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-30 transition-all duration-1000 scale-105" data-alt="Профессиональный металлопрокат" src="/images/beams.png"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
+</div>
+<div class="container mx-auto px-margin-edge-mobile md:px-margin-edge relative z-10 max-w-container-max flex-grow flex items-center w-full">
+<div class="max-w-4xl space-y-6 md:space-y-8">
+<span class="font-label-caps text-label-caps text-primary block tracking-[0.2em] uppercase">Профессиональный металлопрокат</span>
+<h1 class="text-[48px] leading-[1.1] md:text-display-xl font-display-xl uppercase">МЕТАЛЛ<br/><span class="text-primary">ВЫСШЕЙ</span> ПРОБЫ</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl opacity-90">
+                Поставляем высококачественный металлопрокат для амбициозных проектов. Точность до миллиметра, надежность на века.
+            </p>
+<div class="flex flex-col sm:flex-row gap-4 md:gap-6 pt-4">
+<a href="/catalog/" class="pink-slide px-10 py-4 bg-transparent border border-primary text-primary font-label-caps text-label-caps z-10 hover:text-surface transition-colors duration-500 rounded-none tracking-widest inline-block text-center no-underline">
+                            СМОТРЕТЬ КАТАЛОГ
+                        </a>
+</div>
+
+</div>
+</div>
+
+<!-- Scroll Arrow -->
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#hero-target')">
+    <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
+</div>
+
+<div class="absolute right-0 bottom-24 hidden lg:block">
+<div class="p-8 border border-outline-variant/20 border-r-0 bg-surface/50 backdrop-blur-md">
+<div class="space-y-2 text-right pr-6">
+<div class="text-primary font-display-xl text-[48px] leading-none">20+</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant tracking-wider">ЛЕТ ОПЫТА</div>
+</div>
+</div>
+</div>
+</section>
+<!-- About Summary Section -->
+<section id="hero-target" class="min-h-[100dvh] flex flex-col justify-center py-12 md:py-24 px-margin-edge-mobile md:px-margin-edge bg-surface-container-lowest border-b border-white/5 scroll-mt-0 w-full max-w-container-max mx-auto">
+<div class="asymmetric-grid">
+<div class="col-span-12 md:col-span-5 space-y-8">
+<h2 class="text-[36px] leading-tight md:text-headline-lg font-headline-lg text-on-surface uppercase">СИЛА В<br/>ДЕТАЛЯХ</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                        «Железный Дровосек» — это не просто поставщик. Мы — ваш технологический партнер в мире металлообработки. Мы объединяем индустриальную мощь с цифровой точностью управления поставками.
+                    </p>
+
+<div class="pt-8 border-t border-outline-variant/20">
+<ul class="space-y-4">
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">verified</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Сертификация ГОСТ</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">speed</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Логистика 24/7</span>
+</li>
+</ul>
+</div>
+</div>
+<div class="col-span-12 md:col-start-7 md:col-span-6 relative mt-12 md:mt-0">
+<div class="aspect-video md:aspect-[4/5] h-full max-h-[60vh] overflow-hidden border border-outline-variant/20">
+<img class="w-full h-full object-cover zoom-image transition-transform duration-1000 ease-out" data-alt="Металлообработка" src="/images/stainless_steel_product.png"/>
+</div>
+<div class="absolute -bottom-6 -left-4 md:-bottom-10 md:-left-10 p-6 md:p-8 bg-surface border border-outline-variant/20 max-w-[240px] md:max-w-xs shadow-2xl">
+<p class="font-body-md text-body-md text-on-surface italic">
+                            "Мы верим, что металл — это фундамент будущего, и наша задача — сделать этот фундамент безупречным."
+                        </p>
+</div>
+</div>
+
+</div>
+</section>
+<!-- Popular Categories - Bento Grid Style -->
+<section id="popular-categories" class="min-h-[100dvh] flex flex-col justify-center bg-surface-container-lowest border-y border-outline-variant/10 py-24">
+<div class="px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-6">
+<h2 class="text-[36px] leading-tight md:text-headline-lg font-headline-lg uppercase">ПОПУЛЯРНЫЕ<br/>КАТЕГОРИИ</h2>
+<a href="/catalog/" class="font-label-caps text-label-caps text-primary flex items-center gap-2 group tracking-widest no-underline">
+                        ВЕСЬ КАТАЛОГ <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
+</a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Category 1 -->
+<a href="/catalog/?pcat=Черный металлопрокат&cat=Арматура" class="group relative h-[300px] md:h-[50vh] max-h-[500px] overflow-hidden border border-outline-variant/20 bg-surface block no-underline text-inherit cursor-pointer">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60" data-alt="Арматура" src="/images/rebar.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 md:p-8 w-full">
+<span class="font-label-caps text-label-caps text-primary mb-2 block tracking-widest">01 //</span>
+<h3 class="text-[28px] md:text-headline-md font-headline-md uppercase mb-4">АРМАТУРА</h3>
+<p class="text-on-surface-variant opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 line-clamp-2">
+                                Основа любого фундамента и железобетонных конструкций. Все классы прочности.
+                            </p>
+</div>
+</a>
+
+<div class="grid grid-rows-1 md:grid-rows-2 gap-6">
+<!-- Category 2 -->
+<a href="/catalog/?pcat=Трубный металлопрокат" class="group relative h-[300px] md:h-auto overflow-hidden border border-outline-variant/20 bg-surface block no-underline text-inherit cursor-pointer">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60" data-alt="Трубы" src="/images/tubes.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 md:p-8">
+<span class="font-label-caps text-label-caps text-primary mb-2 block tracking-widest">02 //</span>
+<h3 class="text-[24px] md:text-headline-md font-headline-md uppercase text-on-surface">ТРУБЫ</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-100 md:opacity-0 md:translate-y-4 transition-all duration-500 md:group-hover:opacity-100 md:group-hover:translate-y-0 tracking-wider mt-2">ПРОФИЛЬНЫЕ И КРУГЛЫЕ</p>
+</div>
+</a>
+<!-- Category 3 -->
+<a href="/catalog/?pcat=Листовой металлопрокат" class="group relative h-[300px] md:h-auto overflow-hidden border border-outline-variant/20 bg-surface block no-underline text-inherit cursor-pointer">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60" data-alt="Листы" src="/images/sheets.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 md:p-8">
+<span class="font-label-caps text-label-caps text-primary mb-2 block tracking-widest">03 //</span>
+<h3 class="text-[24px] md:text-headline-md font-headline-md uppercase text-on-surface">ЛИСТЫ</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-100 md:opacity-0 md:translate-y-4 transition-all duration-500 md:group-hover:opacity-100 md:group-hover:translate-y-0 tracking-wider mt-2">ПРЕМИАЛЬНЫЕ ХОЛОДНОКАТАНЫЕ</p>
+</div>
+</a>
+</div>
+
+<!-- Category 4 -->
+<a href="/catalog/?pcat=Кровля и фасад" class="group relative h-[300px] md:h-[50vh] max-h-[500px] overflow-hidden border border-outline-variant/20 bg-surface block no-underline text-inherit cursor-pointer">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60" data-alt="Профнастил" src="/images/products/corrugated_sheets_premium.png"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/50 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 md:p-8 w-full">
+<span class="font-label-caps text-label-caps text-primary mb-2 block tracking-widest">04 //</span>
+<h3 class="text-[28px] md:text-headline-md font-headline-md uppercase mb-4 text-on-surface">ПРОФНАСТИЛ</h3>
+<p class="text-on-surface-variant opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 line-clamp-2">
+                                Долговечное покрытие для фасадов и кровель любой сложности.
+                            </p>
+</div>
+</a>
+
+</div>
+</div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits-target" class="relative min-h-[100dvh] flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto">
+        <!-- Scroll Arrow -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#news-target')">
+            <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
+        </div>
+<div class="text-left mb-12 md:mb-16 border-b border-outline-variant/20 pb-8">
+<span class="font-label-caps text-label-caps text-primary tracking-widest block mb-4 uppercase">Почему мы</span>
+<h2 class="text-[36px] leading-tight md:text-headline-lg font-headline-lg uppercase">ПРЕИМУЩЕСТВА КАЧЕСТВА</h2>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<a class="block p-8 border border-outline-variant/20 transition-all duration-500 group bg-surface hover:bg-surface-container-high cursor-pointer no-underline text-inherit" href="/services/">
+<span class="material-symbols-outlined text-headline-md text-primary mb-8 block font-light">precision_manufacturing</span>
+<h4 class="font-label-caps text-label-caps text-on-surface mb-4 tracking-wider">ТОЧНОСТЬ РЕЗКИ</h4>
+<p class="text-on-surface-variant text-body-md opacity-80">Используем лазерное оборудование последнего поколения для идеального среза.</p>
+<div class="mt-8 flex items-center gap-2 text-primary opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-x-4 group-hover:translate-x-0">
+<span class="font-label-caps text-label-caps tracking-widest">ПОДРОБНЕЕ</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</div>
+</a>
+<a class="block p-8 border border-outline-variant/20 transition-all duration-500 group bg-surface hover:bg-surface-container-high cursor-pointer no-underline text-inherit" href="/certificates/">
+<span class="material-symbols-outlined text-headline-md text-primary mb-8 block font-light">workspace_premium</span>
+<h4 class="font-label-caps text-label-caps text-on-surface mb-4 tracking-wider">СЕРТИФИКАТЫ</h4>
+<p class="text-on-surface-variant text-body-md opacity-80">Каждая партия проходит строгий лабораторный контроль на соответствие ГОСТ.</p>
+<div class="mt-8 flex items-center gap-2 text-primary opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-x-4 group-hover:translate-x-0">
+<span class="font-label-caps text-label-caps tracking-widest">ПОДРОБНЕЕ</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</div>
+</a>
+<a class="block p-8 border border-outline-variant/20 transition-all duration-500 group bg-surface hover:bg-surface-container-high cursor-pointer no-underline text-inherit" href="/fleet/">
+<span class="material-symbols-outlined text-headline-md text-primary mb-8 block font-light">local_shipping</span>
+<h4 class="font-label-caps text-label-caps text-on-surface mb-4 tracking-wider">СВОЙ АВТОПАРК</h4>
+<p class="text-on-surface-variant text-body-md opacity-80">Гарантируем доставку в день заказа благодаря собственному логистическому хабу.</p>
+<div class="mt-8 flex items-center gap-2 text-primary opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-x-4 group-hover:translate-x-0">
+<span class="font-label-caps text-label-caps tracking-widest">ПОДРОБНЕЕ</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</div>
+</a>
+<a class="block p-8 border border-outline-variant/20 transition-all duration-500 group bg-surface hover:bg-surface-container-high cursor-pointer no-underline text-inherit" href="/calculator/">
+<span class="material-symbols-outlined text-headline-md text-primary mb-8 block font-light">calculate</span>
+<h4 class="font-label-caps text-label-caps text-on-surface mb-4 tracking-wider">КАЛЬКУЛЯТОР</h4>
+<p class="text-on-surface-variant text-body-md opacity-80">Мгновенный расчет веса и стоимости металлопроката онлайн.</p>
+<div class="mt-8 flex items-center gap-2 text-primary opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-x-4 group-hover:translate-x-0">
+<span class="font-label-caps text-label-caps tracking-widest">ПОДРОБНЕЕ</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</div>
+</a>
+</div>
+    </section>
+
+    <!-- News/Blog Section -->
+    <section id="news-target" class="relative min-h-[100dvh] flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto border-t border-outline-variant/20">
+        <!-- Scroll Arrow -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50 cursor-pointer hover:opacity-100 transition-opacity z-20" onclick="window.scrollToSectionGlobal('#cta-footer-merged')">
+            <span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
+        </div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-6">
+<div>
+<h2 class="text-[36px] leading-tight md:text-headline-lg font-headline-lg uppercase">НОВОСТИ ОТРАСЛИ</h2>
+<p class="text-on-surface-variant mt-2 font-body-lg">Будьте в курсе изменений цен и новых технологий.</p>
+</div>
+<a href="/news/" class="w-full md:w-auto px-8 py-3 border border-outline-variant/50 text-on-surface font-label-caps text-label-caps hover:bg-surface-container-high transition-all tracking-widest no-underline text-center">
+                    ВСЕ НОВОСТИ
+                </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<a href="/news/trends-2026/" class="flex flex-col md:flex-row gap-8 group bg-primary/5 p-6 md:p-8 border border-primary/10 hover:border-primary/30 transition-all duration-500 no-underline text-inherit hover:bg-primary/10">
+<div class="w-full md:w-1/2 aspect-[4/3] md:aspect-square overflow-hidden border border-outline-variant/20">
+<img class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" data-alt="Тренды металлургии 2026" src="/images/news_1.png"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col justify-center space-y-4">
+<span class="font-label-caps text-label-caps text-primary tracking-widest">24 МАЯ, 2026</span>
+<h3 class="font-headline-md text-[24px] md:text-[28px] leading-tight uppercase group-hover:text-primary transition-colors">Тренды металлургии 2026</h3>
+<p class="text-on-surface-variant opacity-80 line-clamp-3">Как цифровизация меняет цепочки поставок и почему это выгодно конечному потребителю.</p>
+<div class="font-label-caps text-label-caps flex items-center gap-2 text-primary tracking-widest mt-2">ЧИТАТЬ <span class="material-symbols-outlined text-[16px] group-hover:translate-x-2 transition-transform">arrow_forward</span></div>
+</div>
+</a>
+
+<a href="/news/sheets-2026/" class="flex flex-col md:flex-row gap-8 group bg-primary/5 p-6 md:p-8 border border-primary/10 hover:border-primary/30 transition-all duration-500 no-underline text-inherit hover:bg-primary/10">
+<div class="w-full md:w-1/2 aspect-[4/3] md:aspect-square overflow-hidden border border-outline-variant/20">
+<img class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" data-alt="Новое поступление" src="/images/news_2.png"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col justify-center space-y-4">
+<span class="font-label-caps text-label-caps text-primary tracking-widest">18 МАЯ, 2026</span>
+<h3 class="font-headline-md text-[24px] md:text-[28px] leading-tight uppercase group-hover:text-primary transition-colors">Новое поступление листов 2026</h3>
+<p class="text-on-surface-variant opacity-80 line-clamp-3">Расширение складской программы: холоднокатаные листы премиального качества уже в наличии.</p>
+<div class="font-label-caps text-label-caps flex items-center gap-2 text-primary tracking-widest mt-2">ЧИТАТЬ <span class="material-symbols-outlined text-[16px] group-hover:translate-x-2 transition-transform">arrow_forward</span></div>
+</div>
+</a>
+</div>
+</section>
+<!-- Forms Section: Subscribe & Contact + Footer Merged -->
+<section id="cta-footer-merged" class="min-h-[100dvh] flex flex-col border-t border-outline-variant/20 bg-background">
+    <div class="relative flex-grow flex flex-col justify-center px-margin-edge-mobile md:px-margin-edge w-full max-w-container-max mx-auto py-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Newsletter CTA -->
+            <div class="bg-primary/10 border border-primary/20 p-6 md:p-8 flex flex-col justify-center">
+                <div class="mb-8">
+                    <h2 class="text-[32px] md:text-[40px] leading-tight uppercase mb-2 text-on-surface font-headline-lg font-bold">ПОДПИШИТЕСЬ<br/>НА ОБНОВЛЕНИЯ</h2>
+                    <p class="font-body-md text-on-surface-variant opacity-80">Получайте актуальные предложения и новости отрасли первыми.</p>
+                </div>
+
+                <form class="flex flex-col gap-4" id="subscribeForm" onsubmit="window.handleApplicationSubmit(event, 'subscription')">
+                    <input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary" placeholder="Email" type="email" name="email" required/>
+                    <button type="submit" class="bg-primary text-surface px-8 py-3 font-label-caps text-label-caps hover:bg-primary/90 transition-all tracking-widest self-start w-full sm:w-auto uppercase font-bold">Отправить</button>
+                </form>
+            </div>
+            <!-- Contact/Feedback Form -->
+            <div class="border border-outline-variant/20 p-6 md:p-8 bg-surface">
+                <div class="mb-8">
+                    <h2 class="text-[32px] md:text-[40px] leading-tight uppercase mb-2 text-on-surface font-headline-lg font-bold">СВЯЗАТЬСЯ<br/>С НАМИ</h2>
+                    <p class="font-body-md text-on-surface-variant opacity-80">Оставьте заявку, и наш менеджер свяжется с вами в ближайшее время.</p>
+                </div>
+
+                <form class="space-y-6" onsubmit="window.handleApplicationSubmit(event, 'main_contact')">
+                    <div class="space-y-4">
+                        <input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary font-medium" placeholder="Имя" type="text" name="name" required/>
+                        <input class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary font-medium" placeholder="Телефон (+7-(000)-000-00-00)" type="tel" name="phone" required/>
+                        <textarea class="bg-surface border border-outline-variant/30 py-3 px-4 text-on-surface font-body-md placeholder:text-on-surface-variant/50 w-full focus:outline-none focus:border-primary h-32 resize-none font-medium" placeholder="Сообщение" name="message"></textarea>
+                    </div>
+                    <button type="submit" class="bg-primary text-surface px-8 py-3 font-label-caps text-label-caps hover:bg-primary/90 transition-all tracking-widest self-start w-full sm:w-auto uppercase font-bold">Отправить заявку</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer id="globalFooter"></footer>
+</section>
+
+
+<script>
+
+
+function updateCartBadge() {
+  if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();
+}
+
+function toggleAuthModal() {
+    if (window.toggleAuthModalGlobal) window.toggleAuthModalGlobal();
+}
+
+updateCartBadge();
+</script>
+</body></html>

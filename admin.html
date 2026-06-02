@@ -3,8 +3,10 @@
 <head>
   <script>
     (function() {
-      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.classList.add(theme);
+      // Force premium dark theme for admin panel
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     })();
   </script>
     <meta charset="utf-8"/>
@@ -36,12 +38,12 @@
     <meta name="twitter:description" content="Панель управления сайтом и базой данных металлопроката «Железный Дровосек». Управление ценами, заказами и пользователями." />
     <meta name="twitter:image" content="https://zhelezniydrovosek.ru/images/logo_premium.png" />
     
-    <meta name="theme-color" content="#ca7093" />
+    <meta name="theme-color" content="#964551" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg?v=5" />
     <link rel="icon" type="image/png" href="/images/logo_icon.png?v=5" sizes="192x192" />
     <link rel="apple-touch-icon" href="/images/logo_icon.png?v=5" />
-    <link rel="mask-icon" href="/images/favicon.svg?v=5" color="#ca7093" />
+    <link rel="mask-icon" href="/images/favicon.svg?v=5" color="#964551" />
   
     <script type="application/ld+json">
     {
@@ -186,14 +188,14 @@
     
     
   
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 
 
 
 
     
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="/js/theme.js?v=6"></script>
+    <script src="/js/theme.js?v=1780400000"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -209,18 +211,18 @@
             max-width: 100vw;
             overflow-x: hidden !important;
         }
-        /* Accent color per theme: dark = #964551, light = #ca7093 */
+        /* Accent color per theme: dark = #964551, light = #964551 */
         html.light, html:not(.dark) {
-            --color-primary: #ca7093 !important;
+            --color-primary: #964551 !important;
             --color-on-primary: #FFFFFF !important;
-            --color-surface-tint: #ca7093 !important;
-            --color-secondary: #ca7093 !important;
+            --color-surface-tint: #964551 !important;
+            --color-secondary: #964551 !important;
         }
         html.dark {
             --color-primary: #964551 !important;
             --color-on-primary: #FFFFFF !important;
             --color-surface-tint: #964551 !important;
-            --color-secondary: #ca7093 !important;
+            --color-secondary: #964551 !important;
         }
 
         body { 
@@ -294,14 +296,165 @@
         /* Navigation Active State */
         .nav-item.active {
             background: rgba(150, 69, 81, 0.08) !important;
-            color: #ca7093 !important;
+            color: #964551 !important;
             border-left: 3px solid #964551;
         }
         html.dark .nav-item.active {
-            background: rgba(202, 112, 147, 0.1) !important;
-            border-left-color: #ca7093;
+            background: rgba(150, 69, 81, 0.1) !important;
+            border-left-color: #964551;
         }
-    </style>
+
+        /* ============================================================
+           MOBILE ADAPTATION LAYER
+           Global safeguards for the admin panel on phones/tablets.
+           ============================================================ */
+
+        /* Respect iOS/Android safe areas (notch + home indicator) */
+        @supports (padding: env(safe-area-inset-bottom)) {
+            #admin-sidebar {
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            /* Floating bulk-action bars sit above the home indicator */
+            .admin-bulk-bar {
+                margin-bottom: env(safe-area-inset-bottom);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            /* Prevent any accidental horizontal scrolling on small screens */
+            #admin-app, #admin-main, #admin-content {
+                max-width: 100vw;
+            }
+            #admin-content {
+                /* Leave room for floating bulk bars / safe area */
+                padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+            }
+        }
+
+        @media (max-width: 640px) {
+            /* Tighter content padding on phones */
+            #admin-content {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            /* Compact sticky header on phones */
+            #admin-header {
+                height: 4rem !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            #admin-content {
+                height: calc(100vh - 64px) !important;
+                height: calc(100dvh - 64px) !important;
+            }
+
+            /* Prevent iOS auto-zoom on focus: inputs must be >= 16px */
+            input:not([type="checkbox"]):not([type="radio"]),
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
+
+            /* Tables stay scrollable, never break the layout */
+            table {
+                font-size: 0.8rem;
+            }
+
+            /* Reduce oversized rounded paddings inside glass cards */
+            .glass, .liquid-glass, .glass-card, .glass-panel {
+                border-radius: 1.25rem !important;
+            }
+        }
+
+        /* Larger, finger-friendly tap targets for icon buttons on touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item {
+                padding-top: 0.85rem;
+                padding-bottom: 0.85rem;
+            }
+            button, .nav-item, [role="button"] {
+                -webkit-tap-highlight-color: transparent;
+            }
+        }
+    
+        /* ============================================================
+           CHERRY COLOR OVERRIDES (#964551)
+           ============================================================ */
+        /* Active menu item text color highlight in dark mode */
+        html.dark .nav-item.active {
+            color: #ffffff !important;
+        }
+
+        /* Overrides for classes generated by shared-ui.js */
+        .text-\[\#ca7093\] {
+            color: #964551 !important;
+        }
+        .text-\[\#ca7093\]\/80 {
+            color: rgba(150, 69, 81, 0.8) !important;
+        }
+        .bg-\[\#ca7093\] {
+            background-color: #964551 !important;
+        }
+        .bg-\[\#ca7093\]\/10 {
+            background-color: rgba(150, 69, 81, 0.1) !important;
+        }
+        .bg-\[\#ca7093\]\/20 {
+            background-color: rgba(150, 69, 81, 0.2) !important;
+        }
+        .border-\[\#ca7093\] {
+            border-color: #964551 !important;
+        }
+        .border-\[\#ca7093\]\/20 {
+            border-color: rgba(150, 69, 81, 0.2) !important;
+        }
+        .border-\[\#ca7093\]\/30 {
+            border-color: rgba(150, 69, 81, 0.3) !important;
+        }
+        .border-\[\#ca7093\]\/40 {
+            border-color: rgba(150, 69, 81, 0.4) !important;
+        }
+        .hover\:border-\[\#ca7093\]:hover {
+            border-color: #964551 !important;
+        }
+        .hover\:border-\[\#ca7093\]\/40:hover {
+            border-color: rgba(150, 69, 81, 0.4) !important;
+        }
+        .hover\:bg-\[\#ca7093\]\/10:hover {
+            background-color: rgba(150, 69, 81, 0.1) !important;
+        }
+        .hover\:bg-\[\#ca7093\]\/15:hover {
+            background-color: rgba(150, 69, 81, 0.15) !important;
+        }
+        .hover\:bg-\[\#ca7093\]\/20:hover {
+            background-color: rgba(150, 69, 81, 0.2) !important;
+        }
+        .hover\:text-\[\#ca7093\]:hover {
+            color: #964551 !important;
+        }
+        .group:hover .group-hover\:text-\[\#ca7093\] {
+            color: #964551 !important;
+        }
+        .group\/item:hover .group-hover\/item\:text-\[\#ca7093\] {
+            color: #964551 !important;
+        }
+        .shadow-\[\#ca7093\]\/20 {
+            --tw-shadow-color: rgba(150, 69, 81, 0.2) !important;
+        }
+        .theme-icon-active {
+            color: #964551 !important;
+        }
+        
+        /* Scrollbar overrides to match cherry theme */
+        ::-webkit-scrollbar-thumb {
+            background: rgba(150, 69, 81, 0.4) !important;
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: rgba(150, 69, 81, 0.6) !important;
+        }
+        * {
+            scrollbar-color: #964551 #151311 !important;
+        }
+</style>
 
 
 
@@ -312,7 +465,7 @@
             background: rgba(21, 19, 17, 0.8) !important;
             backdrop-filter: blur(25px) saturate(180%) !important;
             -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.02), inset 0 0 40px rgba(202, 112, 147, 0.02) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.02), inset 0 0 40px rgba(150, 69, 81, 0.02) !important;
             z-index: 999999; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
@@ -329,7 +482,7 @@
         }
         .loader-ring {
             position: absolute; inset: 0;
-            border: 1px solid rgba(202, 112, 147, 0.05);
+            border: 1px solid rgba(150, 69, 81, 0.05);
             border-radius: 50%;
         }
         .loader-ring::after {
@@ -341,21 +494,21 @@
         }
         .loader-hex {
             width: 100px; height: 100px;
-            background: rgba(202, 112, 147, 0.03);
+            background: rgba(150, 69, 81, 0.03);
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
             display: flex; align-items: center; justify-content: center;
-            border: 1px solid rgba(202, 112, 147, 0.2);
+            border: 1px solid rgba(150, 69, 81, 0.2);
             animation: preloader-pulse 2s ease-in-out infinite;
             position: relative; overflow: hidden;
         }
         .loader-hex::before {
             content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 200%;
-            background: linear-gradient(to bottom, transparent, rgba(202, 112, 147, 0.3), transparent);
+            background: linear-gradient(to bottom, transparent, rgba(150, 69, 81, 0.3), transparent);
             animation: preloader-scan 3s ease-in-out infinite;
         }
         .loader-logo {
             width: 64px; height: 64px; object-fit: cover; border-radius: 50%;
-            filter: drop-shadow(0 0 15px rgba(202, 112, 147, 0.4));
+            filter: drop-shadow(0 0 15px rgba(150, 69, 81, 0.4));
             z-index: 10;
             opacity: 0.9;
         }
@@ -366,7 +519,7 @@
             animation: preloader-text-pulse 1.5s ease-in-out infinite;
         }
         .loader-progress-track {
-            width: 200px; height: 1px; background: rgba(202, 112, 147, 0.1);
+            width: 200px; height: 1px; background: rgba(150, 69, 81, 0.1);
             margin-top: 16px; position: relative; overflow: hidden;
         }
         .loader-progress-bar {
@@ -378,8 +531,8 @@
             to { transform: rotate(360deg); }
         }
         @keyframes preloader-pulse {
-            0%, 100% { transform: scale(1); border-color: rgba(202, 112, 147, 0.2); }
-            50% { transform: scale(1.02); border-color: rgba(202, 112, 147, 0.5); }
+            0%, 100% { transform: scale(1); border-color: rgba(150, 69, 81, 0.2); }
+            50% { transform: scale(1.02); border-color: rgba(150, 69, 81, 0.5); }
         }
         @keyframes preloader-scan {
             0% { transform: translateY(-100%); }
@@ -396,34 +549,34 @@
             background-color: rgba(250, 250, 250, 0.75) !important;
             backdrop-filter: blur(25px) saturate(200%) !important;
             -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.5), inset 0 0 40px rgba(202, 112, 147, 0.03) !important;
+            box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.5), inset 0 0 40px rgba(150, 69, 81, 0.03) !important;
         }
         html.light .loader-ring, html:not(.dark) .loader-ring {
-            border-color: rgba(202, 112, 147, 0.08) !important;
+            border-color: rgba(150, 69, 81, 0.08) !important;
         }
         html.light .loader-ring::after, html:not(.dark) .loader-ring::after {
-            border-top-color: #ca7093 !important;
+            border-top-color: #964551 !important;
         }
         html.light .loader-hex, html:not(.dark) .loader-hex {
-            background: rgba(202, 112, 147, 0.03) !important;
-            border-color: rgba(202, 112, 147, 0.2) !important;
+            background: rgba(150, 69, 81, 0.03) !important;
+            border-color: rgba(150, 69, 81, 0.2) !important;
         }
         html.light .loader-hex::before, html:not(.dark) .loader-hex::before {
-            background: linear-gradient(to bottom, transparent, rgba(202, 112, 147, 0.3), transparent) !important;
+            background: linear-gradient(to bottom, transparent, rgba(150, 69, 81, 0.3), transparent) !important;
         }
         html.light .loader-logo, html:not(.dark) .loader-logo {
-            filter: drop-shadow(0 0 15px rgba(202, 112, 147, 0.3)) !important;
+            filter: drop-shadow(0 0 15px rgba(150, 69, 81, 0.3)) !important;
         }
         html.light .loader-text, html:not(.dark) .loader-text {
             color: #3B3B3B !important;
             opacity: 0.8 !important;
         }
         html.light .loader-progress-track, html:not(.dark) .loader-progress-track {
-            background: rgba(202, 112, 147, 0.1) !important;
+            background: rgba(150, 69, 81, 0.1) !important;
         }
         html.light .loader-progress-bar, html:not(.dark) .loader-progress-bar {
-            background: #ca7093 !important;
-            box-shadow: 0 0 10px rgba(202, 112, 147, 0.5) !important;
+            background: #964551 !important;
+            box-shadow: 0 0 10px rgba(150, 69, 81, 0.5) !important;
         }
 </style>
 <script>
@@ -471,8 +624,8 @@
     </div>
 
     <!-- Shared UI & Global Chat Drawer -->
-    <script src="/js/shared-ui.js?v=22" defer></script>
+    <script src="/js/shared-ui.js?v=1780400000" defer></script>
     <!-- Application Entry Point -->
-    <script type="module" src="/js/admin/app.js"></script>
+    <script type="module" src="/js/admin/app.js?v=1780260008"></script>
 </body>
 </html>

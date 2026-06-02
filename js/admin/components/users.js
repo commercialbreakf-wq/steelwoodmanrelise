@@ -22,28 +22,33 @@ function updateBulkUsersToolbar(state) {
     }
 
     toolbar.innerHTML = `
-        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-surface-container-low/90 backdrop-blur-md border border-primary/20 px-6 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-6 animate-in slide-in-from-bottom-8 duration-500">
-            <div class="flex items-center gap-3 pr-6 border-r border-outline/10">
-                <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs">
-                    ${selectedUserIds.size}
+        <div class="admin-bulk-bar fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1rem)] sm:w-auto max-w-[600px] bg-surface-container-low/95 backdrop-blur-md border border-primary/20 px-3 py-3 md:px-6 md:py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:items-center gap-3 md:gap-6 animate-in slide-in-from-bottom-8 duration-500">
+            <div class="flex items-center justify-between md:justify-start gap-3 md:pr-6 md:border-r border-outline/10 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs shrink-0">
+                        ${selectedUserIds.size}
+                    </div>
+                    <div class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant font-label-caps">Выбрано</div>
                 </div>
-                <div class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant font-label-caps">Выбрано</div>
+                <button id="bulk-user-close-mobile" class="md:hidden p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant">
+                    <span class="material-symbols-outlined text-base">close</span>
+                </button>
             </div>
 
-            <div class="flex items-center gap-4">
-                <button type="button" id="bulk-user-role-btn" class="flex items-center gap-2 bg-surface-container border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary outline-none cursor-pointer hover:bg-on-surface/5 transition-all shadow-md font-label-caps">
+            <div class="flex items-center gap-2 md:gap-4 overflow-x-auto custom-scrollbar md:overflow-visible -mx-1 px-1 md:mx-0 md:px-0">
+                <button type="button" id="bulk-user-role-btn" class="flex items-center gap-2 bg-surface-container border border-primary/20 hover:border-primary/40 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary outline-none cursor-pointer hover:bg-on-surface/5 transition-all shadow-md font-label-caps shrink-0">
                     <span class="material-symbols-outlined text-primary text-sm">manage_accounts</span>
-                    <span>Изменить роль...</span>
+                    <span>Роль...</span>
                     <span class="material-symbols-outlined text-sm opacity-50 ml-1">expand_more</span>
                 </button>
 
-                <button type="button" id="bulk-user-delete-btn" class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 border border-error/20 rounded-xl transition-all text-xs font-bold uppercase tracking-widest text-error font-label-caps">
+                <button type="button" id="bulk-user-delete-btn" class="flex items-center gap-2 px-4 py-2 hover:bg-error/10 border border-error/20 rounded-xl transition-all text-xs font-bold uppercase tracking-widest text-error font-label-caps shrink-0">
                     <span class="material-symbols-outlined text-base">delete</span>
                     Удалить
                 </button>
             </div>
 
-            <button id="bulk-user-close-btn" class="ml-4 p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant" title="Снять выделение">
+            <button id="bulk-user-close-btn" class="hidden md:flex md:ml-4 p-2 hover:bg-on-surface/5 rounded-full transition-all text-on-surface-variant shrink-0" title="Снять выделение">
                 <span class="material-symbols-outlined text-base">close</span>
             </button>
         </div>
@@ -101,6 +106,8 @@ function updateBulkUsersToolbar(state) {
         const selectAll = document.getElementById('users-select-all');
         if (selectAll) selectAll.className = 'w-5 h-5 rounded border flex items-center justify-center transition-all cursor-pointer mx-auto border-outline/20 bg-surface-container-lowest text-transparent';
     };
+    const closeBtnMobile = toolbar.querySelector('#bulk-user-close-mobile');
+    if (closeBtnMobile) closeBtnMobile.onclick = () => closeBtn.onclick();
 }
 
 try {
@@ -151,7 +158,7 @@ export async function renderUsersView(container, state) {
     const loadUsers = async () => {
         tableContainer.innerHTML = `
             <div class="flex items-center justify-center h-[400px]">
-                <div class="w-8 h-8 border-2 border-[#ca7093]/20 border-t-[#ca7093] rounded-full animate-spin"></div>
+                <div class="w-8 h-8 border-2 border-[#964551]/20 border-t-[#964551] rounded-full animate-spin"></div>
             </div>
         `;
         try {
@@ -801,7 +808,7 @@ export async function openUserModal(user, state) {
                                     chatBox.innerHTML = rChatMsgs();
                                     chatBox.scrollTop = chatBox.scrollHeight;
                                     chatBox.style.transition = 'background 0.3s';
-                                    chatBox.style.background = 'rgba(202, 112, 147,0.05)';
+                                    chatBox.style.background = 'rgba(150, 69, 81,0.05)';
                                     setTimeout(() => { chatBox.style.background = ''; }, 600);
                                 }
                             }
@@ -876,7 +883,7 @@ export async function openUserModal(user, state) {
                             <div class="glass p-6 rounded-3xl border-outline/10 space-y-3 bg-surface-variant">
                                 <div class="flex items-center justify-between border-b border-outline/10 pb-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-[#ca7093] text-lg">mark_email_unread</span>
+                                        <span class="material-symbols-outlined text-[#964551] text-lg">mark_email_unread</span>
                                         <span class="font-bold text-xs uppercase tracking-widest text-on-surface font-label-caps">${lead.type === 'callback' ? 'Обратный звонок' : lead.type}</span>
                                     </div>
                                     <span class="text-[10px] font-mono text-on-surface-variant opacity-60">${new Date(lead.created_at).toLocaleString()}</span>
@@ -1058,12 +1065,12 @@ async function openOrderFromUserModal(order, state) {
             return `
                 <div class="flex flex-col items-end mb-4 animate-in fade-in duration-300">
                     <div class="flex items-end gap-2 max-w-[85%] md:max-w-[75%]">
-                        <div class="px-5 py-3 rounded-3xl text-sm bg-[#ca7093] text-[#0f0e0c] rounded-br-none shadow-md font-medium leading-relaxed">
+                        <div class="px-5 py-3 rounded-3xl text-sm bg-[#964551] text-[#0f0e0c] rounded-br-none shadow-md font-medium leading-relaxed">
                             ${m.text}
                         </div>
                     </div>
                     <div class="text-[10px] text-on-surface-variant opacity-70 font-mono mt-1.5 flex items-center gap-1 mr-1">
-                        <span class="material-symbols-outlined text-[12px] text-[#ca7093]">done_all</span>
+                        <span class="material-symbols-outlined text-[12px] text-[#964551]">done_all</span>
                         Вы (Менеджер) • ${dateStr} ${timeStr}
                     </div>
                 </div>
@@ -1076,7 +1083,7 @@ async function openOrderFromUserModal(order, state) {
                             ${m.text}
                         </div>
                     </div>
-                    <div class="text-[10px] text-[#ca7093] font-mono mt-1.5 flex items-center gap-1 ml-1 font-bold">
+                    <div class="text-[10px] text-[#964551] font-mono mt-1.5 flex items-center gap-1 ml-1 font-bold">
                         <span class="material-symbols-outlined text-[12px]">person</span>
                         Клиент • ${dateStr} ${timeStr}
                     </div>
@@ -1094,7 +1101,7 @@ async function openOrderFromUserModal(order, state) {
         <div class="relative w-full max-w-2xl max-h-[85vh] bg-surface border border-outline/10 rounded-3xl shadow-2xl flex flex-col transform scale-95 transition-transform duration-300 min-h-0" id="sod-panel">
             <div class="p-5 border-b border-outline/10 flex items-center justify-between shrink-0 bg-surface-container rounded-t-3xl">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-[#ca7093]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#ca7093] text-base">receipt_long</span></div>
+                    <div class="w-9 h-9 rounded-xl bg-[#964551]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#964551] text-base">receipt_long</span></div>
                     <div>
                         <div class="font-label-caps text-sm font-bold uppercase text-on-surface">Заказ ${order.id}</div>
                         <div class="text-[10px] text-on-surface-variant opacity-70">${new Date(order.created_at).toLocaleDateString()} • <span class="${sCols[order.status] || ''}">${sNames[order.status] || order.status}</span></div>
@@ -1105,27 +1112,27 @@ async function openOrderFromUserModal(order, state) {
             <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-5 min-h-0">
                 ${items.length ? `
                 <div class="space-y-2">
-                    <div class="text-[10px] uppercase tracking-widest text-[#ca7093] font-bold">Состав заказа</div>
+                    <div class="text-[10px] uppercase tracking-widest text-[#964551] font-bold">Состав заказа</div>
                     <div class="flex flex-wrap gap-2">
                         ${items.map(i => {
                             const hasId = i.product_id;
                             if (hasId) {
-                                return `<div onclick="event.stopPropagation(); window.openProductCardModal('${i.product_id}')" class="flex gap-2 px-3 py-2 bg-surface-variant hover:bg-[#ca7093]/10 border border-outline/10 hover:border-[#ca7093]/40 rounded-xl text-xs text-on-surface cursor-pointer transition-all select-none group/item"><span class="group-hover/item:text-[#ca7093] transition-colors">${i.product_name}</span><span class="text-[#ca7093] font-bold">× ${i.quantity} т.</span></div>`;
+                                return `<div onclick="event.stopPropagation(); window.openProductCardModal('${i.product_id}')" class="flex gap-2 px-3 py-2 bg-surface-variant hover:bg-[#964551]/10 border border-outline/10 hover:border-[#964551]/40 rounded-xl text-xs text-on-surface cursor-pointer transition-all select-none group/item"><span class="group-hover/item:text-[#964551] transition-colors">${i.product_name}</span><span class="text-[#964551] font-bold">× ${i.quantity} т.</span></div>`;
                             } else {
-                                return `<div class="flex gap-2 px-3 py-2 bg-surface-variant border border-outline/10 rounded-xl text-xs text-on-surface"><span>${i.product_name}</span><span class="text-[#ca7093] font-bold">× ${i.quantity} т.</span></div>`;
+                                return `<div class="flex gap-2 px-3 py-2 bg-surface-variant border border-outline/10 rounded-xl text-xs text-on-surface"><span>${i.product_name}</span><span class="text-[#964551] font-bold">× ${i.quantity} т.</span></div>`;
                             }
                         }).join('')}
                     </div>
-                    <div class="text-right text-sm font-bold text-[#ca7093]">${Number(order.total).toLocaleString()} ₽</div>
+                    <div class="text-right text-sm font-bold text-[#964551]">${Number(order.total).toLocaleString()} ₽</div>
                 </div>` : ''}
                 <div class="space-y-4">
-                    <div class="text-[10px] uppercase tracking-widest text-[#ca7093] font-bold">Документы по заказу</div>
+                    <div class="text-[10px] uppercase tracking-widest text-[#964551] font-bold">Документы по заказу</div>
                     <div class="space-y-3">
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] uppercase tracking-wider text-on-surface-variant opacity-60">Коммерческое предложение (PDF)</label>
                             <div class="flex gap-2">
-                                <input id="sod-kp" type="text" value="${order.kp_url || ''}" placeholder="Ссылка на КП..." class="flex-1 bg-surface border border-outline/10 rounded-xl px-4 py-2.5 text-xs focus:border-[#ca7093] outline-none transition-all text-on-surface" ${order.kp_url ? 'readonly' : ''}>
-                                <button type="button" class="sod-upload-file-btn p-2.5 rounded-xl bg-surface hover:bg-[#ca7093]/20 text-on-surface-variant hover:text-[#ca7093] transition-all flex items-center justify-center border border-outline/10 shadow-sm shrink-0" data-target="sod-kp" title="Загрузить PDF-файл">
+                                <input id="sod-kp" type="text" value="${order.kp_url || ''}" placeholder="Ссылка на КП..." class="flex-1 bg-surface border border-outline/10 rounded-xl px-4 py-2.5 text-xs focus:border-[#964551] outline-none transition-all text-on-surface" ${order.kp_url ? 'readonly' : ''}>
+                                <button type="button" class="sod-upload-file-btn p-2.5 rounded-xl bg-surface hover:bg-[#964551]/20 text-on-surface-variant hover:text-[#964551] transition-all flex items-center justify-center border border-outline/10 shadow-sm shrink-0" data-target="sod-kp" title="Загрузить PDF-файл">
                                     <span class="material-symbols-outlined text-sm">attach_file</span>
                                 </button>
                                 ${order.kp_url ? `
@@ -1138,8 +1145,8 @@ async function openOrderFromUserModal(order, state) {
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] uppercase tracking-wider text-on-surface-variant opacity-60">Счет на оплату (PDF)</label>
                             <div class="flex gap-2">
-                                <input id="sod-invoice" type="text" value="${order.invoice_url || ''}" placeholder="Ссылка на счёт..." class="flex-1 bg-surface border border-outline/10 rounded-xl px-4 py-2.5 text-xs focus:border-[#ca7093] outline-none transition-all text-on-surface" ${order.invoice_url ? 'readonly' : ''}>
-                                <button type="button" class="sod-upload-file-btn p-2.5 rounded-xl bg-surface hover:bg-[#ca7093]/20 text-on-surface-variant hover:text-[#ca7093] transition-all flex items-center justify-center border border-outline/10 shadow-sm shrink-0" data-target="sod-invoice" title="Загрузить PDF-файл">
+                                <input id="sod-invoice" type="text" value="${order.invoice_url || ''}" placeholder="Ссылка на счёт..." class="flex-1 bg-surface border border-outline/10 rounded-xl px-4 py-2.5 text-xs focus:border-[#964551] outline-none transition-all text-on-surface" ${order.invoice_url ? 'readonly' : ''}>
+                                <button type="button" class="sod-upload-file-btn p-2.5 rounded-xl bg-surface hover:bg-[#964551]/20 text-on-surface-variant hover:text-[#964551] transition-all flex items-center justify-center border border-outline/10 shadow-sm shrink-0" data-target="sod-invoice" title="Загрузить PDF-файл">
                                     <span class="material-symbols-outlined text-sm">attach_file</span>
                                 </button>
                                 ${order.invoice_url ? `
@@ -1158,7 +1165,7 @@ async function openOrderFromUserModal(order, state) {
                 <div class="space-y-4">
                     <div class="flex items-center justify-between bg-surface-variant px-5 py-3 border border-outline/10 rounded-2xl">
                         <div class="flex items-center gap-3">
-                            <div class="w-7 h-7 rounded-full bg-[#ca7093]/20 flex items-center justify-center text-[#ca7093] border border-[#ca7093]/30">
+                            <div class="w-7 h-7 rounded-full bg-[#964551]/20 flex items-center justify-center text-[#964551] border border-[#964551]/30">
                                 <span class="material-symbols-outlined text-sm">forum</span>
                             </div>
                             <div>
@@ -1173,8 +1180,8 @@ async function openOrderFromUserModal(order, state) {
                     <div class="bg-surface-container-lowest rounded-3xl border border-outline/10 flex flex-col h-[280px] shadow-inner overflow-hidden">
                         <div id="sod-chat" class="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-4">${messages.length ? rMsg() : '<div class="flex flex-col items-center justify-center h-full text-on-surface-variant opacity-60 text-center p-6"><span class="material-symbols-outlined text-4xl mb-3 opacity-50">forum</span><span class="text-xs uppercase tracking-widest font-bold font-label-caps text-on-surface">Нет сообщений</span></div>'}</div>
                         <div class="p-4 border-t border-outline/10 flex gap-3 shrink-0 bg-surface-variant items-center">
-                            <input id="sod-input" type="text" placeholder="Написать клиенту..." class="flex-1 bg-surface border border-outline/10 rounded-2xl px-5 py-2.5 text-xs focus:border-[#ca7093] outline-none transition-all text-on-surface placeholder:opacity-50">
-                            <button id="sod-send" class="w-10 h-10 rounded-2xl bg-[#ca7093] text-[#0f0e0c] hover:brightness-110 flex items-center justify-center transition-all shrink-0 shadow-lg shadow-[#ca7093]/20"><span class="material-symbols-outlined text-sm">send</span></button>
+                            <input id="sod-input" type="text" placeholder="Написать клиенту..." class="flex-1 bg-surface border border-outline/10 rounded-2xl px-5 py-2.5 text-xs focus:border-[#964551] outline-none transition-all text-on-surface placeholder:opacity-50">
+                            <button id="sod-send" class="w-10 h-10 rounded-2xl bg-[#964551] text-[#0f0e0c] hover:brightness-110 flex items-center justify-center transition-all shrink-0 shadow-lg shadow-[#964551]/20"><span class="material-symbols-outlined text-sm">send</span></button>
                         </div>
                     </div>
                 </div>
@@ -1186,7 +1193,7 @@ async function openOrderFromUserModal(order, state) {
                         let currentStatus = (order.status || 'new').toLowerCase().trim();
                         if (currentStatus === 'pending' || currentStatus === 'новый') currentStatus = 'new';
                         const statusObj = window.ORDER_STATUS_OPTIONS.find(o => o.value === currentStatus) || { label: currentStatus, color: '#3b82f6', icon: 'donut_large' };
-                        return `<button type="button" id="sod-status-btn" data-status="${currentStatus}" class="flex items-center justify-between gap-2 bg-surface border border-outline/10 hover:border-[#ca7093]/40 rounded-xl px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all shadow-md group/btn w-[150px] shrink-0" style="border-left: 4px solid ${statusObj.color};">
+                        return `<button type="button" id="sod-status-btn" data-status="${currentStatus}" class="flex items-center justify-between gap-2 bg-surface border border-outline/10 hover:border-[#964551]/40 rounded-xl px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all shadow-md group/btn w-[150px] shrink-0" style="border-left: 4px solid ${statusObj.color};">
                             <span class="flex items-center gap-1.5 truncate" style="color: ${statusObj.color};">
                                 <span class="material-symbols-outlined text-sm shrink-0">${statusObj.icon}</span>
                                 <span class="truncate" style="color: ${statusObj.color};">${statusObj.label}</span>
@@ -1195,7 +1202,7 @@ async function openOrderFromUserModal(order, state) {
                         </button>`;
                     })()}
                 </div>
-                <div class="text-sm font-bold text-[#ca7093] font-label-caps">${Number(order.total).toLocaleString()} ₽</div>
+                <div class="text-sm font-bold text-[#964551] font-label-caps">${Number(order.total).toLocaleString()} ₽</div>
             </div>
         </div>`;
 
@@ -1231,7 +1238,7 @@ async function openOrderFromUserModal(order, state) {
                         chat.innerHTML = rMsg();
                         chat.scrollTop = chat.scrollHeight;
                         chat.style.transition = 'background 0.3s';
-                        chat.style.background = 'rgba(202, 112, 147,0.05)';
+                        chat.style.background = 'rgba(150, 69, 81,0.05)';
                         setTimeout(() => { chat.style.background = ''; }, 600);
                     }
                 }

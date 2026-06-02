@@ -177,8 +177,8 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="/js/theme.js?v=1"></script>
-<script src="/js/shared-ui.js?v=8" defer></script>
+<script src="/js/shared-ui.js?v=1780243715" defer></script>
+<script src="/js/theme.js?v=1780243715" defer></script>
 <script src="/js/product-images.js"></script>
 <style>
 .no-glass-blur {
@@ -186,41 +186,264 @@
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
 }
+.filter-parent-category {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+    background-color: #151311 !important;
+    color: #e7e2dd !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+}
+.filter-parent-category:hover, .filter-parent-category.is-active {
+    background-color: #964551 !important;
+    color: #e7e2dd !important;
+}
+.filter-subcategory {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 4px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    background-color: transparent !important;
+    color: #e7e2dd !important;
+}
+.filter-subcategory:hover, .filter-subcategory.is-active {
+    background-color: rgba(150, 69, 81, 0.15) !important;
+    color: #ca7093 !important;
+}
+.filter-subcategory-name {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+.filter-subcategory-count {
+    font-size: 10px !important;
+    opacity: 0.6;
+    font-family: 'Space Grotesk', sans-serif;
+}
+html.light .filter-parent-category {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    color: #151311 !important;
+}
+html.light .filter-parent-category:hover, html.light .filter-parent-category.is-active {
+    background: rgba(202, 112, 147, 0.15) !important;
+    color: #ca7093 !important;
+    border: 1px solid rgba(202, 112, 147, 0.4) !important;
+}
+html.light .filter-subcategory {
+    color: #151311 !important;
+}
+html.light .filter-subcategory:hover, html.light .filter-subcategory.is-active {
+    background-color: rgba(202, 112, 147, 0.12) !important;
+    color: #ca7093 !important;
+}
+.sidebar-product-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.02);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.sidebar-product-item:hover {
+    border-color: rgba(202, 112, 147, 0.3);
+    background-color: rgba(202, 112, 147, 0.05);
+}
+.sidebar-product-item.is-active {
+    border-color: #ca7093;
+    background-color: rgba(202, 112, 147, 0.1);
+}
+html.light .sidebar-product-item {
+    border-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.02);
+}
+html.light .sidebar-product-item:hover {
+    border-color: rgba(202, 112, 147, 0.4);
+    background-color: rgba(202, 112, 147, 0.05);
+}
+html.light .sidebar-product-item.is-active {
+    border-color: #ca7093;
+    background-color: rgba(202, 112, 147, 0.1);
+}
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(202, 112, 147, 0.3);
+    border-radius: 10px;
+}
+
+/* Preloader styles */
+#globalPreloader {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #151311; z-index: 999999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+    pointer-events: auto;
+}
+#globalPreloader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.6s ease, visibility 0.6s ease; }
+.preloader-visual { position: relative; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
+.loader-ring { position: absolute; inset: 0; border: 2px solid rgba(255,176,204,0.1); border-radius: 50%; }
+.loader-ring::after { content: ''; position: absolute; inset: -2px; border: 2px solid transparent; border-top-color: #ca7093; border-radius: 50%; animation: spin 1.2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-hex { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(202,112,147,0.05); border: 1px solid rgba(202,112,147,0.2); }
+.loader-logo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.loader-text { font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,176,204,0.6); }
+.loader-progress-track { width: 120px; height: 2px; background: rgba(255,176,204,0.1); border-radius: 2px; overflow: hidden; }
+.loader-progress-bar { height: 100%; width: 0%; background: #ca7093; transition: width 0.4s ease; border-radius: 2px; }
+html.light #globalPreloader, html:not(.dark) #globalPreloader { background-color: rgba(250, 250, 250, 0.95) !important; }
+html.light .loader-text, html:not(.dark) .loader-text { color: #3B3B3B !important; opacity: 0.8; }
+html.light .loader-ring, html:not(.dark) .loader-ring { border-color: rgba(202, 112, 147, 0.08) !important; }
+html.light .loader-ring::after, html:not(.dark) .loader-ring::after { border-top-color: #ca7093 !important; }
+html.light .loader-progress-track, html:not(.dark) .loader-progress-track { background: rgba(202, 112, 147, 0.1) !important; }
+html.light .loader-progress-bar, html:not(.dark) .loader-progress-bar { background: #ca7093 !important; }
+
+/* Light mode fixes for product page */
+html.light #addToCartBtn,
+html:not(.dark) #addToCartBtn {
+    background: linear-gradient(to right, #964551, #ca7093) !important;
+    color: #ffffff !important;
+}
+html.light #addToCartBtn *,
+html:not(.dark) #addToCartBtn * {
+    color: #ffffff !important;
+}
+html.light #addToCartBtn:hover,
+html:not(.dark) #addToCartBtn:hover {
+    background: linear-gradient(to right, #a54d5b, #d67da0) !important;
+}
+
+/* Mobile: re-flow product page sections via display:contents
+   Desktop (lg+): keep aside/right-area as block children of the grid */
+@media (max-width: 1023px) {
+    /* Make aside and right-area transparent in the layout flow */
+    .product-mobile-flow > #productSidebar,
+    .product-mobile-flow > #rightContentArea {
+        display: contents;
+    }
+    /* Order children explicitly:
+       1 = title + image, 2 = calculator, 3 = tabs (characteristics under cost block),
+       4 = categories, 5 = params, 99 = products-in-category (very bottom) */
+    .product-mobile-flow .pm-image-block { order: 1; }
+    .product-mobile-flow .pm-calculator-block { order: 2; }
+    .product-mobile-flow .pm-tabs-block { order: 3; }
+    .product-mobile-flow .pm-sidebar-categories { order: 4; }
+    .product-mobile-flow .pm-sidebar-params { order: 5; }
+    .product-mobile-flow .pm-sidebar-products { order: 99; }
+    /* Ensure all blocks span full width on mobile (otherwise grid col-span leaks through) */
+    .product-mobile-flow .pm-image-block,
+    .product-mobile-flow .pm-calculator-block,
+    .product-mobile-flow .pm-tabs-block,
+    .product-mobile-flow .pm-sidebar-categories,
+    .product-mobile-flow .pm-sidebar-params,
+    .product-mobile-flow .pm-sidebar-products {
+        width: 100%;
+        max-width: 100%;
+        grid-column: 1 / -1;
+    }
+}
 </style>
 </head>
 <body class="font-body-md bg-background text-on-background selection:bg-primary selection:text-on-primary">
+
+            <div id="globalPreloader">
+                <div class="preloader-visual">
+                    <div class="loader-ring"></div>
+                    <div class="loader-hex">
+                        <img src="/images/logo_icon.png" class="loader-logo" alt="IW">
+                    </div>
+                </div>
+                <div class="loader-text">Инициализация систем</div>
+                <div class="loader-progress-track">
+                    <div class="loader-progress-bar" id="globalPreloaderBar"></div>
+                </div>
+            </div>
+            <script>
+                document.body.classList.add('preloader-active');
+                setTimeout(() => {
+                    const bar = document.getElementById('globalPreloaderBar');
+                    if (bar) bar.style.width = '30%';
+                }, 100);
+                setTimeout(() => {
+                    const bar = document.getElementById('globalPreloaderBar');
+                    if (bar) bar.style.width = '65%';
+                }, 400);
+            </script>
 
 <!-- Shared Header -->
 
 <main class="pt-28 md:pt-32 pb-12 md:pb-24 max-w-container-max mx-auto px-margin-edge-mobile md:px-margin-edge">
 
-<div class="flex flex-col xl:grid xl:grid-cols-12 gap-x-12 gap-y-4 xl:gap-y-10 items-start w-full">
-
-<!-- 0. Header (Breadcrumbs and Title) -->
-<div class="col-span-12 order-1 flex flex-col gap-2 md:gap-3 fade-in w-full overflow-hidden" style="animation-delay:.05s">
-    <!-- Navigation Group -->
-    <div class="flex flex-col gap-2">
-        <!-- Catalog Link -->
-        <div class="flex">
-            <a href="/catalog-select" class="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-primary transition-all duration-300 font-label-caps text-[11px] md:text-[12px] tracking-widest group">
-                <span class="material-symbols-outlined text-[16px] md:text-[18px] transition-transform group-hover:-translate-x-1">west</span> 
-                ВЕРНУТЬСЯ В КАТАЛОГ
-            </a>
-        </div>
-
-        <!-- Breadcrumbs -->
-        <nav id="breadcrumbs" class="flex items-center text-[11px] md:text-[13px] text-on-surface-variant/60 overflow-x-auto whitespace-nowrap pb-1 scroll-hide w-full font-medium"></nav>
+<!-- Breadcrumbs & Back Button -->
+<div class="flex flex-col gap-2.5 w-full mb-4 md:mb-6 fade-in" style="animation-delay:.05s">
+    <!-- Back Button -->
+    <div class="flex items-center justify-start pb-1">
+        <a href="/catalog-select" class="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-primary transition-all duration-300 font-label-caps text-[11px] md:text-[12px] tracking-widest group">
+            <span class="material-symbols-outlined text-[16px] md:text-[18px] transition-transform group-hover:-translate-x-1">west</span> 
+            ВЕРНУТЬСЯ В КАТАЛОГ
+        </a>
     </div>
-
-    <!-- Product Title -->
-    <header class="mt-2 w-full overflow-hidden">
-        <p id="productCategory" class="text-[10px] md:text-[11px] tracking-[0.2em] text-primary mb-0.5 md:mb-2 uppercase opacity-60 font-semibold"></p>
-        <h1 id="productName" class="text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] font-bold leading-tight tracking-tight text-on-surface truncate w-full" title=""></h1 >
-    </header>
+    <!-- Breadcrumbs -->
+    <nav id="breadcrumbs" class="flex items-center text-[11px] md:text-[13px] text-on-surface-variant/60 overflow-x-auto whitespace-nowrap pb-1 scroll-hide w-full font-medium"></nav>
 </div>
 
-<!-- 1. Left Column: Image -->
-<div class="col-span-1 w-full xl:col-span-7 xl:col-start-1 xl:col-end-8 xl:row-start-2 xl:row-span-1 order-2 fade-in flex flex-col gap-4 md:gap-8" style="animation-delay:.1s">
+
+<!-- Main Layout Grid -->
+<div class="product-mobile-flow flex flex-col gap-8 lg:grid lg:grid-cols-12 items-start w-full">
+
+  <!-- Left Sidebar -->
+  <aside id="productSidebar" class="lg:col-span-3 w-full flex flex-col gap-6">
+      <!-- 1. Categories filter -->
+      <div class="pm-sidebar-categories glass-panel p-5 bg-surface-container/30 dark:bg-[#1a1816]/60 backdrop-blur-xl border border-outline-variant/10 dark:border-white/5 rounded-3xl space-y-4 shadow-lg shadow-black/5">
+         <h3 class="font-label-caps text-label-caps text-on-surface border-l-2 border-primary pl-4 tracking-widest uppercase font-bold text-xs md:text-sm">Категории</h3>
+         <div id="sidebarCategories" class="grid grid-cols-1 gap-1.5 font-body-md text-on-surface-variant max-h-[250px] overflow-y-auto pr-1 custom-scrollbar"></div>
+      </div>
+      
+      <!-- 2. Parameter selectors -->
+      <div class="pm-sidebar-params glass-panel p-5 bg-surface-container/30 dark:bg-[#1a1816]/60 backdrop-blur-xl border border-outline-variant/10 dark:border-white/5 rounded-3xl space-y-4 shadow-lg shadow-black/5">
+         <h3 class="font-label-caps text-label-caps text-on-surface border-l-2 border-primary pl-4 tracking-widest uppercase font-bold text-xs md:text-sm">Параметры</h3>
+         <div id="sidebarParamsContainer" class="space-y-4 pr-1"></div>
+      </div>
+
+      <!-- 3. Matching products list (mobile: at the very bottom) -->
+      <div class="pm-sidebar-products glass-panel p-5 bg-surface-container/30 dark:bg-[#1a1816]/60 backdrop-blur-xl border border-outline-variant/10 dark:border-white/5 rounded-3xl space-y-4 shadow-lg shadow-black/5">
+         <div class="flex items-center justify-between">
+             <h3 class="font-label-caps text-label-caps text-on-surface border-l-2 border-primary pl-4 tracking-widest uppercase font-bold text-xs md:text-sm">Товары в категории</h3>
+             <span id="matchingCount" class="text-xs font-bold text-primary">0</span>
+         </div>
+         <div id="sidebarProductsList" class="space-y-2.5 max-h-[350px] overflow-y-auto pr-1 custom-scrollbar"></div>
+      </div>
+  </aside>
+
+  <!-- Right Content Area -->
+  <div id="rightContentArea" class="lg:col-span-9 w-full grid grid-cols-1 xl:grid-cols-12 gap-x-8 gap-y-4 xl:gap-y-10 items-start">
+
+    <!-- 1. Left Column: Image -->
+    <div class="pm-image-block col-span-1 w-full xl:col-span-7 xl:col-start-1 xl:col-end-8 xl:row-start-1 xl:row-span-1 fade-in flex flex-col gap-4 md:gap-8" style="animation-delay:.1s">
+    <!-- Product Title (aligned with image left edge) -->
+    <header class="w-full overflow-hidden">
+        <p id="productCategory" class="text-[10px] md:text-[11px] tracking-[0.2em] text-primary mb-0.5 md:mb-1.5 uppercase opacity-60 font-semibold"></p>
+        <h1 id="productName" class="text-[20px] sm:text-[24px] md:text-[28px] lg:text-[32px] font-bold leading-tight tracking-tight text-on-surface break-words w-full" title=""></h1>
+    </header>
     <div class="aspect-[16/10] md:aspect-[21/9] xl:aspect-[16/10] w-full overflow-hidden border border-outline-variant/10 group relative bg-surface-container shadow-2xl rounded-2xl no-glass-blur">
         <img id="productImg" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" src="" alt=""/>
         <div id="productBadge" class="absolute top-4 left-4 md:top-6 md:left-6 bg-surface/60 backdrop-blur-xl px-3 py-1.5 md:px-4 md:py-2 border border-outline-variant/20 rounded-lg">
@@ -230,103 +453,141 @@
 </div>
 
 <!-- 2. Right Column: Container for Price, Calc -->
-<div class="col-span-1 w-full xl:col-span-5 xl:col-start-8 xl:col-end-13 xl:row-start-2 xl:row-span-2 order-3 flex flex-col gap-3 xl:gap-8 fade-in" style="animation-delay:.2s">
+<div class="pm-calculator-block col-span-1 w-full xl:col-span-5 xl:col-start-8 xl:col-end-13 xl:row-start-1 xl:row-span-2 flex flex-col gap-3 xl:gap-8 fade-in" style="animation-delay:.2s">
 
     <!-- Calculator Card -->
-    <section class="glass-panel no-full-height p-4 md:p-8 space-y-5 md:space-y-6 bg-[#1a1816]/60 backdrop-blur-xl border border-white/5 relative overflow-hidden rounded-3xl md:rounded-[2.5rem]">
+    <section class="glass-panel no-full-height p-6 md:p-8 space-y-5 md:space-y-6 bg-surface-container/30 dark:bg-[#1a1816]/60 backdrop-blur-xl border border-outline-variant/10 dark:border-white/5 relative overflow-hidden rounded-3xl">
         <div class="absolute top-0 right-0 w-40 h-40 bg-primary/5 blur-[100px] rounded-full -mr-20 -mt-20"></div>
         
-        <div class="flex flex-col gap-2 mb-4">
+        <!-- Elegant Header -->
+        <div class="flex flex-col gap-3 pb-4 border-b border-white/5">
             <div class="flex items-center justify-between">
-                <h3 class="text-xl md:text-2xl font-display-xl uppercase text-on-surface">Стоимость</h3>
-                    <div class="flex items-center gap-1.5 text-xs text-on-surface-variant/70">
-                        <span class="material-symbols-outlined text-base text-primary">visibility</span>
-                        Прямо сейчас смотрят: <span class="font-bold global-view-count-span">1</span>
-                    </div>
+                <h3 class="text-base md:text-lg font-bold uppercase tracking-wider text-on-surface font-label-caps">Стоимость</h3>
+                <!-- In Stock Badge -->
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full text-[10px] uppercase font-bold tracking-wider select-none animate-pulse">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                    В наличии
+                </div>
             </div>
-            <div class="flex items-center gap-1.5 text-green-500 font-medium text-[11px] md:text-xs">
-                <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                В наличии
+            
+            <!-- Live Viewers Badge -->
+            <div class="flex items-center gap-2 text-xs text-on-surface-variant/70">
+                <span class="material-symbols-outlined text-base text-primary/85">visibility</span>
+                <span class="font-medium">Прямо сейчас смотрят: <span class="font-bold text-on-surface global-view-count-span">12</span> человек</span>
             </div>
         </div>
 
-        <!-- Price Modes (Radio List) -->
-        <div id="priceModes" class="flex flex-col gap-3 py-4 border-y border-white/5">
-            <!-- JS will inject options here -->
+        <!-- Price Modes (Cards Grid) -->
+        <div id="priceModes" class="flex flex-col gap-3">
+            <!-- JS will inject premium options cards here -->
         </div>
 
         <div class="flex flex-col gap-4">
-            <!-- Quantity and Inline Total -->
-            <div class="flex items-center justify-between gap-4 py-2">
-                <div class="calc-input-container flex items-center bg-[#0a0908] border border-white/10 h-12 md:h-14 w-28 md:w-32 group focus-within:border-primary/50 transition-all duration-500 rounded-xl overflow-hidden shadow-inner shrink-0">
-                    <button onclick="stepCalc(-1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-r border-white/5 bg-white/[0.03]">
-                        <span class="material-symbols-outlined text-lg">remove</span>
-                    </button>
-                    <input id="calcValue" class="w-full h-full bg-transparent border-none text-center font-display-xl text-lg md:text-xl text-on-surface outline-none qty-input p-0" type="text" value="1" inputmode="decimal"/>
-                    <button onclick="stepCalc(1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-l border-white/5 bg-white/[0.03]">
-                        <span class="material-symbols-outlined text-lg">add</span>
-                    </button>
+            <!-- Quantity and Inline Total Card -->
+            <div class="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-surface-container-low/50 dark:bg-white/[0.02] border border-outline-variant/10 dark:border-white/5">
+                <!-- Left: Qty Selector -->
+                <div class="flex flex-col gap-1.5 justify-center">
+                    <span class="text-[9px] uppercase tracking-wider font-bold text-on-surface-variant/60">Количество (<span id="activeUnitLabel">т.</span>)</span>
+                    <div class="flex items-center bg-surface-container-highest dark:bg-[#0a0908] border border-outline-variant/20 dark:border-white/10 h-11 w-full focus-within:border-primary/50 transition-all duration-300 rounded-xl overflow-hidden shadow-inner">
+                        <button type="button" onclick="stepCalc(-1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-r border-outline-variant/20 dark:border-white/5 select-none">
+                            <span class="material-symbols-outlined text-sm font-bold">remove</span>
+                        </button>
+                        <input id="calcValue" class="w-full h-full bg-transparent border-none text-center font-bold text-sm text-on-surface outline-none p-0 focus:ring-0" type="text" value="1" inputmode="decimal"/>
+                        <button type="button" onclick="stepCalc(1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-l border-outline-variant/20 dark:border-white/5 select-none">
+                            <span class="material-symbols-outlined text-sm font-bold">add</span>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="flex items-center gap-3">
-                    <span class="text-on-surface-variant font-bold text-xl">=</span>
-                    <span class="text-[20px] md:text-[28px] font-display-xl text-primary leading-none" id="inlineTotal">0 ₽</span>
+                <!-- Right: Total Cost -->
+                <div class="flex flex-col justify-center items-end gap-0.5 select-none">
+                    <span class="text-[9px] uppercase tracking-wider font-bold text-on-surface-variant/60">Итого к оплате</span>
+                    <span class="text-xl md:text-2xl font-black text-[#ca7093] leading-none whitespace-nowrap drop-shadow-[0_2px_10px_rgba(202,112,147,0.15)]" id="inlineTotal">0 ₽</span>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex flex-col gap-3 mt-2">
-                <button onclick="addToCart()" id="addToCartBtn" class="w-full h-12 md:h-14 bg-primary text-on-primary font-label-caps text-[12px] md:text-[14px] tracking-[0.2em] flex items-center justify-center gap-2 group relative overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] shadow-[0_15px_30px_-10px_rgba(255,176,204,0.3)] rounded-xl">
-                    <span class="material-symbols-outlined text-lg md:text-xl">shopping_cart</span>
-                    <span class="relative z-10 font-bold uppercase">В КОРЗИНУ</span>
-                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+            <!-- Actions Block -->
+            <div class="flex flex-col gap-3">
+                <!-- Add to Cart Button -->
+                <button onclick="addToCart()" id="addToCartBtn" class="w-full h-12 bg-primary bg-gradient-to-r from-[#964551] to-[#ca7093] hover:from-[#a54d5b] hover:to-[#d67da0] text-white font-label-caps text-xs md:text-sm tracking-[0.15em] flex items-center justify-center gap-2 group relative overflow-hidden transition-all duration-500 hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-[#ca7093]/10 rounded-xl border-none cursor-pointer">
+                    <span class="material-symbols-outlined text-base md:text-lg text-white">shopping_cart</span>
+                    <span class="relative z-10 font-bold uppercase text-white">В КОРЗИНУ</span>
                 </button>
-                <button class="w-full h-10 md:h-12 bg-transparent border border-primary/30 text-primary hover:bg-primary/10 transition-colors duration-300 font-label-caps text-[10px] md:text-[11px] tracking-[0.1em] rounded-xl flex items-center justify-center">
-                    Купить в 1 клик
+                
+                <!-- Buy in 1 Click Button -->
+                <button type="button" class="w-full h-11 border border-outline-variant/30 dark:border-white/10 hover:border-[#ca7093]/40 text-on-surface-variant hover:text-primary bg-surface-container-low/50 dark:bg-white/[0.02] hover:bg-[#ca7093]/5 transition-all duration-300 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer">
+                    <span class="material-symbols-outlined text-base text-primary">bolt</span>
+                    Быстрый заказ в 1 клик
                 </button>
             </div>
             
             <!-- Delivery Info Block -->
-            <div class="flex flex-col gap-3 mt-4 pt-4 border-t border-white/5 text-[10px] md:text-xs text-on-surface-variant/80">
-                <div class="flex justify-between items-center border-b border-white/5 pb-2 border-dashed">
-                    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px] opacity-70">local_shipping</span> Доставка</div>
-                    <span class="text-right">в течение дня, после предоплаты</span>
+            <div class="space-y-3 mt-2 pt-2 border-t border-outline-variant/10 dark:border-white/5 text-xs">
+                <!-- Row 1: Delivery -->
+                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-300">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#ca7093]/10 text-primary">
+                        <span class="material-symbols-outlined text-lg">local_shipping</span>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <span class="font-bold text-on-surface text-[10px] uppercase tracking-wider">Доставка по СПБ и ЛО</span>
+                        <span class="text-on-surface-variant/80 mt-0.5">В течение дня (после предоплаты)</span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center border-b border-white/5 pb-2 border-dashed">
-                    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px] opacity-70">storefront</span> Самовывоз</div>
-                    <span class="text-right">0-48 ч.</span>
+                
+                <!-- Row 2: Pickup -->
+                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-300">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#ca7093]/10 text-primary">
+                        <span class="material-symbols-outlined text-lg">storefront</span>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <span class="font-bold text-on-surface text-[10px] uppercase tracking-wider">Самовывоз со склада</span>
+                        <span class="text-on-surface-variant/80 mt-0.5">Отгрузка со склада в СПб (0–48 ч)</span>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center border-b border-white/5 pb-2 border-dashed">
-                    <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[14px] opacity-70">payments</span> Оплата</div>
-                    <span class="text-right">Наличными, безналичным</span>
+                
+                <!-- Row 3: Payment -->
+                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-300">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#ca7093]/10 text-primary">
+                        <span class="material-symbols-outlined text-lg">payments</span>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <span class="font-bold text-on-surface text-[10px] uppercase tracking-wider">Способы оплаты</span>
+                        <span class="text-on-surface-variant/80 mt-0.5">Наличными водителю, безналичный расчет с НДС</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Disclaimer -->
-            <div class="bg-white/5 p-3 rounded-lg border border-white/10 text-[9px] md:text-[10px] text-on-surface-variant/60 leading-relaxed mt-2">
-                Внимание! Перед оплатой по безналичному / наличному счету цены уточняйте у менеджеров! <br>
-                Цена не является публичной офертой.
+            <!-- Warning & Disclaimer Alerts -->
+            <div class="space-y-2.5 mt-2">
+                <div class="flex gap-3 p-3 bg-amber-500/[0.08] dark:bg-amber-500/[0.03] border border-amber-500/20 dark:border-amber-500/10 rounded-xl text-[10px] md:text-[11px] text-amber-700 dark:text-amber-200/70 leading-relaxed font-medium">
+                    <span class="material-symbols-outlined text-base text-amber-500 shrink-0 select-none">info</span>
+                    <span>Внимание! Перед оплатой по безналичному / наличному счету цены уточняйте у менеджеров!</span>
+                </div>
+                <div class="flex gap-3 p-3 bg-surface-container-low/50 dark:bg-white/[0.01] border border-outline-variant/10 dark:border-white/5 rounded-xl text-[10px] md:text-[11px] text-on-surface-variant/60 dark:text-on-surface-variant/40 leading-relaxed font-medium">
+                    <span class="material-symbols-outlined text-base text-on-surface-variant/30 shrink-0 select-none">gavel</span>
+                    <span>Цена не является публичной офертой.</span>
+                </div>
             </div>
         </div>
     </section>
 </div>
 
 <!-- 3. Interactive Tabs Section (Left Column Bottom) -->
-<div class="col-span-1 w-full xl:col-span-7 xl:col-start-1 xl:col-end-8 xl:row-start-3 xl:row-span-1 order-4 fade-in mt-6 pt-6 border-t border-outline-variant/10" style="animation-delay:.3s">
+<div class="pm-tabs-block col-span-1 w-full xl:col-span-7 xl:col-start-1 xl:col-end-8 fade-in mt-2 pt-2 border-t border-outline-variant/10" style="animation-delay:.3s">
     <!-- Tab Navigation -->
-    <div class="flex flex-wrap justify-start sm:justify-center md:justify-start border-b border-outline-variant/10 mb-6 md:mb-8 select-none gap-1 md:gap-4 pb-2 md:pb-0">
-        <button onclick="switchTab('specs')" id="tab-btn-specs" class="whitespace-nowrap px-4 py-3 md:py-4 font-label-caps text-[10px] md:text-xs tracking-wider md:tracking-widest font-bold uppercase transition-all duration-300 border-b-2 border-primary text-primary outline-none focus:outline-none text-center flex-shrink-0">Характеристики</button>
-        <button onclick="switchTab('desc')" id="tab-btn-desc" class="whitespace-nowrap px-4 py-3 md:py-4 font-label-caps text-[10px] md:text-xs tracking-wider md:tracking-widest font-bold uppercase transition-all duration-300 border-b-2 border-transparent text-on-surface-variant/60 hover:text-on-surface outline-none focus:outline-none text-center flex-shrink-0">Описание</button>
-        <button onclick="switchTab('faq')" id="tab-btn-faq" class="whitespace-nowrap px-4 py-3 md:py-4 font-label-caps text-[10px] md:text-xs tracking-wider md:tracking-widest font-bold uppercase transition-all duration-300 border-b-2 border-transparent text-on-surface-variant/60 hover:text-on-surface outline-none focus:outline-none text-center flex-shrink-0">Вопрос-ответ</button>
-        <button onclick="switchTab('payment')" id="tab-btn-payment" class="whitespace-nowrap px-4 py-3 md:py-4 font-label-caps text-[10px] md:text-xs tracking-wider md:tracking-widest font-bold uppercase transition-all duration-300 border-b-2 border-transparent text-on-surface-variant/60 hover:text-on-surface outline-none focus:outline-none text-center flex-shrink-0">Оплата</button>
-        <button onclick="switchTab('delivery')" id="tab-btn-delivery" class="whitespace-nowrap px-4 py-3 md:py-4 font-label-caps text-[10px] md:text-xs tracking-wider md:tracking-widest font-bold uppercase transition-all duration-300 border-b-2 border-transparent text-on-surface-variant/60 hover:text-on-surface outline-none focus:outline-none text-center flex-shrink-0">Доставка</button>
+    <div class="grid grid-cols-6 gap-2.5 mb-6 select-none pb-1.5 border-b border-outline-variant/10">
+        <button onclick="switchTab('specs')" id="tab-btn-specs" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-primary text-on-primary border border-transparent outline-none focus:outline-none text-center">Характеристики</button>
+        <button onclick="switchTab('desc')" id="tab-btn-desc" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Описание</button>
+        <button onclick="switchTab('faq')" id="tab-btn-faq" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Вопрос-ответ</button>
+        <button onclick="switchTab('payment')" id="tab-btn-payment" class="col-span-3 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Оплата</button>
+        <button onclick="switchTab('delivery')" id="tab-btn-delivery" class="col-span-3 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Доставка</button>
     </div>
 
     <!-- Tab Contents -->
     <div class="min-h-[250px]">
         <!-- 1. Specs Tab -->
         <div id="tab-content-specs" class="tab-pane block fade-in duration-300">
-            <div id="specsTable" class="grid grid-cols-1 md:grid-cols-2 gap-x-12 pt-2"></div>
+            <div id="specsTable" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 p-6 bg-surface-container-lowest dark:bg-[#1a1816]/60 border border-outline-variant/10 dark:border-white/5 rounded-2xl"></div>
         </div>
 
         <!-- 2. Description Tab -->
@@ -421,8 +682,9 @@
             </div>
         </div>
     </div>
-</div>
-</div>
+  </div> <!-- Close interactive tabs -->
+  </div> <!-- Close right grid -->
+</div> <!-- Close Main Layout Grid -->
 
 <!-- Related Products -->
 <section class="no-full-height mt-8 md:mt-32 fade-in" style="animation-delay:.4s">
@@ -433,7 +695,7 @@
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const productId = params.get('id');
+let productId = params.get('id');
 
 function formatDescription(text) {
   if (!text) return '';
@@ -510,6 +772,347 @@ function formatDescription(text) {
     </div>`;
 }
 
+function getCleanSizeLabel(size) {
+  if (!size) return '';
+  return size.toString()
+    .replace(/Швеллер|Балка|Арматура|Лист|Труба|Профнастил|сетка|окрашенный|оцинкованный|полиэстер|односторонний|двусторонний/gi, '')
+    .replace(/\s*(мм?|mm|м|m)\.?/gi, '')
+    .trim();
+}
+
+async function loadSidebarCategories(currentCategory) {
+  try {
+    const res = await fetch('/api/filters');
+    window.sidebarFiltersData = await res.json();
+    window.sidebarOpenSections = new Set();
+    
+    // Find parent category of current product
+    let currentParent = '';
+    for (const [p, cats] of Object.entries(window.sidebarFiltersData.categories)) {
+      if (cats.some(c => c.name === currentCategory)) {
+        currentParent = p;
+        break;
+      }
+    }
+    if (currentParent) {
+      window.sidebarOpenSections.add(currentParent);
+    }
+    
+    window.activeSidebarCategory = currentCategory;
+    renderSidebarCategoriesList();
+  } catch (e) {
+    console.error('Failed to load sidebar categories:', e);
+  }
+}
+
+function renderSidebarCategoriesList() {
+  const container = document.getElementById('sidebarCategories');
+  if (!container || !window.sidebarFiltersData) return;
+  
+  const data = window.sidebarFiltersData;
+  const currentCategory = window.activeSidebarCategory;
+  
+  let html = data.parentCategories.filter(p => p !== 'Популярные категории').map(p => {
+    const icons = {
+      'Популярные категории': 'star',
+      'Чёрный металлопрокат': 'construction',
+      'Нержавеющая сталь': 'shield',
+      'Специальные стали': 'workspace_premium',
+      'Кровельные материалы': 'roofing'
+    };
+    const icon = icons[p] || 'inventory_2';
+    const isExpanded = window.sidebarOpenSections.has(p);
+    const categories = data.categories[p] || [];
+    const hasActiveSub = categories.some(c => c.name === currentCategory);
+    
+    return `
+      <div class="mb-1.5">
+        <div onclick="toggleSidebarSection('${p}')" class="filter-parent-category ${hasActiveSub ? 'is-active' : ''}">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[16px]">${icon}</span>
+            <span class="font-bold text-[11px] uppercase tracking-tight">${p}</span>
+          </div>
+          <span class="material-symbols-outlined text-[14px] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}">expand_more</span>
+        </div>
+        
+        <div class="overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] mt-1 opacity-1' : 'max-h-0 opacity-0'}">
+          <div class="pl-2 space-y-0.5">
+            ${categories.map(cat => {
+              const isActive = cat.name === currentCategory;
+              return `
+                <div class="mb-0.5">
+                  <div onclick="selectSidebarCategory('${cat.name}')" class="filter-subcategory ${isActive ? 'is-active' : ''}">
+                    <span class="filter-subcategory-name text-[10px]">${cat.name}</span>
+                    <span class="filter-subcategory-count text-[9px]">${cat.count}</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  container.innerHTML = html;
+}
+
+window.toggleSidebarSection = function(sectionName) {
+  if (window.sidebarOpenSections.has(sectionName)) {
+    window.sidebarOpenSections.delete(sectionName);
+  } else {
+    window.sidebarOpenSections.add(sectionName);
+  }
+  renderSidebarCategoriesList();
+};
+
+window.selectSidebarCategory = async function(categoryName) {
+  window.activeSidebarCategory = categoryName;
+  
+  try {
+    const listContainer = document.getElementById('sidebarProductsList');
+    if (listContainer) {
+      listContainer.innerHTML = `
+        <div class="flex justify-center items-center py-8">
+          <div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>`;
+    }
+    
+    const res = await fetch(`/api/category-filters?category=${encodeURIComponent(categoryName)}`);
+    const cf = await res.json();
+    window.sidebarCategoryFilters = cf;
+    
+    renderSidebarDropdowns(cf, null);
+    await fetchSidebarProducts();
+    renderSidebarCategoriesList();
+    // Не переадресуем на первый товар при выборе категории/подкатегории.
+    // Переход происходит только когда пользователь явно кликает товар в списке.
+  } catch (e) {
+    console.error('Failed to load category filters:', e);
+  }
+};
+
+function renderSidebarDropdowns(cf, currentProduct) {
+  const container = document.getElementById('sidebarParamsContainer');
+  if (!container) return;
+  
+  let html = '';
+  
+  // 1. Size / Diameter Dropdown
+  const rawSizes = [...new Set([...(cf.vids || []), ...(cf.widths || [])])];
+  const uniqueSizes = rawSizes.filter(Boolean).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+  
+  if (uniqueSizes.length > 0) {
+    const currentSize = currentProduct ? (currentProduct.vid || currentProduct.width || '') : '';
+    html += `
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] font-bold text-on-surface-variant/75 uppercase tracking-wider">Размер / Вид</label>
+        <select id="sidebar-select-size" onchange="fetchSidebarProducts()" class="w-full bg-surface-container-highest dark:bg-[#0a0908] border border-outline-variant/20 dark:border-white/10 text-on-surface rounded-xl py-2.5 px-3 text-[11px] font-semibold focus:border-primary/50 focus:ring-0 outline-none transition-all cursor-pointer">
+          <option value="">Все размеры</option>
+          ${uniqueSizes.map(s => {
+            const cleanLabel = getCleanSizeLabel(s);
+            const isSelected = currentSize && (s.toString().toLowerCase() === currentSize.toString().toLowerCase());
+            return `<option value="${s}" ${isSelected ? 'selected' : ''}>${cleanLabel || s}</option>`;
+          }).join('')}
+        </select>
+      </div>
+    `;
+  }
+  
+  // 2. Length Dropdown
+  const uniqueLengths = [...new Set(cf.lengths || [])].filter(Boolean).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+  if (uniqueLengths.length > 0) {
+    const currentLength = currentProduct ? (currentProduct.length || '') : '';
+    html += `
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] font-bold text-on-surface-variant/75 uppercase tracking-wider">Длина</label>
+        <select id="sidebar-select-length" onchange="fetchSidebarProducts()" class="w-full bg-surface-container-highest dark:bg-[#0a0908] border border-outline-variant/20 dark:border-white/10 text-on-surface rounded-xl py-2.5 px-3 text-[11px] font-semibold focus:border-primary/50 focus:ring-0 outline-none transition-all cursor-pointer">
+          <option value="">Любая длина</option>
+          ${uniqueLengths.map(l => {
+            const isSelected = currentLength && (l.toString().toLowerCase() === currentLength.toString().toLowerCase());
+            return `<option value="${l}" ${isSelected ? 'selected' : ''}>${l}</option>`;
+          }).join('')}
+        </select>
+      </div>
+    `;
+  }
+  
+  // 3. Steel Grade Dropdown
+  const uniqueTypes = [...new Set(cf.types || [])].filter(Boolean).sort();
+  if (uniqueTypes.length > 0) {
+    const currentType = currentProduct ? (currentProduct.type || '') : '';
+    html += `
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] font-bold text-on-surface-variant/75 uppercase tracking-wider">Марка стали</label>
+        <select id="sidebar-select-type" onchange="fetchSidebarProducts()" class="w-full bg-surface-container-highest dark:bg-[#0a0908] border border-outline-variant/20 dark:border-white/10 text-on-surface rounded-xl py-2.5 px-3 text-[11px] font-semibold focus:border-primary/50 focus:ring-0 outline-none transition-all cursor-pointer">
+          <option value="">Все марки</option>
+          ${uniqueTypes.map(t => {
+            const isSelected = currentType && (t.toString().toLowerCase() === currentType.toString().toLowerCase());
+            return `<option value="${t}" ${isSelected ? 'selected' : ''}>${t}</option>`;
+          }).join('')}
+        </select>
+      </div>
+    `;
+  }
+  
+  // 4. Subgroup Dropdown
+  const uniqueL3 = [...new Set(cf.l3 || [])].filter(Boolean).sort();
+  if (uniqueL3.length > 0) {
+    const currentL3 = currentProduct ? (currentProduct.l3 || '') : '';
+    html += `
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] font-bold text-on-surface-variant/75 uppercase tracking-wider">Подгруппа</label>
+        <select id="sidebar-select-l3" onchange="fetchSidebarProducts()" class="w-full bg-surface-container-highest dark:bg-[#0a0908] border border-outline-variant/20 dark:border-white/10 text-on-surface rounded-xl py-2.5 px-3 text-[11px] font-semibold focus:border-primary/50 focus:ring-0 outline-none transition-all cursor-pointer">
+          <option value="">Все подгруппы</option>
+          ${uniqueL3.map(v => {
+            const isSelected = currentL3 && (v.toString().toLowerCase() === currentL3.toString().toLowerCase());
+            return `<option value="${v}" ${isSelected ? 'selected' : ''}>${v}</option>`;
+          }).join('')}
+        </select>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html || `<div class="text-xs text-on-surface-variant/50 italic py-2">Параметры отсутствуют</div>`;
+}
+
+async function fetchSidebarProducts() {
+  const category = window.activeSidebarCategory;
+  if (!category) return;
+  
+  const sizeSelect = document.getElementById('sidebar-select-size');
+  const lengthSelect = document.getElementById('sidebar-select-length');
+  const typeSelect = document.getElementById('sidebar-select-type');
+  const l3Select = document.getElementById('sidebar-select-l3');
+  
+  const selectedSize = sizeSelect ? sizeSelect.value : '';
+  const selectedLength = lengthSelect ? lengthSelect.value : '';
+  const selectedType = typeSelect ? typeSelect.value : '';
+  const selectedL3 = l3Select ? l3Select.value : '';
+  
+  const params = new URLSearchParams({
+    category: category,
+    limit: 100
+  });
+  
+  const cf = window.sidebarCategoryFilters;
+  if (selectedSize && cf) {
+    let vidMatch = false;
+    let widthMatch = false;
+    if (cf.vids && cf.vids.includes(selectedSize)) vidMatch = true;
+    if (cf.widths && cf.widths.includes(selectedSize)) widthMatch = true;
+    
+    if (vidMatch) params.append('vid', selectedSize);
+    if (widthMatch) params.append('width', selectedSize);
+  }
+  if (selectedLength) params.append('length', selectedLength);
+  if (selectedType) params.append('type', selectedType);
+  if (selectedL3) params.append('l3', selectedL3);
+  
+  try {
+    const listContainer = document.getElementById('sidebarProductsList');
+    if (listContainer) {
+      listContainer.innerHTML = `
+        <div class="flex justify-center items-center py-8">
+          <div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>`;
+    }
+    
+    const res = await fetch(`/api/products?${params.toString()}`);
+    if (!res.ok) throw new Error('API Error');
+    const data = await res.json();
+    
+    renderSidebarProducts(data.products || []);
+    return data.products || [];
+  } catch (e) {
+    console.error('Failed to fetch sidebar products:', e);
+    const listContainer = document.getElementById('sidebarProductsList');
+    if (listContainer) {
+      listContainer.innerHTML = `<div class="text-xs text-error p-4 text-center">Ошибка загрузки товаров</div>`;
+    }
+    return [];
+  }
+}
+
+function renderSidebarProducts(products) {
+  const listContainer = document.getElementById('sidebarProductsList');
+  const countSpan = document.getElementById('matchingCount');
+  
+  if (!listContainer) return;
+  
+  // De-duplicate matching products by name to prevent cloned rows
+  const currentId = productId;
+  const uniqueProducts = [];
+  const seenNames = new Set();
+  
+  // Always prioritize and keep the currently active product
+  const activeProduct = products.find(p => String(p.id) === String(currentId));
+  if (activeProduct) {
+    seenNames.add(activeProduct.name);
+    uniqueProducts.push(activeProduct);
+  }
+  
+  for (const p of products) {
+    if (!seenNames.has(p.name)) {
+      seenNames.add(p.name);
+      uniqueProducts.push(p);
+    }
+  }
+  
+  if (countSpan) {
+    countSpan.textContent = uniqueProducts.length;
+  }
+  
+  if (uniqueProducts.length === 0) {
+    listContainer.innerHTML = `<div class="text-xs text-on-surface-variant/60 p-4 text-center">Нет подходящих товаров</div>`;
+    return;
+  }
+  
+  listContainer.innerHTML = uniqueProducts.map(p => {
+    const isActive = String(p.id) === String(currentId);
+    
+    let displayPrice = 0;
+    let unitName = 'т.';
+    if (p.price_whip || p.price_unit) {
+      displayPrice = p.price_whip || p.price_unit;
+      displayPrice = parseFloat(displayPrice) || 0;
+      const isSheet = p.name.toLowerCase().includes('лист');
+      unitName = isSheet ? 'лист' : 'хлыст';
+    } else if (p.price_meter) {
+      displayPrice = parseFloat(p.price_meter) || 0;
+      const isSheet = p.name.toLowerCase().includes('лист');
+      unitName = isSheet ? 'м²' : 'пог. м.';
+    } else if (p.price_ton) {
+      displayPrice = parseFloat(p.price_ton) || 0;
+      unitName = 'т.';
+    }
+    
+    const priceFmt = displayPrice > 0 ? `${Math.round(displayPrice).toLocaleString('ru-RU')} ₽/${unitName}` : 'Цена по запросу';
+    
+    const steel = p.type || 'Ст3';
+    const size = p.vid || p.width || '';
+    const len = p.length || '';
+    
+    return `
+      <div onclick="window.loadProductData('${p.id}')" 
+           class="sidebar-product-item ${isActive ? 'is-active' : ''}">
+        <div class="flex-grow min-w-0">
+          <div class="text-xs font-bold text-on-surface break-words leading-tight mb-0.5" title="${p.name}">${p.name}</div>
+          <div class="flex flex-wrap gap-1.5 mt-1 text-[10px] text-on-surface-variant/80">
+            ${size ? `<span class="bg-surface-container-high/40 px-1.5 py-0.5 rounded">${size}</span>` : ''}
+            ${steel ? `<span class="bg-surface-container-high/40 px-1.5 py-0.5 rounded">${steel}</span>` : ''}
+            ${len ? `<span class="bg-surface-container-high/40 px-1.5 py-0.5 rounded">${len}</span>` : ''}
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="text-xs font-bold text-primary whitespace-nowrap">${priceFmt}</div>
+          ${isActive ? `<span class="text-[9px] text-primary/60 font-bold uppercase tracking-wider">Текущий</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 async function init() {
   if (!productId) {
     showNotFound();
@@ -538,6 +1141,71 @@ async function init() {
   }
 }
 
+window.loadProductData = async function(newProductId, pushToHistory = true) {
+  if (!newProductId) return;
+  console.log('SPA Loading product:', newProductId);
+  
+  // Fade out content area for transition effect
+  const mainGrid = document.getElementById('rightContentArea');
+  if (mainGrid) {
+    mainGrid.style.opacity = '0.4';
+    mainGrid.style.transition = 'opacity 0.15s ease';
+  }
+  
+  try {
+    const fetchUrl = `/api/products/${newProductId}`;
+    const res = await fetch(fetchUrl);
+    
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      showNotFound(res.status, errorData.error || 'Ошибка сервера', `URL: ${fetchUrl}`);
+      return;
+    }
+    
+    const product = await res.json();
+    
+    // Update global active ID
+    productId = newProductId;
+    
+    // Reset pricing modes datasets
+    const calcValue = document.getElementById('calcValue');
+    if (calcValue) {
+      delete calcValue.dataset.initialized;
+    }
+    
+    // Re-render details
+    renderProduct(product);
+    loadRelated(product.category, product.id);
+    
+    // Update URL without page reload
+    if (pushToHistory) {
+      const newUrl = `${window.location.pathname}?id=${newProductId}`;
+      window.history.pushState({ productId: newProductId }, '', newUrl);
+    }
+    
+    // Scroll page smoothly to top of grid
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+  } catch (e) {
+    console.error('SPA load error:', e);
+    showNotFound(null, 'Сетевая ошибка', e.message);
+  } finally {
+    if (mainGrid) {
+      setTimeout(() => {
+        mainGrid.style.opacity = '1';
+      }, 50);
+    }
+  }
+};
+
+window.onpopstate = function(event) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentId = urlParams.get('id');
+  if (currentId && currentId !== productId) {
+    window.loadProductData(currentId, false);
+  }
+};
+
 function showNotFound(status, error, details) {
   let errorHtml = `
     <div class="text-center py-32">
@@ -559,10 +1227,7 @@ function renderProduct(product) {
   product.description = product.description || product.desc || '';
   product.desc = product.desc || product.description || '';
   product.specs = product.specs || [];
-  // Если характеристик нет — извлекаем их из наименования товара.
-  if ((!product.specs || product.specs.length === 0) && window.extractCharsFromName) {
-    product.specs = window.extractCharsFromName(product.name, product.category || product.parent_category);
-  }
+  // Не угадываем характеристики из наименования — показываем только то, что есть в БД.
   product.unitLabel = product.unitLabel || product.unit_label || '';
   product.priceUnit = product.priceUnit || product.price_unit || 0;
   product.priceTonNum = product.priceTonNum || product.price_ton || 0;
@@ -624,12 +1289,19 @@ function renderProduct(product) {
   const specsTableEl = document.getElementById('specsTable');
   if (specsTableEl) {
     const specsHtml = product.specs.map(([label, value]) => `
-      <div class="flex justify-between py-4 border-b border-outline-variant/5">
-        <span class="text-on-surface-variant text-sm">${label}</span>
-        <span class="font-medium text-sm ${label === 'Марка стали' || label === 'Класс' || label === 'Покрытие' ? 'text-primary' : ''}">${value}</span>
+      <div class="flex justify-between items-center py-3 border-b border-outline-variant/10 dark:border-white/5 transition-colors">
+        <span class="text-on-surface-variant text-xs md:text-sm font-medium pr-4">${label}</span>
+        <span class="font-bold text-xs md:text-sm text-on-surface text-right ${label === 'Марка стали' || label === 'Класс' || label === 'Покрытие' ? 'text-primary' : ''}">${value}</span>
       </div>`).join('');
     specsTableEl.innerHTML = specsHtml;
   }
+
+  function getWhipLength(p) {
+    if (!p || !p.length) return 11.7;
+    const num = parseFloat(p.length.toString().replace(',', '.'));
+    return isNaN(num) || num <= 0 ? 11.7 : num;
+  }
+  const whipLen = getWhipLength(product);
 
   // Initialize Pricing Modes
   window.pricingModes = [];
@@ -643,6 +1315,7 @@ function renderProduct(product) {
   const p_ton = parseFloat(product.priceTonNum || product.price_ton || 0) || 0;
   let p_unit = parseFloat(product.priceUnit?.toString().replace(/\s/g, '').replace(',', '.')) || 0;
   if (!p_unit && product.price_unit) p_unit = parseFloat(product.price_unit) || 0;
+  let p_whip = parseFloat(product.price_whip || product.priceWhip || product.priceWhipNum || 0) || 0;
   let p_meter = parseFloat(product.price_meter || product.priceMeterNum || 0) || 0;
 
   const isSheet = product.name.toLowerCase().includes('лист');
@@ -651,23 +1324,26 @@ function renderProduct(product) {
   const meterLabel = isSheet ? 'Цена за м²' : 'Цена за метр';
   const meterUnit = isSheet ? 'м²' : 'пог. м.';
 
+  const whipPrice = p_whip || p_unit;
+  // Не выводим производных расчётов: цена за метр показывается только если она реально задана.
+
   // Собираем доступные режимы покупки — только при цене > 0
-  if (p_unit > 0) {
+  if (whipPrice > 0) {
       window.pricingModes.push({
-          label: pieceLabel, unitLabel: pieceUnit, price: p_unit,
-          step: 1, decimals: 0, convertToTon: () => 0
+          label: pieceLabel, unitLabel: pieceUnit, price: whipPrice,
+          step: 1, min: 1, decimals: 0, convertToTon: () => 0
       });
   }
   if (p_meter > 0) {
       window.pricingModes.push({
           label: meterLabel, unitLabel: meterUnit, price: p_meter,
-          step: 1, decimals: 0, convertToTon: () => 0
+          step: whipLen, min: whipLen, decimals: whipLen % 1 === 0 ? 0 : 1, convertToTon: () => 0
       });
   }
   if (p_ton > 0) {
       window.pricingModes.push({
           label: 'Цена за т.', unitLabel: 'т.', price: p_ton,
-          step: 0.1, min: 1, decimals: 3, convertToTon: (val) => val
+          step: 0.1, min: 1, decimals: 1, convertToTon: (val) => val
       });
   }
 
@@ -679,30 +1355,47 @@ function renderProduct(product) {
 
   const modesContainer = document.getElementById('priceModes');
   if (modesContainer) {
-      modesContainer.innerHTML = window.pricingModes.map((m, idx) => `
-          <label class="flex justify-between items-center cursor-pointer group">
-              <div class="flex items-center gap-3">
-                  <div class="w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${idx === window.currentModeIndex ? 'border-primary bg-primary/20' : 'border-outline-variant/40 group-hover:border-primary/50'}">
-                      <div class="w-2 h-2 rounded-full ${idx === window.currentModeIndex ? 'bg-primary' : 'bg-transparent'}"></div>
+      modesContainer.innerHTML = window.pricingModes.map((m, idx) => {
+          const isActive = idx === window.currentModeIndex;
+          const subtext = m.unitLabel === 'т.' ? 'Минимум 0.1 т.' : m.unitLabel === 'пог. м.' ? 'Продажа метрами' : 'Поштучно';
+          return `
+              <div class="price-mode-card relative flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${isActive ? 'bg-[#ca7093]/10 border-[#ca7093] shadow-md shadow-[#ca7093]/5' : 'bg-white/[0.02] border-white/5 hover:border-white/10 hover:bg-white/[0.04]'}" data-index="${idx}">
+                  <div class="flex items-center gap-3">
+                      <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${isActive ? 'border-[#ca7093] bg-[#ca7093]/20' : 'border-white/20'}">
+                          <div class="w-2.5 h-2.5 rounded-full ${isActive ? 'bg-[#ca7093]' : 'bg-transparent'}"></div>
+                      </div>
+                      <div class="flex flex-col">
+                          <span class="text-[11px] uppercase tracking-wider font-bold ${isActive ? 'text-[#ca7093]' : 'text-on-surface-variant/70'}">${m.label}</span>
+                          <span class="text-[10px] text-on-surface-variant/50">${subtext}</span>
+                      </div>
                   </div>
-                  <span class="text-[12px] md:text-sm font-medium ${idx === window.currentModeIndex ? 'text-on-surface' : 'text-on-surface-variant'}">${m.label}</span>
+                  <div class="text-right">
+                      <span class="text-base md:text-lg font-bold text-on-surface">${Math.round(m.price).toLocaleString('ru-RU')} <span class="text-xs font-normal text-on-surface-variant/70">₽/${m.unitLabel}</span></span>
+                  </div>
               </div>
-              <span class="text-[12px] md:text-sm font-bold text-on-surface border-b border-white/5 pb-1 w-24 text-right border-dashed">${Math.round(m.price).toLocaleString('ru-RU')} ₽</span>
-          </label>
-      `).join('');
+          `;
+      }).join('');
 
-      // Add event listeners to labels
-      const labels = modesContainer.querySelectorAll('label');
-      labels.forEach((label, idx) => {
-          label.addEventListener('click', () => {
+      // Add event listeners to pricing cards
+      const cards = modesContainer.querySelectorAll('.price-mode-card');
+      cards.forEach(card => {
+          card.addEventListener('click', () => {
+              const idx = parseInt(card.dataset.index);
               window.currentModeIndex = idx;
+              
+              // Update quantity unit indicator text
+              const activeUnitLabel = document.getElementById('activeUnitLabel');
+              if (activeUnitLabel) {
+                  activeUnitLabel.textContent = window.pricingModes[idx].unitLabel;
+              }
+              
               const input = document.getElementById('calcValue');
               if (input) {
                   const mode = window.pricingModes[idx];
                   const minVal = mode.min !== undefined ? mode.min : mode.step;
                   input.value = Number(minVal.toFixed(mode.decimals)).toString();
               }
-              renderProduct(product); // re-render to update UI (lazy but effective)
+              renderProduct(product); // re-render to update UI
           });
       });
   }
@@ -753,6 +1446,12 @@ function renderProduct(product) {
   };
 
   if (calcValue) {
+      // Update unit label on initial load
+      const activeUnitLabel = document.getElementById('activeUnitLabel');
+      if (activeUnitLabel && window.pricingModes[window.currentModeIndex]) {
+          activeUnitLabel.textContent = window.pricingModes[window.currentModeIndex].unitLabel;
+      }
+      
       if (!calcValue.dataset.initialized) {
           const mode = window.pricingModes[window.currentModeIndex];
           const minVal = mode.min !== undefined ? mode.min : mode.step;
@@ -776,6 +1475,29 @@ function renderProduct(product) {
   if (buyBtn) {
     buyBtn.onclick = () => addToCart();
   }
+
+  // Initialize Left Sidebar filters and categories
+  if (!window._sidebarInitialized || window.lastSidebarProductId !== product.id) {
+    window._sidebarInitialized = true;
+    window.lastSidebarProductId = product.id;
+    
+    // Load categories list
+    loadSidebarCategories(product.category);
+    
+    // Load category parameters & matching products
+    (async () => {
+      try {
+        const res = await fetch(`/api/category-filters?category=${encodeURIComponent(product.category)}`);
+        const cf = await res.json();
+        window.sidebarCategoryFilters = cf;
+        
+        renderSidebarDropdowns(cf, null);
+        await fetchSidebarProducts();
+      } catch (e) {
+        console.error('Failed to initialize sidebar parameters:', e);
+      }
+    })();
+  }
 }
 
 async function loadRelated(category, currentId) {
@@ -785,7 +1507,7 @@ async function loadRelated(category, currentId) {
         const related = data.products.filter(p => p.id !== currentId).slice(0, 4);
 
         document.getElementById('relatedGrid').innerHTML = related.map(p => `
-            <a href="/product?id=${p.id}" class="border border-outline-variant/10 p-5 bg-surface-container-lowest flex flex-col group transition-all duration-500 hover:border-primary/30 no-underline text-inherit no-glass-blur">
+            <a href="/product?id=${p.id}" onclick="event.preventDefault(); window.loadProductData('${p.id}')" class="border border-outline-variant/10 p-5 bg-surface-container-lowest flex flex-col group transition-all duration-500 hover:border-primary/30 no-underline text-inherit no-glass-blur">
                 <div class="relative h-36 mb-4 overflow-hidden bg-surface-container no-glass-blur">
                     <img class="w-full h-full object-cover transition-all duration-500 opacity-60 brightness-75 blur-none group-hover:opacity-100 group-hover:scale-110 group-hover:brightness-100" src="${window.getProductImage ? window.getProductImage(p.category) : p.img}" alt="${p.name}"/>
                 </div>
@@ -868,11 +1590,11 @@ window.switchTab = function(tabName) {
     const btn = document.getElementById(`tab-btn-${b}`);
     if (btn) {
       if (b === tabName) {
-        btn.classList.add('border-primary', 'text-primary');
-        btn.classList.remove('border-transparent', 'text-on-surface-variant/60', 'hover:text-on-surface');
+        btn.classList.add('bg-primary', 'text-on-primary');
+        btn.classList.remove('bg-transparent', 'text-on-surface-variant');
       } else {
-        btn.classList.remove('border-primary', 'text-primary');
-        btn.classList.add('border-transparent', 'text-on-surface-variant/60', 'hover:text-on-surface');
+        btn.classList.remove('bg-primary', 'text-on-primary');
+        btn.classList.add('bg-transparent', 'text-on-surface-variant');
       }
     }
   });
@@ -884,5 +1606,8 @@ window.handleFaqSubmit = function(event) {
   event.target.reset();
 };
 </script>
+
+<footer id="globalFooter"></footer>
+
 </body>
 </html>

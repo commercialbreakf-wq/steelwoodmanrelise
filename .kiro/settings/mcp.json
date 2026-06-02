@@ -1,0 +1,60 @@
+{
+  "mcpServers": {
+    "firecrawl-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-1826f5e2cc5e49738855b8df723812ef"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "firecrawl_scrape",
+        "firecrawl_search",
+        "firecrawl_map"
+      ]
+    },
+    "StitchMCP": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://stitch.googleapis.com/mcp",
+        "--header",
+        "X-Goog-Api-Key: AQ.Ab8RN6J4SiRVFJps3Tjagbuj1Th7DEXONPs6RVehjtQv9J50YA"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    },
+    "github-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "vcp_7bx5lI8hsu8xG9PJvWjOBvOrxyhtQiFcE7idXMC9IREF4T1rXd1irpLx"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.supabase.com/mcp"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
