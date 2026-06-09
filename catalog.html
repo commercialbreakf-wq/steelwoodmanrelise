@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <script>
     (function() {
-      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const theme = localStorage.getItem('theme') || 'dark';
       document.documentElement.classList.add(theme);
     })();
   </script>
@@ -728,7 +728,7 @@ html.light .custom-dropdown-menu button.bg-\[\#964551\]:hover { background-color
 </div>
 
 <!-- Dynamic Category Header -->
-<div id="categoryHeaderContainer" class="mb-6 hidden select-none animate-in fade-in slide-in-from-top-4 duration-300">
+<div id="categoryHeaderContainer" class="mb-6 hidden select-none animate-in fade-in slide-in-from-top-4 duration-500 ease-out">
     <h1 id="categoryPageTitle" class="text-2xl md:text-3xl font-extrabold font-['Space+Grotesk'] text-on-surface tracking-tight uppercase"></h1>
 </div>
 
@@ -756,10 +756,10 @@ html.light .custom-dropdown-menu button.bg-\[\#964551\]:hover { background-color
         </div>
         
         <div class="flex flex-col gap-2 pb-6 md:pb-0 mt-0 md:mt-4">
-            <button onclick="applyFilters(true)" class="w-full py-3.5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 hover:shadow-[0_8px_24px_rgba(150, 69, 81,0.15)] transition-all duration-300 rounded-xl uppercase font-bold border-none active:scale-95">
+            <button onclick="applyFilters(true)" class="w-full py-3.5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 hover:shadow-[0_8px_24px_rgba(150, 69, 81,0.15)] transition-all duration-500 ease-out rounded-xl uppercase font-bold border-none active:scale-95">
                 ПРИМЕНИТЬ ПАРАМЕТРЫ
             </button>
-            <button onclick="resetFilters()" class="w-full py-3.5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-300 rounded-xl uppercase font-bold bg-white/[0.02]">
+            <button onclick="resetFilters()" class="w-full py-3.5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-500 ease-out rounded-xl uppercase font-bold bg-white/[0.02]">
                 СБРОСИТЬ ФИЛЬТРЫ
             </button>
             <div class="border border-outline-variant/10 p-4 bg-surface-container-lowest rounded-2xl flex items-center justify-between md:block">
@@ -775,62 +775,63 @@ html.light .custom-dropdown-menu button.bg-\[\#964551\]:hover { background-color
 <div class="flex-1 min-w-0">
     <!-- Toolbar: Sorting & Desktop count -->
     <div class="mb-6 md:mb-8 bg-surface-container md:bg-transparent p-1 md:p-0 rounded-2xl border border-white/5 md:border-0">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 flex-wrap">
-             <!-- Left side: Parameter Dropdowns & External Actions -->
-             <div id="topBarFilters" class="flex flex-wrap gap-3 flex-1 min-w-0 items-end"></div>
-             
-             <!-- Right side: L3 Tabs + Page text & Custom Sorting Dropdown -->
-             <div class="flex flex-col md:flex-row md:items-center gap-3 shrink-0 w-full md:w-auto select-none flex-wrap min-w-0">
-                  <!-- L3 Tabs (placed to the LEFT of sorting) -->
-                  <div id="categoryL3Tabs" class="hidden gap-2 overflow-x-auto whitespace-nowrap select-none"></div>
-
-                  <div class="flex flex-col items-center md:items-end shrink-0 gap-2 select-none w-full md:w-auto">
-                  <div class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest whitespace-nowrap w-full text-center md:text-right">
-                     Страница <span id="currentPageDisplay" class="text-primary">1</span>
-                  </div>
-                  <div class="relative w-full md:w-60" id="sortDropdownContainer" onclick="event.stopPropagation()">
-                      <button onclick="toggleCustomDropdown('sortDropdown')" id="sortDropdownBtn" class="w-full bg-white/[0.02] border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary font-label-caps text-[10px] tracking-widest outline-none focus:ring-0 shadow-md py-3.5 px-4 rounded-xl font-bold cursor-pointer flex items-center justify-between transition-all duration-300 select-none">
-                          <span id="sortDropdownLabel" class="truncate">СОРТИРОВКА: ПО УМОЛЧАНИЮ</span>
-                          <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
-                      </button>
-                      <div id="sortDropdown" class="custom-dropdown-menu absolute right-0 top-full mt-2 w-full min-w-[240px] rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
-                          <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">СОРТИРОВКА</div>
-                          <div class="grid grid-cols-1 gap-0.5 px-0.5">
-                              <div onclick="selectCustomSort('default')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-default" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-[#964551] border-[#964551]">✔</span>
-                                  <span class="text-on-surface/90 font-medium">ПО УМОЛЧАНИЮ</span>
-                              </div>
-                              <div onclick="selectCustomSort('price_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-price_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
-                                  <span class="text-on-surface/90 font-medium">СНАЧАЛА ДЕШЕВЛЕ</span>
-                              </div>
-                              <div onclick="selectCustomSort('price_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-price_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
-                                  <span class="text-on-surface/90 font-medium">СНАЧАЛА ДОРОЖЕ</span>
-                              </div>
-                              <div onclick="selectCustomSort('name_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-name_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
-                                  <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (А-Я)</span>
-                              </div>
-                              <div onclick="selectCustomSort('name_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
-                                  <span id="sort-opt-name_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
-                                  <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (Я-А)</span>
+        <div class="flex flex-col gap-4">
+             <!-- Top Row: Parameter Dropdowns & Page Info & Sorting -->
+             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 flex-wrap w-full">
+                 <!-- Left side: Parameter Dropdowns -->
+                 <div id="topBarFilters" class="flex flex-wrap gap-3 flex-1 min-w-0 items-end"></div>
+                 
+                 <!-- Right side: Page text & Custom Sorting Dropdown -->
+                 <div class="flex flex-col items-center md:items-end shrink-0 gap-2 select-none w-full lg:w-auto">
+                      <div class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest whitespace-nowrap w-full text-center md:text-right">
+                         Страница <span id="currentPageDisplay" class="text-primary">1</span>
+                      </div>
+                      <div class="relative w-full md:w-60" id="sortDropdownContainer" onclick="event.stopPropagation()">
+                          <button onclick="toggleCustomDropdown('sortDropdown')" id="sortDropdownBtn" class="w-full bg-white/[0.02] border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary font-label-caps text-[10px] tracking-widest outline-none focus:ring-0 shadow-md py-3.5 px-4 rounded-xl font-bold cursor-pointer flex items-center justify-between transition-all duration-500 ease-out select-none">
+                              <span id="sortDropdownLabel" class="truncate">СОРТИРОВКА: ПО УМОЛЧАНИЮ</span>
+                              <span class="material-symbols-outlined text-[16px] transition-transform">expand_more</span>
+                          </button>
+                          <div id="sortDropdown" class="custom-dropdown-menu absolute right-0 top-full mt-2 w-full min-w-[240px] rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col">
+                              <div class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-widest mb-2 px-1">СОРТИРОВКА</div>
+                              <div class="grid grid-cols-1 gap-0.5 px-0.5">
+                                  <div onclick="selectCustomSort('default')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                      <span id="sort-opt-default" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-[#964551] border-[#964551]">✔</span>
+                                      <span class="text-on-surface/90 font-medium">ПО УМОЛЧАНИЮ</span>
+                                  </div>
+                                  <div onclick="selectCustomSort('price_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                      <span id="sort-opt-price_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                      <span class="text-on-surface/90 font-medium">СНАЧАЛА ДЕШЕВЛЕ</span>
+                                  </div>
+                                  <div onclick="selectCustomSort('price_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                      <span id="sort-opt-price_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                      <span class="text-on-surface/90 font-medium">СНАЧАЛА ДОРОЖЕ</span>
+                                  </div>
+                                  <div onclick="selectCustomSort('name_asc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                      <span id="sort-opt-name_asc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                      <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (А-Я)</span>
+                                  </div>
+                                  <div onclick="selectCustomSort('name_desc')" class="custom-dropdown-item flex items-center gap-2.5 px-3 py-1.5 rounded-lg cursor-pointer text-[12px] transition-colors select-none">
+                                      <span id="sort-opt-name_desc" class="w-4 h-4 shrink-0 flex items-center justify-center border border-[#964551] rounded-full text-white text-[8px] font-bold transition-all bg-transparent border-outline-variant/30"></span>
+                                      <span class="text-on-surface/90 font-medium">ПО НАЗВАНИЮ (Я-А)</span>
+                                  </div>
                               </div>
                           </div>
                       </div>
-                  </div>
-                  </div>
+                 </div>
              </div>
+             
+             <!-- Bottom Row: L3 Tabs -->
+             <div id="categoryL3Tabs" class="hidden gap-2 overflow-x-auto whitespace-nowrap select-none w-full flex-wrap"></div>
         </div>
     </div>
 
     <!-- Table Header (Desktop Only) -->
-    <div class="hidden md:flex items-center px-4 py-2 border-b border-outline-variant/10 text-[9px] font-bold text-on-surface-variant uppercase tracking-widest font-label-caps gap-4 mb-2">
-        <div class="flex-1">Наименование</div>
-        <div class="w-28">ГОСТ / Марка стали</div>
-        <div class="w-24">Длина / Вес 1м</div>
-        <div class="w-48 text-right pr-2">Варианты цен</div>
-        <div class="w-[230px] text-right">Расчет / Купить</div>
+    <div class="hidden xl:grid xl:grid-cols-[minmax(0,2.5fr)_100px_100px_180px_280px] gap-4 items-center px-4 md:px-5 py-2 border-b border-outline-variant/10 text-[9px] font-bold text-on-surface-variant uppercase tracking-widest font-label-caps mb-2">
+        <div class="min-w-0">Наименование</div>
+        <div class="w-[100px]">ГОСТ / Марка стали</div>
+        <div class="w-[100px]">Длина / Вес 1м</div>
+        <div class="w-[180px]">Варианты цен</div>
+        <div class="w-[280px] text-right">Расчет / Купить</div>
     </div>
 
     <div id="productGrid" class="flex flex-col gap-2"></div>
@@ -1226,21 +1227,37 @@ function renderFilters() {
                 
                 const isAllActive = activeFilters.l3.length === 0;
                 let tabsHtml = `
-                  <button onclick="window.setL3Filter('')" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 border cursor-pointer active:scale-95 select-none whitespace-nowrap ${isAllActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'}">
+                  <button onclick="window.setL3Filter('')" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-500 ease-out border cursor-pointer active:scale-95 select-none whitespace-nowrap ${isAllActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'}">
                     Все варианты
                   </button>
                 `;
                 
-                sortedL3.forEach(v => {
+                const limit = 4;
+                const showMore = sortedL3.length > limit;
+                const visibleL3 = showMore ? sortedL3.slice(0, 3) : sortedL3;
+                
+                visibleL3.forEach(v => {
                     const isActive = activeFilters.l3.includes(v);
                     const count = window.currentFacets?.l3?.[v] || 0;
                     tabsHtml += `
-                      <button onclick="window.setL3Filter('${v.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 border cursor-pointer active:scale-95 select-none inline-flex items-center gap-2 whitespace-nowrap ${isActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'} ${count === 0 ? 'opacity-40 hover:opacity-60' : ''}">
+                      <button onclick="window.setL3Filter('${v.replace(/'/g, "\\'")}')" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-500 ease-out border cursor-pointer active:scale-95 select-none inline-flex items-center gap-2 whitespace-nowrap ${isActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'} ${count === 0 ? 'opacity-40 hover:opacity-60' : ''}">
                         <span>${v}</span>
                         <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold transition-all shrink-0 ${isActive ? 'bg-white/20 text-white' : 'text-white bg-[#964551] border border-[#964551] shadow-sm'}">${count}</span>
                       </button>
                     `;
                 });
+                
+                if (showMore) {
+                    const remainingCount = sortedL3.length - 3;
+                    const anyRemainingActive = sortedL3.slice(3).some(v => activeFilters.l3.includes(v));
+                    tabsHtml += `
+                      <button onclick="window.openCatalogL3Popup()" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-500 ease-out border cursor-pointer active:scale-95 select-none inline-flex items-center gap-2 whitespace-nowrap ${anyRemainingActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'}">
+                        <span>Еще (+${remainingCount})</span>
+                        <span class="material-symbols-outlined text-[14px]">expand_more</span>
+                      </button>
+                    `;
+                }
+                
                 tabsContainer.innerHTML = tabsHtml;
                 tabsContainer.classList.remove('hidden');
                 tabsContainer.classList.add('flex');
@@ -1279,10 +1296,10 @@ function renderFilters() {
                 <span class="material-symbols-outlined text-[18px] transition-colors">${icon}</span>
                 <span class="font-bold text-xs uppercase tracking-tight transition-colors">${p}</span>
               </div>
-              <span class="material-symbols-outlined text-[14px] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}">expand_more</span>
+              <span class="material-symbols-outlined text-[14px] transition-transform duration-500 ease-out ${isExpanded ? 'rotate-180' : ''}">expand_more</span>
             </div>
 
-            <div class="overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[2000px] mt-1 opacity-1' : 'max-h-0 opacity-0'}">
+            <div class="overflow-hidden transition-all duration-500 ease-out ${isExpanded ? 'max-h-[2000px] mt-1 opacity-1' : 'max-h-0 opacity-0'}">
               <div class="pl-2 space-y-0.5">
                 ${categories.map(cat => {
                   const isActiveCat = activeFilters.category.includes(cat.name);
@@ -1478,10 +1495,10 @@ function renderFilters() {
             if (topFiltersHtml) {
                 topFiltersHtml += `
                   <div class="flex gap-2 select-none mt-2 md:mt-0">
-                    <button onclick="applyFilters(true); closeAllCustomDropdowns();" class="py-3 px-5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 transition-all duration-300 rounded-xl uppercase font-bold border-none cursor-pointer active:scale-95 whitespace-nowrap shadow-md">
+                    <button onclick="applyFilters(true); closeAllCustomDropdowns();" class="py-3 px-5 bg-primary text-on-primary font-label-caps text-[10px] tracking-widest hover:bg-primary/95 transition-all duration-500 ease-out rounded-xl uppercase font-bold border-none cursor-pointer active:scale-95 whitespace-nowrap shadow-md">
                       ПРИМЕНИТЬ
                     </button>
-                    <button onclick="resetParams(); closeAllCustomDropdowns();" class="py-3 px-5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-300 rounded-xl uppercase font-bold bg-white/[0.02] cursor-pointer active:scale-95 whitespace-nowrap">
+                    <button onclick="resetParams(); closeAllCustomDropdowns();" class="py-3 px-5 border border-outline-variant/30 text-on-surface-variant font-label-caps text-[10px] tracking-widest hover:border-primary hover:text-primary transition-all duration-500 ease-out rounded-xl uppercase font-bold bg-white/[0.02] cursor-pointer active:scale-95 whitespace-nowrap">
                       СБРОСИТЬ
                     </button>
                   </div>
@@ -1507,6 +1524,9 @@ function renderFilters() {
     
     // Update mobile filter toggle buttons smoothly
     updateMobileFilterButtons();
+    
+    window.getUniqueFilters = getUniqueFilters;
+    window.sortOptionsByCount = sortOptionsByCount;
 }
 
 function updateMobileFilterButtons() {
@@ -1687,6 +1707,14 @@ function toggleFilterParam(key, value, catName) {
     renderFilters(); // Instantly re-render checkboxes in UI
 }
 
+function resetParameterFilters() {
+    activeFilters.vid = [];
+    activeFilters.length = [];
+    activeFilters.width = [];
+    activeFilters.type = [];
+    activeFilters.l3 = [];
+}
+
 function toggleSection(section) {
     const categories = filterData.categories[section] || [];
     const idx = activeFilters.parentCategory.indexOf(section);
@@ -1710,10 +1738,7 @@ function toggleSection(section) {
     
     // Clear subcategory and parameters when changing parent category to avoid empty card listings
     activeFilters.category = [];
-    activeFilters.vid = [];
-    activeFilters.length = [];
-    activeFilters.width = [];
-    activeFilters.type = [];
+    resetParameterFilters();
     
     renderFilters();
     applyFilters(false, false); // Don't scroll top if in drawer, don't close sidebar
@@ -1768,6 +1793,7 @@ function setFilter(key, value) {
         activeFilters.length = [];
         activeFilters.width = [];
         activeFilters.type = [];
+        activeFilters.l3 = []; // Reset L3 subcategory tab
         renderFilters();
         applyFilters(false, shouldCloseSidebar);
     } else {
@@ -1776,6 +1802,23 @@ function setFilter(key, value) {
         applyFilters(false, false);
     }
 }
+
+window.openCategoryDrawerIfMobile = function() {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+        const sidebar = document.getElementById('catalogSidebar');
+        const overlay = document.getElementById('filterDrawerOverlay');
+        if (sidebar && overlay && !sidebar.classList.contains('translate-x-0')) {
+            overlay.classList.remove('pointer-events-none');
+            // Force reflow
+            overlay.offsetHeight;
+            sidebar.classList.remove('translate-x-[-100%]');
+            sidebar.classList.add('translate-x-0');
+            overlay.classList.replace('opacity-0', 'opacity-100');
+            window.lockScrollGlobal();
+        }
+    }
+};
 
 function resetFilters() {
   activeFilters = { parentCategory: [], category: [], vid: [], length: [], width: [], type: [], l3: [] };
@@ -1791,11 +1834,8 @@ function resetFilters() {
   renderFilters();
   fetchProducts();
 
-  // Close mobile filter drawer if open
-  const sidebar = document.getElementById('catalogSidebar');
-  if (sidebar && sidebar.classList.contains('translate-x-0') && window.innerWidth < 768) {
-      toggleFilters();
-  }
+  // Open mobile category drawer by default when showing all products
+  window.openCategoryDrawerIfMobile();
 }
 
 function resetParams() {
@@ -1811,42 +1851,91 @@ function resetParams() {
 
 window.getCatalogProductModes = function(p) {
     const modes = [];
-    const p_ton = parseFloat(p.price_ton || p.priceTonNum || 0) || 0;
-    let p_meter = parseFloat(p.price_meter || 0) || 0;
-    const p_whip = parseFloat(p.price_whip || p.price_unit || 0) || 0;
-    const isSheet = p.name.toLowerCase().includes('лист');
+    const parsed = window.parseUniversalSpecs ? window.parseUniversalSpecs(p) : p;
+    const lengthVal = Number(parsed.mLenVal || parsed.lengthVal || 0) || (() => {
+        const n = parseFloat(String(p.length || '').replace(',', '.'));
+        return Number.isFinite(n) && n > 0 ? n : 6;
+    })();
+    const weightVal = Number(parsed.wUnitVal || parsed.weightVal || p.weight || 0) || 1;
+    const calcType = parsed.calcType || p.calcType || 'linear';
+    const lowerName = String(p.name || '').toLowerCase();
+    const isSheet = !!parsed.isSheet || !!p.isSheet || lowerName.includes('\u043b\u0438\u0441\u0442');
     const pieceLabel = isSheet ? 'лист' : (p.unit_label || 'хлыст');
+    const areaVal = Number(parsed.m2Val || parsed.areaVal || 0) || 1;
 
-    // Parse whip length from product length (default 11.7)
-    let whipLen = 11.7;
-    if (p.length) {
-        const num = parseFloat(p.length.toString().replace(',', '.'));
-        if (!isNaN(num) && num > 0) whipLen = num;
+    let p_ton = parseFloat(p.price_ton || p.priceTonNum || 0) || 0;
+    let p_whip = parseFloat(p.price_unit || p.priceUnit || p.price_whip || p.priceWhip || p.priceWhipNum || 0) || 0;
+    let p_meter = parseFloat(p.price_meter || p.priceMeterNum || 0) || 0;
+
+    if (p_whip === 0 && p_ton > 0 && weightVal > 0) {
+        p_whip = Math.round((p_ton / 1000) * weightVal * (calcType === 'linear' ? lengthVal : 1));
+    }
+    if (p_meter === 0) {
+        if (calcType === 'linear' && lengthVal > 0) {
+            p_meter = p_whip > 0 ? Math.round(p_whip / lengthVal) : Math.round((p_ton / 1000) * weightVal);
+        } else if (isSheet || calcType === 'area') {
+            p_meter = p_whip > 0 ? Math.round(p_whip / areaVal) : Math.round((p_ton / 1000) * weightVal);
+        } else {
+            p_meter = p_whip;
+        }
+    }
+    if (p_ton === 0 && p_whip > 0 && weightVal > 0) {
+        if (isSheet || calcType === 'area') {
+            p_ton = Math.round(((p_whip / areaVal) / weightVal) * 1000);
+        } else {
+            p_ton = Math.round(((p_whip / lengthVal) / weightVal) * 1000);
+        }
     }
 
-    if (p_whip > 0 && p_meter === 0 && whipLen > 0) {
-        // Не делаем производных расчётов цены за метр.
-    }
+    const MAX_TONS = 1000;
 
     if (p_ton > 0) {
-        modes.push({ name: 'тонну', unit: 'т.', price: p_ton, step: 0.1, min: 1, decimals: 1 });
+        modes.push({ name: 'тонну', unit: 'т.', price: p_ton, step: 0.1, min: 0.1, max: MAX_TONS, decimals: 1 });
     }
     if (p_meter > 0) {
-        modes.push({ name: 'метр', unit: isSheet ? 'м²' : 'пог. м.', price: p_meter, step: whipLen, min: whipLen, decimals: whipLen % 1 === 0 ? 0 : 1 });
+        let maxMeters = 1000000;
+        if (p_ton > 0) {
+             maxMeters = Math.floor(MAX_TONS * (p_ton / p_meter));
+        }
+        modes.push({ name: 'метр', unit: isSheet ? 'м²' : 'пог. м.', price: p_meter, step: lengthVal, min: lengthVal, max: maxMeters, decimals: lengthVal % 1 === 0 ? 0 : 1 });
     }
     if (p_whip > 0) {
-        modes.push({ name: pieceLabel, unit: pieceLabel, price: p_whip, step: 1, min: 1, decimals: 0 });
+        let maxWhips = 1000000;
+        if (p_ton > 0) {
+             maxWhips = Math.floor(MAX_TONS * (p_ton / p_whip));
+        }
+        modes.push({ name: pieceLabel, unit: pieceLabel, price: p_whip, step: 1, min: 1, max: maxWhips, decimals: 0 });
     }
 
     if (modes.length === 0) {
-        modes.push({ name: 'запрос', unit: 'ед.', price: 0, step: 1, min: 1, decimals: 0 });
+        modes.push({ name: 'запрос', unit: 'ед.', price: 0, step: 1, min: 1, max: 100000, decimals: 0 });
     }
 
     return modes;
 };
 
+            window.getCurrentCatalogProductById = function(id) {
+    if (!window.currentProductsById) return null;
+    return window.currentProductsById.get(String(id)) || null;
+};
+
+window.getCatalogQtyValue = function(id) {
+    const input = document.getElementById('qty-' + id);
+    let qty = input ? parseFloat(input.value.replace(',', '.')) : 1;
+    return isNaN(qty) || qty <= 0 ? 1 : qty;
+};
+
+window.getCatalogSelectedMode = function(id) {
+    const p = window.getCurrentCatalogProductById(id);
+    if (!p) return null;
+    const modes = window.getCatalogProductModes(p);
+    const selectedIdx = window.catalogProductSelectedModes[id] || 0;
+    return modes[selectedIdx] || modes[0] || null;
+};
+
 function renderProducts(products) {
   window.currentProductsList = products;
+  window.currentProductsById = new Map(products.map(product => [String(product.id), product]));
   const grid = document.getElementById('productGrid');
   
   if (!window.catalogProductSelectedModes) {
@@ -1863,11 +1952,12 @@ function renderProducts(products) {
         window.catalogProductSelectedModes[p.id] = activeIdx;
     }
     const currentMode = modes[activeIdx] || modes[0];
+    const boxHeight = modes.length * 44 + Math.max(0, modes.length - 1) * 8;
 
     const radiosHtml = modes.map((m, idx) => {
       if (m.price === 0) return `<span class="text-xs text-on-surface-variant/40 italic">Цена по запросу</span>`;
       return `
-        <label class="flex items-center gap-2 cursor-pointer select-none justify-start md:justify-end text-[11px] md:text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors py-0.5" onclick="event.stopPropagation()">
+        <label class="flex items-center gap-2 cursor-pointer select-none justify-start text-[11px] md:text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors py-2 px-3 rounded-xl border border-outline-variant/10 bg-white/[0.02] min-h-[44px]" onclick="event.stopPropagation()">
           <input type="radio" name="mode-${p.id}" ${idx === activeIdx ? 'checked' : ''} onchange="window.selectCatalogProductMode('${p.id}', ${idx})" class="w-3.5 h-3.5 text-primary border-outline-variant/30 focus:ring-0 bg-transparent cursor-pointer"/>
           <span class="${idx === activeIdx ? 'text-primary font-bold' : ''}">${Math.round(m.price).toLocaleString('ru-RU')} ₽/${m.unit}</span>
         </label>
@@ -1880,65 +1970,64 @@ function renderProducts(products) {
     const lenFmt = p.length ? p.length : 'Немерная';
 
     return `
-    <div class="group relative overflow-hidden border border-outline-variant/10 bg-surface-container-lowest hover:border-primary/20 hover:bg-white/[0.02] transition-all duration-300 p-5 rounded-2xl shadow-lg shadow-black/5 cursor-pointer flex flex-col md:flex-row md:items-center gap-4 select-none" style="animation-delay:${i * 20}ms" onclick="window.location.href='/product?id=${p.id}'">
-      
-      <!-- 1. Name Column (flex-1) -->
-      <div class="flex-1 min-w-0 pointer-events-none">
+    <div class="group relative overflow-hidden border border-outline-variant/10 bg-surface-container-lowest hover:border-primary/20 hover:bg-white/[0.02] transition-all duration-500 ease-out p-4 md:p-5 rounded-2xl shadow-lg shadow-black/5 cursor-pointer flex flex-col md:flex-row md:flex-wrap xl:flex-nowrap md:items-center gap-4 select-none xl:grid xl:grid-cols-[minmax(0,2.5fr)_100px_100px_180px_280px] xl:items-center" style="animation-delay:${i * 20}ms" onclick="window.handleCatalogCardClick(event, '${p.id}')">
+      <div class="flex-1 min-w-0 pointer-events-none md:w-full xl:w-auto">
         <div class="flex items-center gap-2 mb-1.5">
           <span class="text-[9px] font-label-caps uppercase tracking-widest text-primary/80">${p.category}</span>
         </div>
         <h4 class="font-headline-md text-base md:text-lg font-semibold text-on-surface group-hover:text-primary transition-colors leading-snug break-words" title="${p.name}">${p.name}</h4>
       </div>
 
-      <!-- 2. Standard / Steel (w-28) -->
-      <div class="w-full md:w-28 shrink-0 pointer-events-none flex md:flex-col gap-2 md:gap-0.5 text-xs text-on-surface-variant font-medium">
-         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest">Сталь: </span>
+      <div class="w-full xl:w-auto md:w-auto shrink-0 pointer-events-none flex md:flex-col gap-2 md:gap-0.5 text-xs text-on-surface-variant font-medium">
+         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest">Сталь:</span>
          <span>${steel}</span>
-         <span class="hidden md:inline border-t border-outline-variant/10 my-0.5 w-12"></span>
-         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest ml-4">ГОСТ: </span>
-         <span class="truncate max-w-[100px]">${standard}</span>
+         <span class="opacity-40 uppercase text-[9px] tracking-widest hidden md:inline-block">${standard}</span>
       </div>
 
-      <!-- 3. Dimensions / Weight (w-24) -->
-      <div class="w-full md:w-24 shrink-0 pointer-events-none flex md:flex-col gap-2 md:gap-0.5 text-xs text-on-surface-variant font-medium">
-         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest">Длина: </span>
-         <span>${lenFmt}</span>
-         <span class="hidden md:inline border-t border-outline-variant/10 my-0.5 w-12"></span>
-         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest ml-4">Вес: </span>
+      <div class="w-full xl:w-auto md:w-auto shrink-0 pointer-events-none flex md:flex-col gap-2 md:gap-0.5 text-xs text-on-surface-variant font-medium">
+         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest ml-4">Вес:</span>
          <span>${weightFmt}</span>
       </div>
 
-      <!-- 4. Price Options (w-48) -->
-      <div class="w-full md:w-48 shrink-0 flex flex-col items-start md:items-end justify-center gap-0.5">
-         <span class="md:hidden opacity-60 uppercase font-bold text-[9px] tracking-widest self-start mb-1">Варианты цен:</span>
-         ${radiosHtml}
+      <div class="w-full xl:w-auto md:w-48 shrink-0 flex flex-col items-start xl:items-stretch justify-center gap-2 mt-2 md:mt-0">
+         <span class="opacity-60 uppercase font-bold text-[9px] tracking-widest self-start hidden md:block">Варианты цен:</span>
+         <div class="grid grid-cols-1 gap-2 w-full xl:max-w-[180px]">
+            ${radiosHtml}
+         </div>
       </div>
 
-      <!-- 5. Quantity selector & Buy Button (w-[230px]) -->
-      <div class="w-full md:w-[230px] shrink-0 flex items-center justify-between md:justify-end gap-3" onclick="event.stopPropagation()">
-         <div class="text-right shrink-0 flex flex-col justify-center">
-             <span class="text-[9px] font-label-caps text-on-surface-variant uppercase tracking-widest opacity-60">Итого</span>
-             <span id="total-${p.id}" class="text-primary font-bold text-sm md:text-base leading-none">0 ₽</span>
-         </div>
+      <div class="w-full xl:w-auto shrink-0 flex flex-col items-end justify-start gap-2 mt-2 md:mt-0" onclick="event.stopPropagation()">
+         <span class="opacity-0 uppercase font-bold text-[9px] tracking-widest self-start hidden md:block select-none pointer-events-none">Spacer</span>
+         <div class="flex items-center justify-between xl:justify-end gap-3 w-full">
+             <div class="flex flex-col items-center gap-1.5 select-none w-[140px] sm:w-[150px] md:w-32 xl:w-[130px] shrink-0">
+                 <div class="qty-selector-container flex items-center bg-[#0a0908] dark:bg-[#0a0908] border border-white/10 overflow-hidden w-full rounded-2xl shadow-inner" style="height: ${boxHeight}px;">
+                     <button type="button" onclick="window.stepCatalogQty('${p.id}', -1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-r border-white/5 select-none bg-transparent cursor-pointer">
+                         <span class="material-symbols-outlined text-xl font-bold">remove</span>
+                     </button>
+                     <div class="flex-1 flex flex-col items-center justify-center h-full gap-0.5">
+                         <input type="text" id="qty-${p.id}" value="${Number(Math.max(1, currentMode.min || currentMode.step).toFixed(currentMode.decimals)).toString()}" inputmode="decimal" onblur="window.handleCatalogQtyBlur('${p.id}')" oninput="window.handleCatalogQtyInput('${p.id}')" class="w-full bg-transparent border-none text-center font-bold text-on-surface outline-none text-sm sm:text-base p-0 focus:ring-0 focus:outline-none"/>
+                         <span id="unit-${p.id}" class="text-[10px] font-bold uppercase tracking-widest text-[#964551] leading-none">${currentMode.unit}</span>
+                     </div>
+                     <button type="button" onclick="window.stepCatalogQty('${p.id}', 1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-l border-white/5 select-none bg-transparent cursor-pointer">
+                         <span class="material-symbols-outlined text-xl font-bold">add</span>
+                     </button>
+                 </div>
+             </div>
 
-         <div class="flex flex-col items-center gap-1 select-none w-24">
-             <div class="qty-selector-container flex items-center bg-[#0a0908] dark:bg-[#0a0908] border border-white/10 overflow-hidden h-9 w-full rounded-xl shadow-inner">
-                 <button type="button" onclick="window.stepCatalogQty('${p.id}', -1)" class="w-8 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-r border-white/5 select-none bg-transparent">
-                     <span class="material-symbols-outlined text-[10px] font-bold">remove</span>
+             <div class="flex flex-col gap-2 w-[140px] sm:w-[150px] md:w-32 xl:w-[130px] shrink-0 h-full" style="height: ${boxHeight}px;">
+                 <button onclick="window.buyInOneClickGlobal('${p.id}', window.getCatalogQtyValue('${p.id}'), window.getCatalogSelectedMode('${p.id}')?.unit, window.getCatalogSelectedMode('${p.id}')?.price); event.stopPropagation();" class="flex-1 w-full relative overflow-hidden group bg-surface-container-high border border-white/5 hover:border-primary/40 text-on-surface hover:text-primary flex items-center justify-center transition-all duration-500 ease-out rounded-xl cursor-pointer active:scale-95 text-[9px] md:text-[10px] font-bold uppercase tracking-widest gap-1" title="Купить в 1 клик">
+                     <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                     <span class="material-symbols-outlined text-sm md:text-base text-primary/70 group-hover:text-primary transition-colors">bolt</span>
+                     <span class="z-10 relative">Быстро</span>
                  </button>
-                 <input type="text" id="qty-${p.id}" value="${Number((currentMode.min || currentMode.step).toFixed(currentMode.decimals)).toString()}" inputmode="decimal" onblur="window.handleCatalogQtyBlur('${p.id}')" oninput="window.handleCatalogQtyInput('${p.id}')" class="w-8 bg-transparent border-none text-center font-bold text-on-surface outline-none text-[11px] h-full p-0 focus:ring-0 focus:outline-none"/>
-                 <button type="button" onclick="window.stepCatalogQty('${p.id}', 1)" class="w-8 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-l border-white/5 select-none bg-transparent">
-                     <span class="material-symbols-outlined text-[10px] font-bold">add</span>
+
+                 <button id="cart-btn-${p.id}" onclick="window.addCatalogProductToCart('${p.id}')" class="flex-1 w-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow rounded-xl border border-primary cursor-pointer active:scale-95 text-[9px] md:text-[10px] font-bold uppercase tracking-widest gap-1">
+                     <span class="material-symbols-outlined text-sm md:text-base">shopping_cart</span>
+                     <span>В корзину</span>
                  </button>
              </div>
-             <span id="unit-${p.id}" class="text-[9px] font-bold uppercase tracking-widest text-[#964551] leading-none mt-0.5">${currentMode.unit}</span>
          </div>
-
-         <button onclick="window.addCatalogProductToCart('${p.id}')" class="w-10 h-10 bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-all pink-glow rounded-full border border-primary cursor-pointer active:scale-95">
-             <span class="material-symbols-outlined text-base">shopping_cart</span>
-         </button>
       </div>
-
     </div>
     `;
   }).join('');
@@ -1946,12 +2035,25 @@ function renderProducts(products) {
   products.forEach(p => window.updateCatalogProductTotal(p.id));
 }
 
+window.handleCatalogCardClick = function(event, id) {
+    if (event.target.closest('button, input, label, a, select, textarea')) {
+        return;
+    }
+    window.location.href = `/product?id=${id}`;
+};
+
 window.setL3Filter = function(val) {
     if (!val) {
         activeFilters.l3 = [];
     } else {
         activeFilters.l3 = [val];
     }
+    // Automatically reset parameters when switching L3 tabs
+    activeFilters.vid = [];
+    activeFilters.length = [];
+    activeFilters.width = [];
+    activeFilters.type = [];
+    
     currentPage = 1;
     applyFilters(true);
 };
@@ -1968,7 +2070,7 @@ window.selectCatalogProductMode = function(id, modeIdx) {
     const modes = window.getCatalogProductModes(p);
     const mode = modes[modeIdx] || modes[0];
     if (input) {
-        input.value = Number((mode.min || mode.step).toFixed(mode.decimals)).toString();
+        input.value = Number(Math.max(1, mode.min || mode.step).toFixed(mode.decimals)).toString();
     }
     if (unitSpan) {
         unitSpan.textContent = mode.unit;
@@ -1995,9 +2097,10 @@ window.stepCatalogQty = function(id, delta) {
     const minVal = mode.min !== undefined ? mode.min : mode.step;
     let finalVal = Math.max(minVal, newVal);
     
-    if (mode.unit === 'т.' && finalVal > 1000) {
-        alert("Максимум 1000 т в одном заказе.");
-        return;
+    const maxVal = mode.max !== undefined ? mode.max : 100000;
+    if (finalVal > maxVal) {
+        finalVal = maxVal;
+        window.showToast("Максимальное количество для заказа - 1000 тонн на один товар", "error");
     }
 
     input.value = Number(finalVal.toFixed(mode.decimals)).toString();
@@ -2005,6 +2108,20 @@ window.stepCatalogQty = function(id, delta) {
 };
 
 window.handleCatalogQtyInput = function(id) {
+    const input = document.getElementById('qty-' + id);
+    if (!input) return;
+    const p = window.currentProductsList.find(x => x.id === id);
+    if (!p) return;
+    const modes = window.getCatalogProductModes(p);
+    const selectedIdx = window.catalogProductSelectedModes[id] || 0;
+    const mode = modes[selectedIdx] || modes[0];
+    
+    let val = parseFloat(input.value.replace(',', '.')) || 0;
+    const maxVal = mode.max !== undefined ? mode.max : 100000;
+    if (val > maxVal) {
+        input.value = Number(maxVal.toFixed(mode.decimals)).toString();
+        window.showToast("Максимальное количество для заказа - 1000 тонн на один товар", "error");
+    }
     window.updateCatalogProductTotal(id);
 };
 
@@ -2022,9 +2139,11 @@ window.handleCatalogQtyBlur = function(id) {
     let val = parseFloat(input.value.replace(',', '.')) || 0;
     const minVal = mode.min !== undefined ? mode.min : mode.step;
     if (val < minVal) val = minVal;
-    if (mode.unit === 'т.' && val > 1000) {
-        alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
-        val = 1000;
+    
+    const maxVal = mode.max !== undefined ? mode.max : 100000;
+    if (val > maxVal) {
+        val = maxVal;
+        window.showToast("Максимальное количество для заказа - 1000 тонн на один товар", "error");
     }
 
     input.value = Number(val.toFixed(mode.decimals)).toString();
@@ -2096,12 +2215,6 @@ window.addCatalogProductToCart = function(id) {
     localStorage.setItem('metal_cart', JSON.stringify(cart));
     if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();
     if (window.toggleCartDrawerGlobal) window.toggleCartDrawerGlobal();
-
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-8 right-8 bg-primary text-on-primary px-6 py-3 font-label-caps text-sm shadow-2xl z-[100]';
-    toast.textContent = 'ТОВАР ДОБАВЛЕН В КОРЗИНУ';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
 };
 
 function renderPagination(nav) {
@@ -2156,37 +2269,48 @@ async function init() {
     
     // Restore from localStorage first
     try {
-        const savedFilters = localStorage.getItem('catalog_active_filters');
-        if (savedFilters) {
-            activeFilters = JSON.parse(savedFilters);
-            // Ensure all keys exist
-            if (!activeFilters.parentCategory) activeFilters.parentCategory = [];
-            if (!activeFilters.category) activeFilters.category = [];
-            if (!activeFilters.vid) activeFilters.vid = [];
-            if (!activeFilters.length) activeFilters.length = [];
-            if (!activeFilters.width) activeFilters.width = [];
-            if (!activeFilters.type) activeFilters.type = [];
-            if (!activeFilters.l3) activeFilters.l3 = [];
+        const isAllProducts = urlParams.get('all') === 'true';
+        if (!isAllProducts) {
+            const savedFilters = localStorage.getItem('catalog_active_filters');
+            if (savedFilters) {
+                activeFilters = JSON.parse(savedFilters);
+                // Ensure all keys exist
+                if (!activeFilters.parentCategory) activeFilters.parentCategory = [];
+                if (!activeFilters.category) activeFilters.category = [];
+                if (!activeFilters.vid) activeFilters.vid = [];
+                if (!activeFilters.length) activeFilters.length = [];
+                if (!activeFilters.width) activeFilters.width = [];
+                if (!activeFilters.type) activeFilters.type = [];
+                if (!activeFilters.l3) activeFilters.l3 = [];
+                
+                // Re-fill openSections based on active filters
+                activeFilters.parentCategory.forEach(p => openSections.add(p));
+            }
             
-            // Re-fill openSections based on active filters
-            activeFilters.parentCategory.forEach(p => openSections.add(p));
-        }
-        
-        const savedSearch = localStorage.getItem('catalog_search_query');
-        if (savedSearch !== null) {
-            searchQuery = savedSearch;
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) searchInput.value = searchQuery;
-        }
-        
-        const savedSort = localStorage.getItem('catalog_current_sort');
-        if (savedSort !== null) {
-            currentSort = savedSort;
-        }
-        
-        const savedPage = localStorage.getItem('catalog_current_page');
-        if (savedPage !== null) {
-            currentPage = parseInt(savedPage, 10) || 1;
+            const savedSearch = localStorage.getItem('catalog_search_query');
+            if (savedSearch !== null) {
+                searchQuery = savedSearch;
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.value = searchQuery;
+            }
+            
+            const savedSort = localStorage.getItem('catalog_current_sort');
+            if (savedSort !== null) {
+                currentSort = savedSort;
+            }
+            
+            const savedPage = localStorage.getItem('catalog_current_page');
+            if (savedPage !== null) {
+                currentPage = parseInt(savedPage, 10) || 1;
+            }
+        } else {
+            // Clear saved filters on all products request to allow fresh start
+            localStorage.removeItem('catalog_active_filters');
+            localStorage.removeItem('catalog_search_query');
+            localStorage.removeItem('catalog_current_page');
+            activeFilters = { parentCategory: [], category: [], vid: [], length: [], width: [], type: [], l3: [] };
+            searchQuery = '';
+            currentPage = 1;
         }
     } catch (e) {
         console.error('Failed to restore filters from localStorage', e);
@@ -2284,6 +2408,11 @@ async function init() {
     }
 
     fetchProducts();
+
+    // Open mobile categories drawer if no category is selected (all products view)
+    if (activeFilters.category.length === 0 && activeFilters.parentCategory.length === 0) {
+        window.openCategoryDrawerIfMobile();
+    }
 }
 
 init();
@@ -2340,12 +2469,6 @@ function addToCart(id) {
     localStorage.setItem('metal_cart', JSON.stringify(cart));
     if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();
     if (window.toggleCartDrawerGlobal) window.toggleCartDrawerGlobal();
-    
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-8 right-8 bg-primary text-on-primary px-6 py-3 font-label-caps text-sm shadow-2xl z-[100]';
-    toast.textContent = 'ТОВАР ДОБАВЛЕН В КОРЗИНУ';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
   });
 }
 
@@ -2353,8 +2476,69 @@ function toggleAuthModal() {
     if (window.toggleAuthModalGlobal) window.toggleAuthModalGlobal();
 }
 
+window.openCatalogL3Popup = function() {
+    const popup = document.getElementById('catalogL3Popup');
+    if (!popup) return;
+    
+    const activeCat = activeFilters.category[0];
+    if (!activeCat) return;
+    
+    const cf = categoryFiltersCache[activeCat];
+    if (!cf || !cf.l3 || cf.l3.length === 0) return;
+    
+    const uniqueL3 = getUniqueFilters(cf.l3);
+    const sortedL3 = sortOptionsByCount(uniqueL3, v => window.currentFacets?.l3?.[v] || 0);
+    const grid = document.getElementById('catalogL3PopupGrid');
+    if (!grid) return;
+    
+    let gridHtml = '';
+    sortedL3.forEach(v => {
+        const isActive = activeFilters.l3.includes(v);
+        const count = window.currentFacets?.l3?.[v] || 0;
+        gridHtml += `
+            <button onclick="window.selectCatalogL3FromPopup('${v.replace(/'/g, "\\'")}')" class="px-5 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-wider transition-all duration-500 ease-out border cursor-pointer active:scale-95 select-none flex items-center justify-between gap-3 text-left ${isActive ? 'bg-primary text-on-primary border-primary shadow-[0_4px_12px_rgba(150,69,81,0.3)] pink-glow' : 'bg-surface-container border-outline-variant/15 text-on-surface-variant hover:border-primary'} ${count === 0 ? 'opacity-40 hover:opacity-60' : ''}">
+                <span class="truncate">${v}</span>
+                <span class="px-2 py-0.5 rounded-md text-[9px] font-bold transition-all shrink-0 ${isActive ? 'bg-white/20 text-white' : 'text-white bg-[#964551] border border-[#964551] shadow-sm'}">${count}</span>
+            </button>
+        `;
+    });
+    
+    grid.innerHTML = gridHtml;
+    popup.classList.remove('hidden');
+    window.lockScrollGlobal();
+};
+
+window.closeCatalogL3Popup = function() {
+    const popup = document.getElementById('catalogL3Popup');
+    if (popup) {
+        popup.classList.add('hidden');
+        window.unlockScrollGlobal();
+    }
+};
+
+window.selectCatalogL3FromPopup = function(val) {
+    window.setL3Filter(val);
+    window.closeCatalogL3Popup();
+};
+
 updateCartBadge();
 </script>
+
+<!-- Centered L3 Tabs "Еще" Popup Modal -->
+<div id="catalogL3Popup" class="hidden fixed inset-0 z-[7000] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-500 ease-out" onclick="window.closeCatalogL3Popup()"></div>
+    <div class="relative w-full max-w-xl bg-surface border border-outline-variant/20 p-6 md:p-8 rounded-[2.5rem] shadow-2xl flex flex-col max-h-[80vh] overflow-y-auto custom-scrollbar" style="background-color: var(--md-sys-color-surface, #151311);">
+        <button onclick="window.closeCatalogL3Popup()" class="absolute top-6 right-6 material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-white/5 cursor-pointer border-none bg-transparent">close</button>
+        <div class="mb-6">
+            <h3 id="catalogL3PopupTitle" class="font-display-xl text-lg font-bold uppercase tracking-wider text-on-surface">Выбор подкатегории</h3>
+            <p class="text-[10px] text-on-surface-variant uppercase tracking-widest opacity-60">Все доступные варианты</p>
+        </div>
+        <div id="catalogL3PopupGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-4">
+            <!-- Dynamically populated L3 buttons -->
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
 

@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <script>
     (function() {
-      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const theme = localStorage.getItem('theme') || 'dark';
       document.documentElement.classList.add(theme);
     })();
   </script>
@@ -177,9 +177,9 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="/js/shared-ui.js?v=1780243715" defer></script>
+<script src="/js/shared-ui.js?v=1780605200" defer></script>
 <script src="/js/theme.js?v=1780243715" defer></script>
-<script src="/js/product-images.js"></script>
+<script src="/js/product-images.js?v=20260602a"></script>
 <style>
 .no-glass-blur {
   backdrop-filter: none !important;
@@ -372,7 +372,7 @@ html:not(.dark) #addToCartBtn:hover {
                         <img src="/images/logo_icon.png" class="loader-logo" alt="IW">
                     </div>
                 </div>
-                <div class="loader-text">Инициализация систем</div>
+                <div class="loader-text">Инициализация системы</div>
                 <div class="loader-progress-track">
                     <div class="loader-progress-bar" id="globalPreloaderBar"></div>
                 </div>
@@ -397,7 +397,7 @@ html:not(.dark) #addToCartBtn:hover {
 <div class="flex flex-col gap-2.5 w-full mb-4 md:mb-6 fade-in" style="animation-delay:.05s">
     <!-- Back Button -->
     <div class="flex items-center justify-start pb-1">
-        <a href="/catalog-select" class="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-primary transition-all duration-300 font-label-caps text-[11px] md:text-[12px] tracking-widest group">
+        <a href="/catalog-select" class="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-primary transition-all duration-500 ease-out font-label-caps text-[11px] md:text-[12px] tracking-widest group">
             <span class="material-symbols-outlined text-[16px] md:text-[18px] transition-transform group-hover:-translate-x-1">west</span> 
             ВЕРНУТЬСЯ В КАТАЛОГ
         </a>
@@ -484,25 +484,25 @@ html:not(.dark) #addToCartBtn:hover {
 
         <div class="flex flex-col gap-4">
             <!-- Quantity and Inline Total Card -->
-            <div class="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-surface-container-low/50 dark:bg-white/[0.02] border border-outline-variant/10 dark:border-white/5">
+            <div class="flex flex-row justify-between items-center gap-3 p-4 rounded-2xl bg-surface-container-low/50 dark:bg-white/[0.02] border border-outline-variant/10 dark:border-white/5">
                 <!-- Left: Qty Selector -->
-                <div class="flex flex-col gap-1.5 justify-center">
+                <div class="flex flex-col gap-1.5 justify-center w-[150px] sm:w-[170px] shrink-0">
                     <span class="text-[9px] uppercase tracking-wider font-bold text-on-surface-variant/60">Количество (<span id="activeUnitLabel">т.</span>)</span>
-                    <div class="flex items-center bg-surface-container-highest dark:bg-[#0a0908] border border-outline-variant/20 dark:border-white/10 h-11 w-full focus-within:border-primary/50 transition-all duration-300 rounded-xl overflow-hidden shadow-inner">
-                        <button type="button" onclick="stepCalc(-1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-r border-outline-variant/20 dark:border-white/5 select-none">
-                            <span class="material-symbols-outlined text-sm font-bold">remove</span>
+                    <div class="flex items-center bg-surface-container-highest dark:bg-[#0a0908] border border-outline-variant/20 dark:border-white/10 h-12 w-full focus-within:border-primary/50 transition-all duration-500 ease-out rounded-xl overflow-hidden shadow-inner">
+                        <button type="button" onclick="stepCalc(-1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-r border-outline-variant/20 dark:border-white/5 select-none shrink-0">
+                            <span class="material-symbols-outlined text-xl font-bold">remove</span>
                         </button>
-                        <input id="calcValue" class="w-full h-full bg-transparent border-none text-center font-bold text-sm text-on-surface outline-none p-0 focus:ring-0" type="text" value="1" inputmode="decimal"/>
-                        <button type="button" onclick="stepCalc(1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-l border-outline-variant/20 dark:border-white/5 select-none">
-                            <span class="material-symbols-outlined text-sm font-bold">add</span>
+                        <input id="calcValue" class="flex-1 min-w-0 h-full bg-transparent border-none text-center font-bold text-sm sm:text-base text-on-surface outline-none p-0 focus:ring-0" type="text" value="1" inputmode="decimal"/>
+                        <button type="button" onclick="stepCalc(1)" class="w-10 h-full flex items-center justify-center hover:bg-primary/20 text-primary transition-colors border-l border-outline-variant/20 dark:border-white/5 select-none shrink-0">
+                            <span class="material-symbols-outlined text-xl font-bold">add</span>
                         </button>
                     </div>
                 </div>
                 
                 <!-- Right: Total Cost -->
-                <div class="flex flex-col justify-center items-end gap-0.5 select-none">
+                <div class="flex flex-col justify-center items-end gap-0.5 select-none flex-1 min-w-0">
                     <span class="text-[9px] uppercase tracking-wider font-bold text-on-surface-variant/60">Итого к оплате</span>
-                    <span class="text-xl md:text-2xl font-black text-[#ca7093] leading-none whitespace-nowrap drop-shadow-[0_2px_10px_rgba(202,112,147,0.15)]" id="inlineTotal">0 ₽</span>
+                    <span class="text-[14px] xs:text-[15px] sm:text-xl md:text-2xl font-black text-[#ca7093] leading-[1.1] w-full text-right drop-shadow-[0_2px_10px_rgba(202,112,147,0.15)] whitespace-nowrap tracking-tight" id="inlineTotal">0 ₽</span>
                 </div>
             </div>
 
@@ -515,7 +515,7 @@ html:not(.dark) #addToCartBtn:hover {
                 </button>
                 
                 <!-- Buy in 1 Click Button -->
-                <button type="button" class="w-full h-11 border border-outline-variant/30 dark:border-white/10 hover:border-[#ca7093]/40 text-on-surface-variant hover:text-primary bg-surface-container-low/50 dark:bg-white/[0.02] hover:bg-[#ca7093]/5 transition-all duration-300 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer">
+                <button type="button" onclick="if(currentProduct && window.pricingModes && window.pricingModes[window.currentModeIndex]) { window.buyInOneClickGlobal(currentProduct.id, parseFloat(document.getElementById('calcValue').value.replace(',', '.')) || 1, window.pricingModes[window.currentModeIndex].unitLabel, window.pricingModes[window.currentModeIndex].price); }" class="w-full h-11 border border-outline-variant/30 dark:border-white/10 hover:border-[#ca7093]/40 text-on-surface-variant hover:text-primary bg-surface-container-low/50 dark:bg-white/[0.02] hover:bg-[#ca7093]/5 transition-all duration-500 ease-out rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer">
                     <span class="material-symbols-outlined text-base text-primary">bolt</span>
                     Быстрый заказ в 1 клик
                 </button>
@@ -524,7 +524,7 @@ html:not(.dark) #addToCartBtn:hover {
             <!-- Delivery Info Block -->
             <div class="space-y-3 mt-2 pt-2 border-t border-outline-variant/10 dark:border-white/5 text-xs">
                 <!-- Row 1: Delivery -->
-                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-300">
+                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-500 ease-out">
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#ca7093]/10 text-primary">
                         <span class="material-symbols-outlined text-lg">local_shipping</span>
                     </div>
@@ -535,7 +535,7 @@ html:not(.dark) #addToCartBtn:hover {
                 </div>
                 
                 <!-- Row 2: Pickup -->
-                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-300">
+                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-500 ease-out">
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#ca7093]/10 text-primary">
                         <span class="material-symbols-outlined text-lg">storefront</span>
                     </div>
@@ -546,7 +546,7 @@ html:not(.dark) #addToCartBtn:hover {
                 </div>
                 
                 <!-- Row 3: Payment -->
-                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-300">
+                <div class="flex items-center gap-3.5 p-3 rounded-xl bg-surface-container-low/50 dark:bg-white/[0.01] hover:bg-surface-container dark:hover:bg-white/[0.03] border border-outline-variant/10 dark:border-white/5 transition-all duration-500 ease-out">
                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#ca7093]/10 text-primary">
                         <span class="material-symbols-outlined text-lg">payments</span>
                     </div>
@@ -576,22 +576,22 @@ html:not(.dark) #addToCartBtn:hover {
 <div class="pm-tabs-block col-span-1 w-full xl:col-span-7 xl:col-start-1 xl:col-end-8 fade-in mt-2 pt-2 border-t border-outline-variant/10" style="animation-delay:.3s">
     <!-- Tab Navigation -->
     <div class="grid grid-cols-6 gap-2.5 mb-6 select-none pb-1.5 border-b border-outline-variant/10">
-        <button onclick="switchTab('specs')" id="tab-btn-specs" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-primary text-on-primary border border-transparent outline-none focus:outline-none text-center">Характеристики</button>
-        <button onclick="switchTab('desc')" id="tab-btn-desc" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Описание</button>
-        <button onclick="switchTab('faq')" id="tab-btn-faq" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Вопрос-ответ</button>
-        <button onclick="switchTab('payment')" id="tab-btn-payment" class="col-span-3 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Оплата</button>
-        <button onclick="switchTab('delivery')" id="tab-btn-delivery" class="col-span-3 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-300 bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Доставка</button>
+        <button onclick="switchTab('specs')" id="tab-btn-specs" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-500 ease-out bg-primary text-on-primary border border-transparent outline-none focus:outline-none text-center">Характеристики</button>
+        <button onclick="switchTab('desc')" id="tab-btn-desc" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-500 ease-out bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Описание</button>
+        <button onclick="switchTab('faq')" id="tab-btn-faq" class="col-span-2 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-500 ease-out bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Вопрос-ответ</button>
+        <button onclick="switchTab('payment')" id="tab-btn-payment" class="col-span-3 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-500 ease-out bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Оплата</button>
+        <button onclick="switchTab('delivery')" id="tab-btn-delivery" class="col-span-3 whitespace-nowrap px-5 py-2.5 rounded-xl font-label-caps text-[11px] md:text-xs tracking-wider font-bold uppercase transition-all duration-500 ease-out bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 border border-transparent outline-none focus:outline-none text-center">Доставка</button>
     </div>
 
     <!-- Tab Contents -->
     <div class="min-h-[250px]">
         <!-- 1. Specs Tab -->
-        <div id="tab-content-specs" class="tab-pane block fade-in duration-300">
+        <div id="tab-content-specs" class="tab-pane block fade-in duration-500 ease-out">
             <div id="specsTable" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 p-6 bg-surface-container-lowest dark:bg-[#1a1816]/60 border border-outline-variant/10 dark:border-white/5 rounded-2xl"></div>
         </div>
 
         <!-- 2. Description Tab -->
-        <div id="tab-content-desc" class="tab-pane hidden fade-in duration-300 max-w-4xl">
+        <div id="tab-content-desc" class="tab-pane hidden fade-in duration-500 ease-out max-w-4xl">
             <div class="relative p-6 md:p-8 bg-surface-container-lowest border border-outline-variant/20 rounded-3xl overflow-hidden shadow-sm">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-[#ca7093]"></div>
                 <div class="flex items-start gap-4">
@@ -605,7 +605,7 @@ html:not(.dark) #addToCartBtn:hover {
         </div>
 
         <!-- 3. FAQ Tab -->
-        <div id="tab-content-faq" class="tab-pane hidden fade-in duration-300 max-w-3xl space-y-6">
+        <div id="tab-content-faq" class="tab-pane hidden fade-in duration-500 ease-out max-w-3xl space-y-6">
             <div class="space-y-4" id="faqAccordion">
                 <div class="border border-outline-variant/10 rounded-2xl p-5 bg-surface-container-lowest">
                     <h4 class="font-bold text-sm text-on-surface mb-2">Как быстро осуществляется доставка после подтверждения?</h4>
@@ -636,7 +636,7 @@ html:not(.dark) #addToCartBtn:hover {
         </div>
 
         <!-- 4. Payment Tab -->
-        <div id="tab-content-payment" class="tab-pane hidden fade-in duration-300 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div id="tab-content-payment" class="tab-pane hidden fade-in duration-500 ease-out grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="border border-outline-variant/10 rounded-2xl p-6 bg-surface-container-lowest space-y-3">
                 <span class="material-symbols-outlined text-primary text-3xl">account_balance</span>
                 <h4 class="font-bold text-sm text-on-surface uppercase tracking-wide">Безналичный расчет</h4>
@@ -655,7 +655,7 @@ html:not(.dark) #addToCartBtn:hover {
         </div>
 
         <!-- 5. Delivery Tab -->
-        <div id="tab-content-delivery" class="tab-pane hidden fade-in duration-300 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div id="tab-content-delivery" class="tab-pane hidden fade-in duration-500 ease-out grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="border border-outline-variant/10 rounded-2xl p-6 bg-surface-container-lowest space-y-4">
                 <div class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary text-3xl">local_shipping</span>
@@ -832,10 +832,10 @@ function renderSidebarCategoriesList() {
             <span class="material-symbols-outlined text-[16px]">${icon}</span>
             <span class="font-bold text-[11px] uppercase tracking-tight">${p}</span>
           </div>
-          <span class="material-symbols-outlined text-[14px] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}">expand_more</span>
+          <span class="material-symbols-outlined text-[14px] transition-transform duration-500 ease-out ${isExpanded ? 'rotate-180' : ''}">expand_more</span>
         </div>
         
-        <div class="overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] mt-1 opacity-1' : 'max-h-0 opacity-0'}">
+        <div class="overflow-hidden transition-all duration-500 ease-out ${isExpanded ? 'max-h-[1000px] mt-1 opacity-1' : 'max-h-0 opacity-0'}">
           <div class="pl-2 space-y-0.5">
             ${categories.map(cat => {
               const isActive = cat.name === currentCategory;
@@ -1251,7 +1251,7 @@ function renderProduct(product) {
 
   const productImgEl = document.getElementById('productImg');
   if (productImgEl) {
-    productImgEl.src = window.getProductImage ? window.getProductImage(product.category) : product.image;
+    productImgEl.src = product.image || product.img || (window.getProductImage ? window.getProductImage(product.category) : null) || '/images/products/real/metal-loading.jpg';
     productImgEl.alt = product.name;
   }
   
@@ -1296,6 +1296,43 @@ function renderProduct(product) {
     specsTableEl.innerHTML = specsHtml;
   }
 
+
+function getStorefrontDetailPrices(product) {
+  const parsed = window.parseUniversalSpecs ? window.parseUniversalSpecs(product) : product;
+  const lengthVal = Number(parsed.mLenVal || parsed.lengthVal || 0) || (() => {
+    const n = parseFloat(String(product.length || '').replace(',', '.'));
+    return Number.isFinite(n) && n > 0 ? n : 6;
+  })();
+  const weightVal = Number(parsed.wUnitVal || parsed.weightVal || product.weight || 0) || 1;
+  const calcType = parsed.calcType || product.calcType || 'linear';
+  const lowerName = String(product.name || '').toLowerCase();
+  const isSheet = !!parsed.isSheet || !!product.isSheet || lowerName.includes('\u043b\u0438\u0441\u0442');
+  const areaVal = Number(parsed.m2Val || parsed.areaVal || 0) || 1;
+  let priceTon = parseFloat(product.price_ton || product.priceTonNum || 0) || 0;
+  let priceUnit = parseFloat(product.price_unit || product.priceUnit || product.price_whip || product.priceWhip || product.priceWhipNum || 0) || 0;
+  let priceMeter = parseFloat(product.price_meter || product.priceMeterNum || 0) || 0;
+  if (priceUnit === 0 && priceTon > 0 && weightVal > 0) {
+    priceUnit = Math.round((priceTon / 1000) * weightVal * (calcType === 'linear' ? lengthVal : 1));
+  }
+  if (priceMeter === 0) {
+    if (calcType === 'linear' && lengthVal > 0) {
+      priceMeter = priceUnit > 0 ? Math.round(priceUnit / lengthVal) : Math.round((priceTon / 1000) * weightVal);
+    } else if (isSheet || calcType === 'area') {
+      priceMeter = priceUnit > 0 ? Math.round(priceUnit / areaVal) : Math.round((priceTon / 1000) * weightVal);
+    } else {
+      priceMeter = priceUnit;
+    }
+  }
+  if (priceTon === 0 && priceUnit > 0 && weightVal > 0) {
+    if (isSheet || calcType === 'area') {
+      priceTon = Math.round(((priceUnit / areaVal) / weightVal) * 1000);
+    } else {
+      priceTon = Math.round(((priceUnit / lengthVal) / weightVal) * 1000);
+    }
+  }
+  return { ton: Math.round(priceTon), meter: Math.round(priceMeter), unit: Math.round(priceUnit), isSheet, lengthVal, weightVal, calcType, areaVal };
+}
+
   function getWhipLength(p) {
     if (!p || !p.length) return 11.7;
     const num = parseFloat(p.length.toString().replace(',', '.'));
@@ -1311,40 +1348,22 @@ function renderProduct(product) {
   }
 
   // ── Цены: только реальные, без производных расчётов.
-  // Показываем ровно те единицы, по которым у товара есть цена.
-  const p_ton = parseFloat(product.priceTonNum || product.price_ton || 0) || 0;
-  let p_unit = parseFloat(product.priceUnit?.toString().replace(/\s/g, '').replace(',', '.')) || 0;
-  if (!p_unit && product.price_unit) p_unit = parseFloat(product.price_unit) || 0;
-  let p_whip = parseFloat(product.price_whip || product.priceWhip || product.priceWhipNum || 0) || 0;
-  let p_meter = parseFloat(product.price_meter || product.priceMeterNum || 0) || 0;
+  // Pricing: same derived values as admin table.
+  const prices = getStorefrontDetailPrices(product);
+  const isSheet = prices.isSheet;
+  const pieceLabel = isSheet ? '\u0426\u0435\u043d\u0430 \u0437\u0430 \u043b\u0438\u0441\u0442' : '\u0426\u0435\u043d\u0430 \u0437\u0430 \u0448\u0442\u0443\u043a\u0443';
+  const pieceUnit = isSheet ? '\u043b\u0438\u0441\u0442' : (product.unit_label || '\u0448\u0442');
+  const meterLabel = isSheet ? '\u0426\u0435\u043d\u0430 \u0437\u0430 \u043c\u00b2' : '\u0426\u0435\u043d\u0430 \u0437\u0430 \u043c\u0435\u0442\u0440';
+  const meterUnit = isSheet ? '\u043c\u00b2' : '\u043c';
 
-  const isSheet = product.name.toLowerCase().includes('лист');
-  const pieceLabel = isSheet ? 'Цена за лист' : 'Цена за хлыст';
-  const pieceUnit = isSheet ? 'лист' : 'шт.';
-  const meterLabel = isSheet ? 'Цена за м²' : 'Цена за метр';
-  const meterUnit = isSheet ? 'м²' : 'пог. м.';
-
-  const whipPrice = p_whip || p_unit;
-  // Не выводим производных расчётов: цена за метр показывается только если она реально задана.
-
-  // Собираем доступные режимы покупки — только при цене > 0
-  if (whipPrice > 0) {
-      window.pricingModes.push({
-          label: pieceLabel, unitLabel: pieceUnit, price: whipPrice,
-          step: 1, min: 1, decimals: 0, convertToTon: () => 0
-      });
+  if (prices.unit > 0) {
+      window.pricingModes.push({ label: pieceLabel, unitLabel: pieceUnit, price: prices.unit, step: 1, min: 1, decimals: 0, convertToTon: (val) => prices.ton > 0 ? (val * prices.unit) / prices.ton : 0 });
   }
-  if (p_meter > 0) {
-      window.pricingModes.push({
-          label: meterLabel, unitLabel: meterUnit, price: p_meter,
-          step: whipLen, min: whipLen, decimals: whipLen % 1 === 0 ? 0 : 1, convertToTon: () => 0
-      });
+  if (prices.meter > 0) {
+      window.pricingModes.push({ label: meterLabel, unitLabel: meterUnit, price: prices.meter, step: prices.lengthVal, min: prices.lengthVal, decimals: prices.lengthVal % 1 === 0 ? 0 : 1, convertToTon: (val) => prices.ton > 0 ? (val * prices.meter) / prices.ton : 0 });
   }
-  if (p_ton > 0) {
-      window.pricingModes.push({
-          label: 'Цена за т.', unitLabel: 'т.', price: p_ton,
-          step: 0.1, min: 1, decimals: 1, convertToTon: (val) => val
-      });
+  if (prices.ton > 0) {
+      window.pricingModes.push({ label: '\u0426\u0435\u043d\u0430 \u0437\u0430 \u0442.', unitLabel: 'т.', price: prices.ton, step: 0.1, min: 0.1, decimals: 1, convertToTon: (val) => val });
   }
 
   if (window.currentModeIndex === null) {
@@ -1359,7 +1378,7 @@ function renderProduct(product) {
           const isActive = idx === window.currentModeIndex;
           const subtext = m.unitLabel === 'т.' ? 'Минимум 0.1 т.' : m.unitLabel === 'пог. м.' ? 'Продажа метрами' : 'Поштучно';
           return `
-              <div class="price-mode-card relative flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-300 ${isActive ? 'bg-[#ca7093]/10 border-[#ca7093] shadow-md shadow-[#ca7093]/5' : 'bg-white/[0.02] border-white/5 hover:border-white/10 hover:bg-white/[0.04]'}" data-index="${idx}">
+              <div class="price-mode-card relative flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-500 ease-out ${isActive ? 'bg-[#ca7093]/10 border-[#ca7093] shadow-md shadow-[#ca7093]/5' : 'bg-white/[0.02] border-white/5 hover:border-white/10 hover:bg-white/[0.04]'}" data-index="${idx}">
                   <div class="flex items-center gap-3">
                       <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${isActive ? 'border-[#ca7093] bg-[#ca7093]/20' : 'border-white/20'}">
                           <div class="w-2.5 h-2.5 rounded-full ${isActive ? 'bg-[#ca7093]' : 'bg-transparent'}"></div>
@@ -1393,7 +1412,7 @@ function renderProduct(product) {
               if (input) {
                   const mode = window.pricingModes[idx];
                   const minVal = mode.min !== undefined ? mode.min : mode.step;
-                  input.value = Number(minVal.toFixed(mode.decimals)).toString();
+                  input.value = Number(Math.max(1, minVal).toFixed(mode.decimals)).toString();
               }
               renderProduct(product); // re-render to update UI
           });
@@ -1409,14 +1428,12 @@ function renderProduct(product) {
 
       let val = parseFloat(calcValue.value.replace(',', '.')) || 0;
       
-      const tons = mode.convertToTon(val);
-      if (tons > 1000) {
-          alert("Максимум 1000 т в одном заказе. Для более крупного заказа оставьте заявку.");
-          // reset to 1000t equivalent
-          if (mode.unitLabel === 'т.') {
-              val = 1000;
-              calcValue.value = "1000";
-          }
+      const MAX_TONS = 1000;
+      if (mode.convertToTon(val) > MAX_TONS && prices.ton > 0) {
+          val = Math.floor((MAX_TONS * prices.ton) / mode.price);
+          if (mode.unitLabel === 'т.') val = 1000;
+          
+          calcValue.value = Number(val.toFixed(mode.decimals)).toString();
       }
 
       const total = val * mode.price;
@@ -1433,10 +1450,10 @@ function renderProduct(product) {
       
       let newVal = val + (delta * mode.step);
       
-      const tons = mode.convertToTon(newVal);
-      if (tons > 1000) {
-          alert("Максимум 1000 т в одном заказе.");
-          return;
+      const MAX_TONS = 1000;
+      if (mode.convertToTon(newVal) > MAX_TONS && prices.ton > 0) {
+          newVal = Math.floor((MAX_TONS * prices.ton) / mode.price);
+          if (mode.unitLabel === 'т.') newVal = 1000;
       }
       
       const minVal = mode.min !== undefined ? mode.min : mode.step;
@@ -1455,7 +1472,7 @@ function renderProduct(product) {
       if (!calcValue.dataset.initialized) {
           const mode = window.pricingModes[window.currentModeIndex];
           const minVal = mode.min !== undefined ? mode.min : mode.step;
-          calcValue.value = Number(minVal.toFixed(mode.decimals)).toString();
+          calcValue.value = Number(Math.max(1, minVal).toFixed(mode.decimals)).toString();
           calcValue.dataset.initialized = "true";
       }
       calcValue.oninput = updateInlineTotal;
@@ -1509,7 +1526,7 @@ async function loadRelated(category, currentId) {
         document.getElementById('relatedGrid').innerHTML = related.map(p => `
             <a href="/product?id=${p.id}" onclick="event.preventDefault(); window.loadProductData('${p.id}')" class="border border-outline-variant/10 p-5 bg-surface-container-lowest flex flex-col group transition-all duration-500 hover:border-primary/30 no-underline text-inherit no-glass-blur">
                 <div class="relative h-36 mb-4 overflow-hidden bg-surface-container no-glass-blur">
-                    <img class="w-full h-full object-cover transition-all duration-500 opacity-60 brightness-75 blur-none group-hover:opacity-100 group-hover:scale-110 group-hover:brightness-100" src="${window.getProductImage ? window.getProductImage(p.category) : p.img}" alt="${p.name}"/>
+                    <img class="w-full h-full object-cover transition-all duration-500 opacity-60 brightness-75 blur-none group-hover:opacity-100 group-hover:scale-110 group-hover:brightness-100" src="${p.image || p.img || (window.getProductImage ? window.getProductImage(p.category) : '/images/products/real/metal-loading.jpg')}" alt="${p.name}"/>
                 </div>
                 <h4 class="font-headline-md text-sm font-semibold text-on-surface mb-1 line-clamp-1">${p.name}</h4>
                 <p class="text-on-surface-variant text-xs mb-3">${p.type || 'Ст3'}</p>
@@ -1527,33 +1544,9 @@ window.addToCart = function() {
     const mode = window.pricingModes[window.currentModeIndex];
     if (!mode) return;
 
-    let cart = JSON.parse(localStorage.getItem('metal_cart') || '[]');
-    
-    const len = parseFloat(currentProduct.length) || 0;
-    const existing = cart.find(item => item.id === currentProduct.id && item.length === len && item.unit === mode.unitLabel);
-    
-    if (existing) {
-      let newQty = parseFloat(existing.qty) + val;
-      const tons = mode.convertToTon(newQty);
-      if (tons > 1000) {
-          alert("Максимум 1000 т в одном заказе.");
-          return;
-      }
-      existing.qty = newQty.toFixed(mode.decimals);
-    } else {
-      cart.push({ 
-        id: currentProduct.id, 
-        qty: val.toFixed(mode.decimals), 
-        name: currentProduct.name, 
-        price: mode.price, 
-        unit: mode.unitLabel,
-        length: len,
-        img: currentProduct.img
-      });
-    }
+    // Call unified adder to handle same/different units correctly
+    window.addProductToCartUnified(currentProduct, val, mode.unitLabel, mode.price);
 
-    localStorage.setItem('metal_cart', JSON.stringify(cart));
-    if (window.updateGlobalCartBadge) window.updateGlobalCartBadge();
     if (window.toggleCartDrawerGlobal) window.toggleCartDrawerGlobal();
     
     const btn = document.getElementById('addToCartBtn');
@@ -1611,3 +1604,4 @@ window.handleFaqSubmit = function(event) {
 
 </body>
 </html>
+
